@@ -1,14 +1,56 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { formatCurrency } from '@/lib/plans';
 import { OBJECTIVES, SMART_TIPS } from '@/lib/objectives';
-import { TrendingUp, Landmark, Percent, BarChart3, Receipt, CalendarDays, ArrowRight, Lightbulb, X as XIcon } from 'lucide-react';
+import {
+  TrendingUp, TrendingDown, DollarSign, Percent, Hash, Zap,
+  ArrowRight, ArrowUpRight, ArrowDownRight, Lightbulb, X as XIcon,
+  PlusCircle, ReceiptText
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format, parseISO, startOfMonth, endOfMonth, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
+
+function useCountUp(target: number, duration = 600) {
+  const [val, setVal] = useState(0);
+  const ref = useRef(false);
+  useEffect(() => {
+    if (ref.current) return;
+    ref.current = true;
+    const start = performance.now();
+    const step = (now: number) => {
+      const t = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      setVal(target * ease);
+      if (t < 1) requestAnimationFrame(step);
+      else setVal(target);
+    };
+    requestAnimationFrame(step);
+  }, [target, duration]);
+  return val;
+}
+
+function AnimatedCurrency({ value, currency }: { value: number; currency: string }) {
+  const animated = useCountUp(value);
+  return <>{formatCurrency(animated, currency)}</>;
+}
+
+function ProgressBar({ pct, delay = 0 }: { pct: number; delay?: number }) {
+  const [w, setW] = useState(0);
+  useEffect(() => {
+    const t = setTimeout(() => setW(Math.min(pct, 100)), delay);
+    return () => clearTimeout(t);
+  }, [pct, delay]);
+  const color = pct < 30 ? 'bg-[#ef4444]' : pct < 70 ? 'bg-[#f59e0b]' : 'bg-[#16a34a]';
+  return (
+    <div className="h-[6px] bg-[#f1f5f9] rounded-full overflow-hidden">
+      <div className={`h-full rounded-full transition-all duration-800 ease-out ${color}`} style={{ width: `${w}%` }} />
+    </div>
+  );
+}
 
 export default function OverviewPage() {
   const { user } = useAuth();
@@ -67,135 +109,215 @@ export default function OverviewPage() {
     localStorage.setItem('dismissed_tips', JSON.stringify(next));
   };
 
-  const activeTips = objectives.filter(k => SMART_TIPS[k] && !dismissedTips.includes(k)).slice(0, 2);
+  const activeTip = objectives.find(k => SMART_TIPS[k] && !dismissedTips.includes(k));
 
   if (loading) return <Skeleton />;
 
   const recent = transactions.slice(0, 8);
 
-  // Adaptive KPIs
   const kpis = profileType === 'personal' ? [
-    { label: 'Saldo', value: formatCurrency(stats.netBalance), icon: TrendingUp, color: 'text-fin-green', bg: 'bg-fin-green-pale' },
-    { label: 'Total Receitas', value: formatCurrency(stats.totalIncome), icon: Landmark, color: 'text-fin-green', bg: 'bg-fin-green-pale' },
-    { label: 'Total Despesas', value: formatCurrency(stats.totalExpense), icon: Receipt, color: 'text-fin-red', bg: 'bg-fin-red-pale' },
-    { label: 'Total Guardado', value: formatCurrency(Math.max(0, stats.netBalance)), icon: Landmark, color: 'text-fin-green', bg: 'bg-fin-green-pale' },
-    { label: 'Metas Ativas', value: goals.filter(g => Number(g.current_amount) < Number(g.target_amount)).length.toString(), icon: BarChart3, color: 'text-fin-purple', bg: 'bg-fin-purple-pale' },
-    { label: 'Taxa Poupança', value: `${stats.savingsRate.toFixed(1)}%`, icon: Percent, color: 'text-fin-green', bg: 'bg-fin-green-pale', bar: Math.min(stats.savingsRate, 100) },
+    { label: 'Saldo', value: stats.netBalance, icon: TrendingUp, iconBg: 'bg-[#f0fdf4]', iconColor: 'text-[#16a34a]' },
+    { label: 'Total Receitas', value: stats.totalIncome, icon: DollarSign, iconBg: 'bg-[#f0fdf4]', iconColor: 'text-[#16a34a]' },
+    { label: 'Total Despesas', value: stats.totalExpense, icon: TrendingDown, iconBg: 'bg-[#fef2f2]', iconColor: 'text-[#ef4444]' },
+    { label: 'Total Guardado', value: Math.max(0, stats.netBalance), icon: DollarSign, iconBg: 'bg-[#f0fdf4]', iconColor: 'text-[#16a34a]' },
+    { label: 'Metas Ativas', value: goals.filter(g => Number(g.current_amount) < Number(g.target_amount)).length, icon: Hash, iconBg: 'bg-[#f5f3ff]', iconColor: 'text-[#7c3aed]', isCount: true },
+    { label: 'Taxa Poupança', value: stats.savingsRate, icon: Percent, iconBg: 'bg-[#f0fdf4]', iconColor: 'text-[#16a34a]', isPct: true, bar: Math.min(stats.savingsRate, 100) },
   ] : [
-    { label: 'Receita', value: formatCurrency(stats.bizIncome), icon: TrendingUp, color: 'text-fin-green', bg: 'bg-fin-green-pale' },
-    { label: 'Custos', value: formatCurrency(stats.bizExpense), icon: Receipt, color: 'text-fin-red', bg: 'bg-fin-red-pale' },
-    { label: 'Lucro', value: formatCurrency(stats.bizProfit), icon: Landmark, color: 'text-fin-green', bg: 'bg-fin-green-pale' },
-    { label: 'ROI', value: `${stats.roiBiz.toFixed(1)}%`, icon: BarChart3, color: 'text-fin-purple', bg: 'bg-fin-purple-pale' },
-    { label: 'Lançamentos', value: stats.txCount.toString(), icon: Receipt, color: 'text-muted', bg: 'bg-secondary' },
-    { label: 'Média/dia', value: formatCurrency(stats.avgPerDay), icon: CalendarDays, color: 'text-fin-amber', bg: 'bg-fin-amber-pale' },
+    { label: 'Receita', value: stats.totalIncome, icon: TrendingUp, iconBg: 'bg-[#f0fdf4]', iconColor: 'text-[#16a34a]' },
+    { label: 'Custos', value: stats.totalExpense, icon: TrendingDown, iconBg: 'bg-[#fef2f2]', iconColor: 'text-[#ef4444]' },
+    { label: 'Lucro', value: stats.bizProfit, icon: DollarSign, iconBg: 'bg-[#f0fdf4]', iconColor: 'text-[#16a34a]' },
+    { label: 'ROI', value: stats.roiBiz, icon: Percent, iconBg: 'bg-[#f5f3ff]', iconColor: 'text-[#7c3aed]', isPct: true },
+    { label: 'Lançamentos', value: stats.txCount, icon: Hash, iconBg: 'bg-[#f8fafc]', iconColor: 'text-[#64748b]', isCount: true },
+    { label: 'Média/Dia', value: stats.avgPerDay, icon: Zap, iconBg: 'bg-[#fffbeb]', iconColor: 'text-[#d97706]' },
   ];
 
   return (
-    <div className="space-y-4">
-      {/* Smart Tips */}
-      {activeTips.length > 0 && (
-        <div className="space-y-2">
-          {activeTips.map(key => (
-            <div key={key} className="flex items-start gap-3 p-3.5 rounded-xl bg-fin-green-pale border border-fin-green-border">
-              <Lightbulb className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-              <p className="text-[13px] text-foreground flex-1 leading-relaxed">{SMART_TIPS[key]}</p>
-              <button onClick={() => dismissTip(key)} className="text-muted hover:text-foreground transition-colors flex-shrink-0">
-                <XIcon className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}
+      className="space-y-5">
+
+      {/* Smart Tip */}
+      {activeTip && (
+        <div className="bg-white border border-[#e2e8f0] border-l-[3px] border-l-[#16a34a] rounded-r-[10px] rounded-l-none flex items-start gap-3 px-4 py-3">
+          <Lightbulb className="w-4 h-4 text-[#16a34a] flex-shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] uppercase font-bold text-[#16a34a] tracking-wide mb-0.5">Dica do dia</p>
+            <p className="text-[13px] text-[#374151] leading-relaxed">{SMART_TIPS[activeTip]}</p>
+          </div>
+          <button onClick={() => dismissTip(activeTip)} className="text-[#cbd5e1] hover:text-[#ef4444] transition-colors flex-shrink-0">
+            <XIcon className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
-      {/* Hero cards */}
+      {/* Hero Cards */}
       {profileType === 'both' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card-surface p-6 border-l-4 border-l-blue-400 relative overflow-hidden">
-            <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-blue-100 opacity-30" />
-            <p className="label-upper text-muted mb-1">💼 Negócio</p>
-            <p className={`text-3xl metric-value ${stats.bizProfit >= 0 ? 'text-fin-green' : 'text-fin-red'}`}>{formatCurrency(stats.bizProfit)}</p>
-            <div className="grid grid-cols-2 gap-3 mt-4">
-              <div><p className="label-upper text-muted">Receita</p><p className="text-sm metric-value text-fin-green">{formatCurrency(stats.bizIncome)}</p></div>
-              <div><p className="label-upper text-muted">Despesas</p><p className="text-sm metric-value text-fin-red">{formatCurrency(stats.bizExpense)}</p></div>
+          {/* Negócio card */}
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+            className="bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl p-6 relative overflow-hidden">
+            <div className="absolute -right-10 -top-10 w-[180px] h-[180px] rounded-full bg-[#f0fdf4] opacity-40" />
+            <div className="relative">
+              <p className="text-[10px] font-extrabold tracking-widest text-[#16a34a] flex items-center gap-1.5">
+                💼 NEGÓCIO
+              </p>
+              <p className={`text-4xl font-black tracking-tighter mt-2 ${stats.bizProfit >= 0 ? 'text-[#14532d]' : 'text-[#dc2626]'}`}>
+                <AnimatedCurrency value={stats.bizProfit} currency={currency} />
+              </p>
+              <div className="flex items-center gap-1 mt-1.5">
+                <ArrowUpRight className="w-3.5 h-3.5 text-[#16a34a]" />
+                <span className="text-[12px] font-semibold text-[#16a34a]">vs mês anterior</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                <div className="bg-[#f8faf8] rounded-[10px] p-3">
+                  <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide">Receita</p>
+                  <p className="text-base font-black text-[#16a34a]">{formatCurrency(stats.bizIncome, currency)}</p>
+                </div>
+                <div className="bg-[#f8faf8] rounded-[10px] p-3">
+                  <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide">Despesas</p>
+                  <p className="text-base font-black text-[#dc2626]">{formatCurrency(stats.bizExpense, currency)}</p>
+                </div>
+              </div>
             </div>
           </motion.div>
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="card-surface p-6 border-l-4 border-l-primary relative overflow-hidden">
-            <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-fin-green-border opacity-30" />
-            <p className="label-upper text-muted mb-1">🏠 Pessoal</p>
-            <p className={`text-3xl metric-value ${stats.personalBalance >= 0 ? 'text-fin-green' : 'text-fin-red'}`}>{formatCurrency(stats.personalBalance)}</p>
-            <div className="grid grid-cols-2 gap-3 mt-4">
-              <div><p className="label-upper text-muted">Receita</p><p className="text-sm metric-value text-fin-green">{formatCurrency(stats.personalIncome)}</p></div>
-              <div><p className="label-upper text-muted">Despesas</p><p className="text-sm metric-value text-fin-red">{formatCurrency(stats.personalExpense)}</p></div>
+
+          {/* Pessoal card */}
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            className="bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl p-6 relative overflow-hidden">
+            <div className="absolute -right-10 -top-10 w-[180px] h-[180px] rounded-full bg-[#eff6ff] opacity-40" />
+            <div className="relative">
+              <p className="text-[10px] font-extrabold tracking-widest text-[#2563eb] flex items-center gap-1.5">
+                🏠 PESSOAL
+              </p>
+              <p className={`text-4xl font-black tracking-tighter mt-2 ${stats.personalBalance >= 0 ? 'text-[#14532d]' : 'text-[#dc2626]'}`}>
+                <AnimatedCurrency value={stats.personalBalance} currency={currency} />
+              </p>
+              <div className="flex items-center gap-1 mt-1.5">
+                <ArrowUpRight className="w-3.5 h-3.5 text-[#16a34a]" />
+                <span className="text-[12px] font-semibold text-[#16a34a]">vs mês anterior</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                <div className="bg-[#f8faf8] rounded-[10px] p-3">
+                  <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide">Receita</p>
+                  <p className="text-base font-black text-[#16a34a]">{formatCurrency(stats.personalIncome, currency)}</p>
+                </div>
+                <div className="bg-[#f8faf8] rounded-[10px] p-3">
+                  <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide">Despesas</p>
+                  <p className="text-base font-black text-[#dc2626]">{formatCurrency(stats.personalExpense, currency)}</p>
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>
       ) : (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card-surface p-6 bg-fin-green-pale relative overflow-hidden">
-          <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-fin-green-border opacity-40" />
-          <p className="label-upper text-muted mb-1">{profileType === 'personal' ? 'Saldo do mês' : 'Resultado do Negócio'}</p>
-          <p className={`text-4xl metric-value ${stats.netBalance >= 0 ? 'text-fin-green' : 'text-fin-red'}`}>{formatCurrency(stats.netBalance)}</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
-            {[
-              { label: 'Total Receitas', val: stats.totalIncome, cls: 'text-fin-green' },
-              { label: 'Total Despesas', val: stats.totalExpense, cls: 'text-fin-red' },
-              { label: profileType === 'business' ? 'Receita Negócio' : 'Patrimônio', val: profileType === 'business' ? stats.bizIncome : stats.patrimonio, cls: 'text-fin-green' },
-              { label: profileType === 'business' ? 'Gasto Negócio' : 'Poupança', val: profileType === 'business' ? stats.bizExpense : Math.max(0, stats.netBalance), cls: profileType === 'business' ? 'text-fin-red' : 'text-fin-green' },
-            ].map(s => (
-              <div key={s.label}><p className="label-upper text-muted">{s.label}</p><p className={`text-lg metric-value ${s.cls}`}>{formatCurrency(s.val)}</p></div>
-            ))}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+          className="bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl p-6 relative overflow-hidden">
+          <div className="absolute -right-10 -top-10 w-[180px] h-[180px] rounded-full bg-[#f0fdf4] opacity-40" />
+          <div className="relative">
+            <p className="text-[10px] font-extrabold tracking-widest text-[#16a34a]">
+              {profileType === 'personal' ? 'SALDO DO MÊS' : 'RESULTADO DO NEGÓCIO'}
+            </p>
+            <p className={`text-4xl font-black tracking-tighter mt-2 ${stats.netBalance >= 0 ? 'text-[#14532d]' : 'text-[#dc2626]'}`}>
+              <AnimatedCurrency value={stats.netBalance} currency={currency} />
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
+              {[
+                { label: 'Receitas', val: stats.totalIncome, color: 'text-[#16a34a]' },
+                { label: 'Despesas', val: stats.totalExpense, color: 'text-[#dc2626]' },
+                { label: profileType === 'business' ? 'Receita Neg.' : 'Patrimônio', val: profileType === 'business' ? stats.bizIncome : stats.patrimonio, color: 'text-[#16a34a]' },
+                { label: profileType === 'business' ? 'Gasto Neg.' : 'Poupança', val: profileType === 'business' ? stats.bizExpense : Math.max(0, stats.netBalance), color: profileType === 'business' ? 'text-[#dc2626]' : 'text-[#16a34a]' },
+              ].map(s => (
+                <div key={s.label} className="bg-[#f8faf8] rounded-[10px] p-3">
+                  <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide">{s.label}</p>
+                  <p className={`text-base font-black ${s.color}`}>{formatCurrency(s.val, currency)}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </motion.div>
       )}
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {kpis.map((k, i) => (
-          <motion.div key={k.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="card-surface p-4">
-            <div className={`w-7 h-7 rounded-lg ${k.bg} flex items-center justify-center mb-2`}>
-              <k.icon className={`w-4 h-4 ${k.color}`} />
+          <motion.div key={k.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+            className="bg-white border-[1.5px] border-[#e2e8f0] rounded-[14px] p-[18px] transition-all duration-200 hover:border-[#86efac] hover:-translate-y-[2px] group">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide">{k.label}</p>
+              <div className={`w-8 h-8 rounded-[9px] ${k.iconBg} flex items-center justify-center`}>
+                <k.icon className={`w-4 h-4 ${k.iconColor}`} />
+              </div>
             </div>
-            <p className="label-upper text-muted">{k.label}</p>
-            <p className={`text-lg metric-value ${k.color}`}>{k.value}</p>
+            <p className="text-[22px] font-black tracking-tight mt-2.5 leading-none text-[#14532d]">
+              {k.isCount ? k.value : k.isPct ? `${k.value.toFixed(1)}%` : formatCurrency(k.value, currency)}
+            </p>
             {k.bar !== undefined && (
-              <div className="mt-1.5 h-1.5 bg-fin-green-border rounded-full overflow-hidden">
-                <div className="h-full bg-fin-green rounded-full transition-all duration-500" style={{ width: `${k.bar}%` }} />
+              <div className="mt-2">
+                <ProgressBar pct={k.bar} delay={200 + i * 100} />
               </div>
             )}
           </motion.div>
         ))}
       </div>
 
-      {/* Objectives Widget */}
+      {/* Objectives */}
       {objectives.length > 0 && (
         <div>
-          <h3 className="text-[13px] font-extrabold text-fin-green-dark mb-3">Seus Objetivos</h3>
-          <div className="flex gap-3 overflow-x-auto pb-2">
-            {objectives.map(key => {
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-[15px] font-extrabold text-[#14532d]">Seus Objetivos</h3>
+            <Link to="/app/goals" className="text-[12px] font-bold text-[#16a34a] hover:underline flex items-center gap-1">
+              Gerenciar <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+            {objectives.map((key, i) => {
               const obj = OBJECTIVES.find(o => o.key === key);
               if (!obj) return null;
               const goal = goals.find(g => g.objective_type === key);
+              const pct = goal ? Math.min((Number(goal.current_amount) / Number(goal.target_amount)) * 100, 100) : 0;
+              const daysLeft = goal?.deadline ? Math.max(0, differenceInDays(parseISO(goal.deadline), new Date())) : null;
               const isUrgent = obj.urgent;
+
               return (
-                <div key={key} className={`flex-shrink-0 w-[200px] h-[140px] rounded-xl p-4 border-[1.5px] bg-card ${
-                  goal ? (isUrgent ? 'border-red-300' : 'border-border') : 'border-dashed border-border'
-                }`}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-2xl">{obj.emoji}</span>
-                    <span className="text-[13px] font-bold text-foreground truncate">{obj.label}</span>
+                <motion.div key={key} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                  className={`flex-shrink-0 w-[220px] min-w-[220px] rounded-[14px] p-[18px] transition-all duration-200 hover:-translate-y-[2px] cursor-pointer ${
+                    goal
+                      ? `bg-white border-[1.5px] ${isUrgent ? 'border-[#fecaca]' : 'border-[#e2e8f0]'} hover:border-[#86efac]`
+                      : 'bg-white border-[1.5px] border-dashed border-[#d4edda] hover:border-[#16a34a]'
+                  }`}>
+                  <div className="flex items-start gap-2.5">
+                    <div className={`w-10 h-10 rounded-[10px] flex items-center justify-center text-xl flex-shrink-0 ${isUrgent ? 'bg-[#fef2f2]' : 'bg-[#f0fdf4]'}`}>
+                      {obj.emoji}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-extrabold text-[#14532d] truncate">{obj.label}</p>
+                      {isUrgent && (
+                        <span className="inline-block mt-0.5 text-[9px] font-extrabold bg-[#fef2f2] text-[#dc2626] border border-[#fecaca] px-[7px] py-[2px] rounded-[5px]">
+                          Urgente
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  {isUrgent && <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-red-50 text-red-500 mb-1 inline-block">Urgente</span>}
+
                   {goal ? (
-                    <div>
-                      <div className="mt-1 h-2 bg-fin-green-border rounded-full overflow-hidden">
-                        <div className="h-full bg-fin-green rounded-full" style={{ width: `${Math.min((Number(goal.current_amount) / Number(goal.target_amount)) * 100, 100)}%` }} />
+                    <div className="mt-3">
+                      <ProgressBar pct={pct} delay={300 + i * 100} />
+                      <div className="flex items-center justify-between mt-1.5">
+                        <span className="text-[13px] font-extrabold text-[#16a34a]">{formatCurrency(Number(goal.current_amount), currency)}</span>
+                        <span className="text-[12px] font-bold text-[#94a3b8]">{pct.toFixed(0)}%</span>
                       </div>
-                      <p className="text-[10px] text-muted mt-1">{formatCurrency(Number(goal.current_amount))} de {formatCurrency(Number(goal.target_amount))}</p>
-                      {goal.deadline && <p className="text-[10px] text-muted">{Math.max(0, differenceInDays(parseISO(goal.deadline), new Date()))} dias restantes</p>}
+                      <p className="text-[11px] text-[#94a3b8] mt-1">
+                        {pct >= 100 ? '✓ Meta atingida!' : daysLeft !== null ? `${daysLeft} dias restantes` : ''}
+                      </p>
                     </div>
                   ) : (
-                    <Link to="/app/goals" className="text-xs font-bold text-primary hover:underline mt-4 block text-center">Criar meta →</Link>
+                    <div className="flex flex-col items-center justify-center mt-4">
+                      <PlusCircle className="w-6 h-6 text-[#cbd5e1]" />
+                      <Link to="/app/goals" className="text-[12px] font-bold text-[#16a34a] mt-2 hover:underline">
+                        Criar meta
+                      </Link>
+                    </div>
                   )}
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -203,50 +325,79 @@ export default function OverviewPage() {
       )}
 
       {/* Recent Transactions */}
-      <div className="card-surface">
-        <div className="flex items-center justify-between p-4 pb-2">
-          <h3 className="text-[13px] font-extrabold text-fin-green-dark">Lançamentos Recentes</h3>
-          <Link to="/app/transactions" className="flex items-center gap-1 text-xs font-semibold text-fin-green hover:underline">
+      <div className="bg-white border-[1.5px] border-[#e2e8f0] rounded-[14px] overflow-hidden">
+        <div className="flex items-center justify-between px-5 pt-[18px] pb-3.5 border-b border-[#f8fafc]">
+          <h3 className="text-[15px] font-extrabold text-[#14532d]">Lançamentos Recentes</h3>
+          <Link to="/app/transactions" className="text-[12px] font-bold text-[#16a34a] hover:underline flex items-center gap-1">
             Ver todos <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead><tr className="border-b border-border">
-              <th className="text-left px-4 py-2 label-upper text-muted">Data</th>
-              <th className="text-left px-4 py-2 label-upper text-muted">Descrição</th>
-              <th className="text-left px-4 py-2 label-upper text-muted">Categoria</th>
-              <th className="text-right px-4 py-2 label-upper text-muted">Valor</th>
-            </tr></thead>
-            <tbody>
-              {recent.length === 0 ? (
-                <tr><td colSpan={4} className="text-center py-8 text-muted text-sm">Nenhum lançamento no período</td></tr>
-              ) : recent.map(tx => (
-                <tr key={tx.id} className={`border-b border-border/50 hover:bg-secondary/50 transition-colors border-l-2 ${tx.type === 'income' ? 'border-l-fin-green' : 'border-l-fin-red'}`}>
-                  <td className="px-4 py-2.5 font-medium">{format(parseISO(tx.date), 'dd/MM', { locale: ptBR })}</td>
-                  <td className="px-4 py-2.5">{tx.description}</td>
-                  <td className="px-4 py-2.5"><span className="px-2 py-0.5 rounded-full bg-secondary text-[10px] font-semibold">{tx.category}</span></td>
-                  <td className={`px-4 py-2.5 text-right metric-value ${tx.type === 'income' ? 'text-fin-green' : 'text-fin-red'}`}>
-                    {tx.type === 'expense' ? '−' : '+'}{formatCurrency(Number(tx.amount))}
-                  </td>
+
+        {recent.length === 0 ? (
+          <div className="py-12 flex flex-col items-center justify-center">
+            <ReceiptText className="w-10 h-10 text-[#e2e8f0] mb-3" />
+            <p className="text-[15px] font-bold text-[#374151]">Nenhum lançamento ainda</p>
+            <p className="text-[13px] text-[#94a3b8] mt-1">Adicione seu primeiro lançamento para começar.</p>
+            <Link to="/app/transactions"
+              className="mt-4 inline-flex items-center gap-1.5 px-[18px] py-2 border-[1.5px] border-[#16a34a] text-[#16a34a] bg-white rounded-lg text-[13px] font-bold hover:bg-[#f0fdf4] transition-colors">
+              <PlusCircle className="w-4 h-4" /> Adicionar lançamento
+            </Link>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-[#fafcfa]">
+                  <th className="text-left px-5 py-2.5 text-[10px] uppercase tracking-wide font-bold text-[#94a3b8]">Data</th>
+                  <th className="text-left px-5 py-2.5 text-[10px] uppercase tracking-wide font-bold text-[#94a3b8]">Descrição</th>
+                  <th className="text-left px-5 py-2.5 text-[10px] uppercase tracking-wide font-bold text-[#94a3b8]">Categoria</th>
+                  <th className="text-right px-5 py-2.5 text-[10px] uppercase tracking-wide font-bold text-[#94a3b8]">Valor</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {recent.map(tx => {
+                  const isIncome = tx.type === 'income';
+                  return (
+                    <tr key={tx.id}
+                      className={`border-b border-[#f8fafc] hover:bg-[#fafffe] transition-colors border-l-[3px] ${isIncome ? 'border-l-[#16a34a]' : 'border-l-[#ef4444]'}`}>
+                      <td className="px-5 py-3 text-[12px] font-medium text-[#94a3b8]">
+                        {format(parseISO(tx.date), 'dd/MM', { locale: ptBR })}
+                      </td>
+                      <td className="px-5 py-3 text-[13px] font-bold text-[#1a2e1a]">{tx.description}</td>
+                      <td className="px-5 py-3">
+                        <span className={`inline-block px-2.5 py-[3px] rounded-full text-[11px] font-bold border ${
+                          isIncome
+                            ? 'bg-[#f0fdf4] text-[#166534] border-[#d4edda]'
+                            : 'bg-[#fef2f2] text-[#991b1b] border-[#fecaca]'
+                        }`}>
+                          {tx.category}
+                        </span>
+                      </td>
+                      <td className={`px-5 py-3 text-right text-[14px] font-black ${isIncome ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}>
+                        {isIncome ? '+' : '−'}{formatCurrency(Number(tx.amount), currency)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function Skeleton() {
   return (
-    <div className="space-y-4">
-      <div className="card-surface p-6 h-48 animate-pulse bg-fin-green-pale" />
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        {Array.from({ length: 6 }).map((_, i) => <div key={i} className="card-surface p-4 h-24 animate-pulse" />)}
+    <div className="space-y-5">
+      <div className="bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl p-6 h-48 animate-pulse" />
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="bg-white border-[1.5px] border-[#e2e8f0] rounded-[14px] p-[18px] h-24 animate-pulse" />
+        ))}
       </div>
-      <div className="card-surface p-4 h-64 animate-pulse" />
+      <div className="bg-white border-[1.5px] border-[#e2e8f0] rounded-[14px] p-5 h-64 animate-pulse" />
     </div>
   );
 }

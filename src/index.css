@@ -88,17 +88,26 @@
 
 @layer utilities {
   .card-surface {
-    @apply bg-card border-[1.5px] border-border rounded-[14px] transition-all duration-200;
+    @apply bg-white border-[1.5px] border-[#e2e8f0] rounded-[14px] transition-all duration-200;
   }
   .card-surface:hover {
-    border-color: hsl(var(--green-light));
-    transform: translateY(-1px);
+    border-color: #86efac;
+    transform: translateY(-2px);
   }
   .metric-value {
-    @apply font-black tabular-nums;
+    @apply font-black tabular-nums tracking-tight;
   }
   .label-upper {
     @apply uppercase tracking-wider text-[10px] font-bold;
+  }
+
+  /* Hide scrollbar for objectives row */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }
 
@@ -108,4 +117,9 @@
 }
 .animate-marquee {
   animation: marquee 30s linear infinite;
+}
+
+/* Duration utility for progress bars */
+.duration-800 {
+  transition-duration: 800ms;
 }
