@@ -14,7 +14,246 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      credit_cards: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          credit_limit: number
+          due_day: number | null
+          id: string
+          name: string
+          used_amount: number | null
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          credit_limit: number
+          due_day?: number | null
+          id?: string
+          name: string
+          used_amount?: number | null
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          credit_limit?: number
+          due_day?: number | null
+          id?: string
+          name?: string
+          used_amount?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      goals: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          current_amount: number | null
+          deadline: string | null
+          id: string
+          name: string
+          start_date: string | null
+          target_amount: number
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          current_amount?: number | null
+          deadline?: string | null
+          id?: string
+          name: string
+          start_date?: string | null
+          target_amount: number
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          current_amount?: number | null
+          deadline?: string | null
+          id?: string
+          name?: string
+          start_date?: string | null
+          target_amount?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      investments: {
+        Row: {
+          asset_type: string
+          created_at: string | null
+          current_amount: number
+          date: string | null
+          id: string
+          invested_amount: number
+          name: string
+          user_id: string
+        }
+        Insert: {
+          asset_type: string
+          created_at?: string | null
+          current_amount: number
+          date?: string | null
+          id?: string
+          invested_amount: number
+          name: string
+          user_id: string
+        }
+        Update: {
+          asset_type?: string
+          created_at?: string | null
+          current_amount?: number
+          date?: string | null
+          id?: string
+          invested_amount?: number
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          full_name: string | null
+          id: string
+          plan: string | null
+          plan_expires_at: string | null
+          stripe_customer_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id: string
+          plan?: string | null
+          plan_expires_at?: string | null
+          stripe_customer_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          plan?: string | null
+          plan_expires_at?: string | null
+          stripe_customer_id?: string | null
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          plan: string
+          status: string
+          stripe_subscription_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan: string
+          status: string
+          stripe_subscription_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string | null
+          date: string
+          description: string
+          id: string
+          notes: string | null
+          origin: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string | null
+          date: string
+          description: string
+          id?: string
+          notes?: string | null
+          origin: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string | null
+          date?: string
+          description?: string
+          id?: string
+          notes?: string | null
+          origin?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_config: {
+        Row: {
+          created_at: string | null
+          currency: string | null
+          default_save_pct: number | null
+          id: string
+          notifications_enabled: boolean | null
+          onboarding_completed: boolean | null
+          project_name: string | null
+          theme: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string | null
+          default_save_pct?: number | null
+          id?: string
+          notifications_enabled?: boolean | null
+          onboarding_completed?: boolean | null
+          project_name?: string | null
+          theme?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string | null
+          default_save_pct?: number | null
+          id?: string
+          notifications_enabled?: boolean | null
+          onboarding_completed?: boolean | null
+          project_name?: string | null
+          theme?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
