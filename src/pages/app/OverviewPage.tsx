@@ -141,6 +141,20 @@ export default function OverviewPage() {
     return { totalIncome, totalExpense, netBalance, bizIncome, bizExpense, personalExpense, personalIncome, bizProfit, personalBalance, patrimonio, savingsRate, roiBiz, avgPerDay, txCount: transactions.length };
   }, [transactions, investments]);
 
+  /* financial score */
+  const scoreResult = useMemo(() => {
+    const scoreData: ScoreData = {
+      totalIncome: stats.totalIncome,
+      totalExpense: stats.totalExpense,
+      cards: cards.map(c => ({ used_amount: Number(c.used_amount || 0), credit_limit: Number(c.credit_limit) })),
+      goals: goals.map(g => ({ current_amount: Number(g.current_amount || 0), target_amount: Number(g.target_amount) })),
+      totalDebt: debts.reduce((s, d) => s + Number(d.remaining_amount), 0),
+      investments: investments.map(i => ({ asset_type: i.asset_type })),
+      recentTransactionCount: transactions.length,
+    };
+    return calculateFinancialScore(scoreData);
+  }, [stats, cards, goals, debts, investments, transactions]);
+
   /* chart data */
   const chartData = useMemo(() => {
     const days = chartPeriod === '7d' ? 7 : chartPeriod === '30d' ? 30 : 90;
