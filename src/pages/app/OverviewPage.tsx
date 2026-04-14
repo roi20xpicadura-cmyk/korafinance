@@ -7,7 +7,7 @@ import { OBJECTIVES, SMART_TIPS } from '@/lib/objectives';
 import {
   TrendingUp, TrendingDown, DollarSign, Percent, Hash, Zap,
   ArrowRight, ArrowUpRight, Lightbulb, X as XIcon,
-  PlusCircle, ReceiptText, BarChart2
+  PlusCircle, ReceiptText, BarChart2, Target, Check, Flame
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format, parseISO, startOfMonth, endOfMonth, subDays, differenceInDays, eachDayOfInterval, isSameDay } from 'date-fns';
