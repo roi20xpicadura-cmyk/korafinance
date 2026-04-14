@@ -7,14 +7,17 @@ import AIChatDrawer from '@/components/app/AIChatDrawer';
 import {
   LayoutDashboard, ArrowLeftRight, Target, TrendingUp, FileText,
   CreditCard, Briefcase, BarChart2, Download, Settings2, Crown,
-  LogOut, Menu, X, Bell, ChevronRight, BarChart3, Home, MoreHorizontal, Sparkles
+  LogOut, Menu, X, Bell, ChevronRight, BarChart3, Home, MoreHorizontal, Sparkles,
+  AlertCircle
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const ALL_NAV_ITEMS = [
   { label: 'Visão Geral', path: '/app', icon: LayoutDashboard, profiles: ['personal', 'business', 'both'] },
   { label: 'Lançamentos', path: '/app/transactions', icon: ArrowLeftRight, profiles: ['personal', 'business', 'both'] },
   { label: 'Metas', path: '/app/goals', icon: Target, profiles: ['personal', 'business', 'both'] },
+  { label: 'Dívidas', path: '/app/debts', icon: AlertCircle, profiles: ['personal', 'business', 'both'] },
   { label: 'Fluxo de Caixa', path: '/app/cashflow', icon: TrendingUp, profiles: ['business', 'both'] },
   { label: 'DRE', path: '/app/dre', icon: FileText, profiles: ['business', 'both'] },
   { label: 'Cartões', path: '/app/cards', icon: CreditCard, profiles: ['personal', 'business', 'both'] },
@@ -46,6 +49,13 @@ export default function AppLayout() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMoreDrawer, setShowMoreDrawer] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [activeDebtCount, setActiveDebtCount] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('debts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'active')
+      .then(({ count }) => setActiveDebtCount(count || 0));
+  }, [user, location.pathname]);
 
   const profileType = config?.profile_type || 'personal';
   const navItems = ALL_NAV_ITEMS.filter(item => item.profiles.includes(profileType));
@@ -66,6 +76,7 @@ export default function AppLayout() {
     '/app': 'Visão Geral',
     '/app/transactions': 'Lançamentos',
     '/app/goals': 'Metas',
+    '/app/debts': 'Sair das Dívidas',
     '/app/cashflow': 'Fluxo de Caixa',
     '/app/dre': 'DRE',
     '/app/cards': 'Cartões de Crédito',
@@ -157,11 +168,20 @@ export default function AppLayout() {
                   active ? 'bg-[#f0fdf4]' : 'hover:bg-[#f8faf8]'
                 }`}>
                 <div className={`w-[22px] h-[22px] rounded-md flex items-center justify-center flex-shrink-0 ${active ? 'bg-[#dcfce7]' : ''}`}>
-                  <item.icon className={`w-[15px] h-[15px] ${active ? 'text-[#16a34a]' : 'text-[#94a3b8] group-hover:text-[#16a34a]'}`} />
+                  <item.icon className={`w-[15px] h-[15px] ${
+                    item.path === '/app/debts' && activeDebtCount > 0
+                      ? 'text-[#dc2626]'
+                      : active ? 'text-[#16a34a]' : 'text-[#94a3b8] group-hover:text-[#16a34a]'
+                  }`} />
                 </div>
-                <span className={`text-[13px] ${active ? 'font-bold text-[#16a34a]' : 'font-medium text-[#64748b] group-hover:text-[#14532d]'}`}>
+                <span className={`text-[13px] flex-1 ${active ? 'font-bold text-[#16a34a]' : 'font-medium text-[#64748b] group-hover:text-[#14532d]'}`}>
                   {item.label}
                 </span>
+                {item.path === '/app/debts' && activeDebtCount > 0 && (
+                  <span className="text-[10px] font-extrabold bg-[#dc2626] text-white px-[6px] py-[1px] rounded-full min-w-[18px] text-center">
+                    {activeDebtCount}
+                  </span>
+                )}
               </Link>
             );
           })}
