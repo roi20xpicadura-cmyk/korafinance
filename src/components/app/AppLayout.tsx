@@ -49,7 +49,7 @@ const MOBILE_NAV_BUSINESS = [
   { label: 'Início', path: '/app', icon: Home, activeColor: '#16a34a' },
   { label: 'Lançar', path: '/app/transactions', icon: ArrowLeftRight, activeColor: '#2563eb' },
   { label: '', path: 'fab', icon: Plus, activeColor: '#16a34a' },
-  { label: 'DRE', path: '/app/dre', icon: FileText, activeColor: '#7c3aed' },
+  { label: 'Cartões', path: '/app/cards', icon: CreditCard, activeColor: '#7c3aed' },
   { label: 'Mais', path: 'more', icon: MoreHorizontal, activeColor: '#64748b' },
 ];
 
@@ -519,11 +519,11 @@ fontSize: 13,
               {/* Grid of remaining nav items */}
               <div className="grid grid-cols-3" style={{ gap: 12 }}>
                 {navItems.filter(i => !['fab','more'].includes(i.path) && !MOBILE_NAV.find(m => m.path === i.path)).map(item => {
-                  const tileColors: Record<string, string> = {
-                    '/app/cashflow': '#d97706', '/app/dre': '#7c3aed', '/app/cards': '#2563eb',
-                    '/app/investments': '#16a34a', '/app/charts': '#0891b2', '/app/debts': '#dc2626',
-                    '/app/budget': '#d97706', '/app/export': '#64748b', '/app/banks': '#0891b2',
-                  };
+                    const tileColors: Record<string, string> = {
+                      '/app/cards': '#2563eb',
+                      '/app/debts': '#dc2626',
+                      '/app/budget': '#d97706', '/app/export': '#64748b',
+                    };
                   const color = tileColors[item.path] || 'var(--color-text-muted)';
                   return (
                     <Link key={item.path} to={item.path} onClick={() => setShowMoreDrawer(false)}
