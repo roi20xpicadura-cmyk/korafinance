@@ -12,7 +12,7 @@ import {
   LayoutDashboard, ArrowLeftRight, Target, TrendingUp, FileText,
   CreditCard, Briefcase, BarChart2, Download, Settings2, Crown,
   LogOut, Menu, X, Bell, ChevronRight, BarChart3, Home, MoreHorizontal, Sparkles,
-  AlertCircle, CalendarDays, Trophy, Gift, Sun, Moon, Monitor, Plus, Building2, Plug
+  AlertCircle, CalendarDays, Trophy, Gift, Sun, Moon, Monitor, Plus, Building2, Plug, FlaskConical
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -31,6 +31,8 @@ const ALL_NAV_ITEMS = [
   { label: 'Investimentos', path: '/app/investments', icon: Briefcase, profiles: ['personal', 'business', 'both'] },
   { label: 'Gráficos', path: '/app/charts', icon: BarChart2, profiles: ['business', 'both'] },
   { label: 'Exportar', path: '/app/export', icon: Download, profiles: ['personal', 'business', 'both'] },
+  { label: 'Simulador', path: '/app/simulator', icon: FlaskConical, profiles: ['personal', 'business', 'both'], badge: 'NOVO' },
+  { label: 'Previsões', path: '/app/predictions', icon: TrendingUp, profiles: ['personal', 'business', 'both'] },
 ];
 
 const ACCOUNT_ITEMS = [
