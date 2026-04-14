@@ -215,7 +215,7 @@ export default function AppLayout() {
                   }} />
                 </div>
                 <span className="flex-1" style={{
-214:                   fontSize: 13,
+fontSize: 13,
                   fontWeight: active ? 700 : 500,
                   color: active ? 'var(--color-green-800)' : 'var(--color-text-muted)',
                 }}>{item.label}</span>
