@@ -232,7 +232,7 @@ export default function SimulatorPage() {
   );
 
   return (
-    <div className="space-y-4 pb-28">
+    <div className="space-y-4 pb-4">
       {/* Sandbox banner */}
       <div className="flex items-center gap-2.5" style={{
         background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 12, padding: '12px 20px',
