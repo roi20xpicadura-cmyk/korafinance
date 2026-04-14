@@ -215,10 +215,13 @@ export default function AppLayout() {
                   }} />
                 </div>
                 <span className="flex-1" style={{
-                  fontSize: 13,
+214:                   fontSize: 13,
                   fontWeight: active ? 700 : 500,
                   color: active ? 'var(--color-green-800)' : 'var(--color-text-muted)',
                 }}>{item.label}</span>
+                {(item as any).badge && (
+                  <span style={{ fontSize: 9, fontWeight: 800, background: '#fbbf24', color: '#78350f', padding: '2px 7px', borderRadius: 99 }}>{(item as any).badge}</span>
+                )}
                 {item.path === '/app/debts' && activeDebtCount > 0 && (
                   <span className="ml-auto text-center" style={{
                     fontSize: 10, fontWeight: 800,
