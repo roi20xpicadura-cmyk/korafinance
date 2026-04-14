@@ -93,14 +93,22 @@ export default function OverviewPage() {
     if (!user) return;
     const start = format(startOfMonth(new Date()), 'yyyy-MM-dd');
     const end = format(endOfMonth(new Date()), 'yyyy-MM-dd');
+    const weekAgo = format(subDays(new Date(), 6), 'yyyy-MM-dd');
     Promise.all([
       supabase.from('transactions').select('*').eq('user_id', user.id).gte('date', start).lte('date', end).order('date', { ascending: false }),
       supabase.from('investments').select('*').eq('user_id', user.id),
       supabase.from('goals').select('*').eq('user_id', user.id),
-    ]).then(([txRes, invRes, goalRes]) => {
+      supabase.from('goal_checkins').select('*').eq('user_id', user.id).gte('date', weekAgo).order('date', { ascending: true }),
+    ]).then(([txRes, invRes, goalRes, ckRes]) => {
       setTransactions(txRes.data || []);
       setInvestments(invRes.data || []);
       setGoals(goalRes.data || []);
+      const grouped: Record<string, any[]> = {};
+      (ckRes.data || []).forEach((ck: any) => {
+        if (!grouped[ck.goal_id]) grouped[ck.goal_id] = [];
+        grouped[ck.goal_id].push(ck);
+      });
+      setGoalCheckins(grouped);
       setLoading(false);
     });
   }, [user]);
