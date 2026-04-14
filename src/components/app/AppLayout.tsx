@@ -102,6 +102,8 @@ export default function AppLayout() {
 
   const profileType = config?.profile_type || 'personal';
   const navItems = ALL_NAV_ITEMS.filter(item => item.profiles.includes(profileType));
+  const MOBILE_NAV = profileType === 'business' ? MOBILE_NAV_BUSINESS : MOBILE_NAV_PERSONAL;
+  const accountItems = ACCOUNT_ITEMS.filter(item => !(item as any).profiles || (item as any).profiles.includes(profileType));
   const plan = profile?.plan || 'free';
 
   useEffect(() => {
