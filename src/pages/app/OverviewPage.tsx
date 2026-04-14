@@ -4,10 +4,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { formatCurrency } from '@/lib/plans';
 import { OBJECTIVES, SMART_TIPS } from '@/lib/objectives';
+import { calculateFinancialScore, getScoreColor, getScoreLevel, ScoreData } from '@/lib/financialScore';
 import {
   TrendingUp, TrendingDown, DollarSign, Percent, Hash, Zap,
   ArrowRight, ArrowUpRight, Lightbulb, X as XIcon,
-  PlusCircle, ReceiptText, BarChart2, Target, Check, Flame
+  PlusCircle, ReceiptText, BarChart2, Target, Check, Flame, Shield
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format, parseISO, startOfMonth, endOfMonth, subDays, differenceInDays, eachDayOfInterval, isSameDay } from 'date-fns';
