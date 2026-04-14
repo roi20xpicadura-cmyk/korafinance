@@ -37,6 +37,7 @@ const ReferralPage = lazy(() => import("./pages/app/ReferralPage"));
 const SettingsPage = lazy(() => import("./pages/app/SettingsPage"));
 const BillingPage = lazy(() => import("./pages/app/BillingPage"));
 const BanksPage = lazy(() => import("./pages/app/BanksPage"));
+const IntegrationsPage = lazy(() => import("./pages/app/IntegrationsPage"));
 
 // Gated page lazy imports
 const GatedCashFlow = lazy(() => import("./pages/app/GatedPages").then(m => ({ default: m.CashFlowPage })));
@@ -100,6 +101,7 @@ const App = () => (
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="billing" element={<BillingPage />} />
                   <Route path="banks" element={<BanksPage />} />
+                  <Route path="integrations" element={<IntegrationsPage />} />
                   <Route path="achievements" element={<AchievementsPage />} />
                   <Route path="referral" element={<ReferralPage />} />
                 </Route>
