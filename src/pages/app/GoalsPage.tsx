@@ -6,9 +6,9 @@ import { formatCurrency, PLAN_LIMITS, PlanType } from '@/lib/plans';
 import { OBJECTIVES } from '@/lib/objectives';
 import {
   Target, Trophy, TrendingUp, Star, PlusCircle, ChevronDown, X,
-  MoreHorizontal, Pencil, DollarSign, Award, Trash2, Calendar, Clock
+  MoreHorizontal, Pencil, DollarSign, Award, Trash2, Calendar, Clock, Check, Flame
 } from 'lucide-react';
-import { format, parseISO, differenceInDays } from 'date-fns';
+import { format, parseISO, differenceInDays, subDays, isSameDay, startOfDay } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import confetti from 'canvas-confetti';
@@ -24,6 +24,7 @@ export default function GoalsPage() {
   const limits = PLAN_LIMITS[plan];
 
   const [goals, setGoals] = useState<any[]>([]);
+  const [checkins, setCheckins] = useState<Record<string, any[]>>({});
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
   const [sortMode, setSortMode] = useState<SortMode>('recent');
@@ -55,6 +56,15 @@ export default function GoalsPage() {
     if (!user) return;
     const { data } = await supabase.from('goals').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
     setGoals(data || []);
+    // Fetch checkins for last 7 days
+    const weekAgo = format(subDays(new Date(), 6), 'yyyy-MM-dd');
+    const { data: cks } = await supabase.from('goal_checkins').select('*').eq('user_id', user.id).gte('date', weekAgo).order('date', { ascending: true });
+    const grouped: Record<string, any[]> = {};
+    (cks || []).forEach(ck => {
+      if (!grouped[ck.goal_id]) grouped[ck.goal_id] = [];
+      grouped[ck.goal_id].push(ck);
+    });
+    setCheckins(grouped);
     setLoading(false);
   };
 
@@ -113,7 +123,16 @@ export default function GoalsPage() {
     const goal = goals.find(g => g.id === id);
     if (!goal) return;
     const newVal = Number(goal.current_amount) + amount;
+    const today = format(new Date(), 'yyyy-MM-dd');
+    // Update goal amount
     await supabase.from('goals').update({ current_amount: newVal }).eq('id', id);
+    // Upsert daily checkin
+    const existing = (checkins[id] || []).find(c => c.date === today);
+    if (existing) {
+      await supabase.from('goal_checkins').update({ amount: Number(existing.amount) + amount }).eq('id', existing.id);
+    } else {
+      await supabase.from('goal_checkins').insert({ user_id: user!.id, goal_id: id, date: today, amount });
+    }
     toast.success(`✓ ${formatCurrency(amount)} adicionado!`);
     if (newVal >= Number(goal.target_amount) && Number(goal.current_amount) < Number(goal.target_amount)) {
       triggerConfetti();
@@ -126,6 +145,21 @@ export default function GoalsPage() {
     const amount = parseFloat(val);
     if (isNaN(amount) || amount <= 0) return;
     await handleQuickAdd(id, amount);
+  };
+
+  const handleCheckinToday = async (goalId: string) => {
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const existing = (checkins[goalId] || []).find(c => c.date === today);
+    if (existing) {
+      // Already checked in today — uncheckin
+      await supabase.from('goal_checkins').delete().eq('id', existing.id);
+      toast('Check-in de hoje removido');
+    } else {
+      // Check in with 0 amount (just marking the day)
+      await supabase.from('goal_checkins').insert({ user_id: user!.id, goal_id: goalId, date: today, amount: 0 });
+      toast.success('✓ Dia marcado!');
+    }
+    fetchGoals();
   };
 
   const handleRemove = async (id: string) => {
@@ -374,7 +408,8 @@ export default function GoalsPage() {
           {sortedActive.map((g, i) => (
             <GoalCard key={g.id} goal={g} index={i} openMenu={openMenu} setOpenMenu={setOpenMenu}
               onQuickAdd={handleQuickAdd} onCustomAdd={handleCustomAdd} onRemove={handleRemove}
-              onComplete={handleMarkComplete} onEdit={openEditModal} />
+              onComplete={handleMarkComplete} onEdit={openEditModal}
+              checkins={checkins[g.id] || []} onCheckinToday={() => handleCheckinToday(g.id)} />
           ))}
         </div>
       )}
@@ -490,10 +525,11 @@ export default function GoalsPage() {
 }
 
 /* ─── GOAL CARD COMPONENT ─── */
-function GoalCard({ goal: g, index: i, openMenu, setOpenMenu, onQuickAdd, onCustomAdd, onRemove, onComplete, onEdit }: {
+function GoalCard({ goal: g, index: i, openMenu, setOpenMenu, onQuickAdd, onCustomAdd, onRemove, onComplete, onEdit, checkins, onCheckinToday }: {
   goal: any; index: number; openMenu: string | null; setOpenMenu: (id: string | null) => void;
   onQuickAdd: (id: string, amount: number) => void; onCustomAdd: (id: string, val: string) => void;
   onRemove: (id: string) => void; onComplete: (id: string) => void; onEdit: (g: any) => void;
+  checkins: any[]; onCheckinToday: () => void;
 }) {
   const pct = Math.min((Number(g.current_amount) / Number(g.target_amount)) * 100, 100);
   const obj = OBJECTIVES.find(o => o.key === g.objective_type);
@@ -621,7 +657,66 @@ function GoalCard({ goal: g, index: i, openMenu, setOpenMenu, onQuickAdd, onCust
         </span>
       </div>
 
-      {/* Quick update */}
+      {/* Daily Check-in Tracker */}
+      <div className="mt-3 pt-3" style={{ borderTop: '1px solid #f8fafc' }}>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-1.5">
+            <Flame size={13} style={{ color: '#d97706' }} />
+            <span className="text-[11px] font-bold" style={{ color: '#14532d' }}>Streak diário</span>
+            {(() => {
+              let streak = 0;
+              for (let d = 0; d < 30; d++) {
+                const day = format(subDays(new Date(), d), 'yyyy-MM-dd');
+                if (checkins.some(c => c.date === day)) streak++;
+                else break;
+              }
+              return streak > 0 ? (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: '#fefce8', color: '#d97706', border: '1px solid #fde68a' }}>
+                  🔥 {streak} {streak === 1 ? 'dia' : 'dias'}
+                </span>
+              ) : null;
+            })()}
+          </div>
+          <button onClick={onCheckinToday}
+            className="flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full cursor-pointer transition-all active:scale-95"
+            style={{
+              background: checkins.some(c => c.date === format(new Date(), 'yyyy-MM-dd')) ? '#16a34a' : '#f0fdf4',
+              color: checkins.some(c => c.date === format(new Date(), 'yyyy-MM-dd')) ? 'white' : '#166534',
+              border: `1px solid ${checkins.some(c => c.date === format(new Date(), 'yyyy-MM-dd')) ? '#16a34a' : '#d4edda'}`,
+            }}>
+            <Check size={11} />
+            {checkins.some(c => c.date === format(new Date(), 'yyyy-MM-dd')) ? 'Feito hoje ✓' : 'Marcar hoje'}
+          </button>
+        </div>
+        <div className="flex gap-1">
+          {Array.from({ length: 7 }).map((_, idx) => {
+            const day = subDays(new Date(), 6 - idx);
+            const dayStr = format(day, 'yyyy-MM-dd');
+            const ck = checkins.find(c => c.date === dayStr);
+            const isToday = isSameDay(day, new Date());
+            const dayLabel = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'][day.getDay()];
+            return (
+              <div key={idx} className="flex-1 flex flex-col items-center gap-1">
+                <span className="text-[9px] font-medium" style={{ color: '#94a3b8' }}>{dayLabel}</span>
+                <div className="w-full aspect-square rounded-lg flex items-center justify-center transition-all"
+                  style={{
+                    background: ck ? (Number(ck.amount) > 0 ? '#16a34a' : '#86efac') : (isToday ? '#f8faf8' : '#f1f5f9'),
+                    border: isToday ? '1.5px solid #16a34a' : '1px solid transparent',
+                  }}>
+                  {ck ? (
+                    <Check size={12} style={{ color: Number(ck.amount) > 0 ? 'white' : '#166534' }} />
+                  ) : (
+                    <span className="text-[9px]" style={{ color: '#cbd5e1' }}>{format(day, 'd')}</span>
+                  )}
+                </div>
+                {ck && Number(ck.amount) > 0 && (
+                  <span className="text-[8px] font-bold" style={{ color: '#16a34a' }}>+{Number(ck.amount).toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
       <div className="mt-3.5 pt-3.5 flex flex-wrap items-center gap-2" style={{ borderTop: '1px solid #f8fafc' }}>
         <span className="text-[11px]" style={{ color: '#94a3b8' }}>Adicionar:</span>
         {presets.map(p => (
