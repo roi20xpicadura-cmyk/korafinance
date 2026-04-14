@@ -203,18 +203,18 @@ export default function TransactionsPage() {
       return (
         <div className="relative">
           <select value={cat} onChange={e => setCat(e.target.value)}
-            className="w-full h-[42px] px-3 pr-8 text-[13px] font-semibold rounded-[9px] border-[1.5px] border-border bg-card appearance-none focus:border-[#16a34a] focus:outline-none transition-colors">
+            className="w-full h-[38px] md:h-[42px] px-2.5 pr-7 text-[12px] md:text-[13px] font-semibold rounded-lg border border-border bg-card appearance-none focus:border-[#16a34a] focus:outline-none transition-colors">
             <option value="">Selecione...</option>
             {(cats as string[]).map(c => <option key={c} value={c}>{c}</option>)}
           </select>
-          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+          <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
         </div>
       );
     }
     return (
       <div className="relative">
         <select value={cat} onChange={e => setCat(e.target.value)}
-          className="w-full h-[42px] px-3 pr-8 text-[13px] font-semibold rounded-[9px] border-[1.5px] border-border bg-card appearance-none focus:border-[#16a34a] focus:outline-none transition-colors">
+          className="w-full h-[38px] md:h-[42px] px-2.5 pr-7 text-[12px] md:text-[13px] font-semibold rounded-lg border border-border bg-card appearance-none focus:border-[#16a34a] focus:outline-none transition-colors">
           <option value="">Selecione...</option>
           {(cats as { group: string; items: string[] }[]).map(g => (
             <optgroup key={g.group} label={g.group}>
@@ -222,7 +222,7 @@ export default function TransactionsPage() {
             </optgroup>
           ))}
         </select>
-        <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
       </div>
     );
   };
