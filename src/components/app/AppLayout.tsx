@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
+import { useTheme } from '@/contexts/ThemeContext';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import AIChatDrawer from '@/components/app/AIChatDrawer';
 import {
   LayoutDashboard, ArrowLeftRight, Target, TrendingUp, FileText,
   CreditCard, Briefcase, BarChart2, Download, Settings2, Crown,
   LogOut, Menu, X, Bell, ChevronRight, BarChart3, Home, MoreHorizontal, Sparkles,
-  AlertCircle
+  AlertCircle, CalendarDays, Trophy, Gift, Sun, Moon, Monitor
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,6 +17,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const ALL_NAV_ITEMS = [
   { label: 'Visão Geral', path: '/app', icon: LayoutDashboard, profiles: ['personal', 'business', 'both'] },
   { label: 'Lançamentos', path: '/app/transactions', icon: ArrowLeftRight, profiles: ['personal', 'business', 'both'] },
+  { label: 'Orçamento', path: '/app/budget', icon: CalendarDays, profiles: ['personal', 'business', 'both'] },
   { label: 'Metas', path: '/app/goals', icon: Target, profiles: ['personal', 'business', 'both'] },
   { label: 'Dívidas', path: '/app/debts', icon: AlertCircle, profiles: ['personal', 'business', 'both'] },
   { label: 'Fluxo de Caixa', path: '/app/cashflow', icon: TrendingUp, profiles: ['business', 'both'] },
@@ -27,6 +29,8 @@ const ALL_NAV_ITEMS = [
 ];
 
 const bottomItems = [
+  { label: 'Conquistas', path: '/app/achievements', icon: Trophy },
+  { label: 'Indicar Amigos', path: '/app/referral', icon: Gift },
   { label: 'Configurações', path: '/app/settings', icon: Settings2 },
   { label: 'Meu Plano', path: '/app/billing', icon: Crown },
 ];
