@@ -40,10 +40,11 @@ const ACCOUNT_ITEMS = [
 ];
 
 const MOBILE_NAV = [
-  { label: 'Home', path: '/app', icon: Home },
-  { label: 'Lançamentos', path: '/app/transactions', icon: ArrowLeftRight },
-  { label: 'Metas', path: '/app/goals', icon: Target },
-  { label: 'Cartões', path: '/app/cards', icon: CreditCard },
+  { label: 'Início', path: '/app', icon: Home, activeColor: '#16a34a' },
+  { label: 'Lançar', path: '/app/transactions', icon: ArrowLeftRight, activeColor: '#2563eb' },
+  { label: '', path: 'fab', icon: Plus, activeColor: '#16a34a' }, // center FAB
+  { label: 'Metas', path: '/app/goals', icon: Target, activeColor: '#7c3aed' },
+  { label: 'Mais', path: 'more', icon: MoreHorizontal, activeColor: '#64748b' },
 ];
 
 const PAGE_TITLES: Record<string, string> = {
@@ -434,34 +435,54 @@ export default function AppLayout() {
 
       {/* ═══ MOBILE BOTTOM NAV ═══ */}
       {isMobile && (
-        <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-start pb-safe" style={{
+        <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center pb-safe" style={{
           height: 64,
           background: 'var(--color-bg-surface)',
           borderTop: '1px solid var(--color-border-weak)',
           boxShadow: '0 -4px 20px rgba(0,0,0,0.06)',
-          paddingTop: 8,
         }}>
-          {MOBILE_NAV.map(item => {
-            const active = isActive(item.path);
+          {MOBILE_NAV.map((item, i) => {
+            if (item.path === 'fab') {
+              return (
+                <div key="fab" className="flex-1 flex items-center justify-center" style={{ marginTop: -24 }}>
+                  <QuickAddFAB embedded />
+                </div>
+              );
+            }
+            const active = item.path !== 'more' && isActive(item.path);
             return (
-              <Link key={item.path} to={item.path}
-                className="flex-1 flex flex-col items-center"
-                style={{ gap: 3, padding: '6px 4px', WebkitTapHighlightColor: 'transparent' }}>
-                <item.icon style={{ width: 22, height: 22, color: active ? 'var(--color-green-600)' : 'var(--color-text-subtle)' }} />
-                {active ? (
-                  <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--color-green-600)' }} />
-                ) : (
-                  <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--color-text-subtle)', letterSpacing: '0.2px' }}>{item.label}</span>
+              <button
+                key={item.path}
+                onClick={() => {
+                  if (item.path === 'more') setShowMoreDrawer(true);
+                  else navigate(item.path);
+                }}
+                className="flex-1 flex flex-col items-center tap-target relative"
+                style={{ gap: 2, WebkitTapHighlightColor: 'transparent' }}
+              >
+                <motion.div
+                  animate={{ scale: active ? 1.15 : 1 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                >
+                  <item.icon style={{
+                    width: 22, height: 22,
+                    color: active ? item.activeColor : 'var(--color-text-subtle)',
+                    strokeWidth: active ? 2.5 : 2,
+                  }} />
+                </motion.div>
+                <span style={{
+                  fontSize: 10, fontWeight: active ? 700 : 500,
+                  color: active ? item.activeColor : 'var(--color-text-subtle)',
+                  letterSpacing: '0.2px',
+                }}>{item.label}</span>
+                {active && (
+                  <motion.div layoutId="bottomNavDot"
+                    style={{ width: 5, height: 5, borderRadius: '50%', background: item.activeColor, position: 'absolute', bottom: 2 }}
+                  />
                 )}
-              </Link>
+              </button>
             );
           })}
-          <button onClick={() => setShowMoreDrawer(true)}
-            className="flex-1 flex flex-col items-center"
-            style={{ gap: 3, padding: '6px 4px', WebkitTapHighlightColor: 'transparent' }}>
-            <MoreHorizontal style={{ width: 22, height: 22, color: showMoreDrawer ? 'var(--color-green-600)' : 'var(--color-text-subtle)' }} />
-            <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--color-text-subtle)', letterSpacing: '0.2px' }}>Mais</span>
-          </button>
         </nav>
       )}
 
@@ -488,18 +509,31 @@ export default function AppLayout() {
 
               {/* Grid of remaining nav items */}
               <div className="grid grid-cols-3" style={{ gap: 12 }}>
-                {navItems.filter(i => !MOBILE_NAV.find(m => m.path === i.path)).map(item => (
-                  <Link key={item.path} to={item.path} onClick={() => setShowMoreDrawer(false)}
-                    className="flex flex-col items-center transition-colors"
-                    style={{
-                      gap: 6, padding: '14px 8px', borderRadius: 'var(--radius-xl)',
-                      background: 'var(--color-bg-sunken)',
-                      border: '1px solid var(--color-border-weak)',
-                    }}>
-                    <item.icon style={{ width: 24, height: 24, color: 'var(--color-text-muted)' }} />
-                    <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--color-text-muted)', textAlign: 'center', lineHeight: 1.3 }}>{item.label}</span>
-                  </Link>
-                ))}
+                {navItems.filter(i => !['fab','more'].includes(i.path) && !MOBILE_NAV.find(m => m.path === i.path)).map(item => {
+                  const tileColors: Record<string, string> = {
+                    '/app/cashflow': '#d97706', '/app/dre': '#7c3aed', '/app/cards': '#2563eb',
+                    '/app/investments': '#16a34a', '/app/charts': '#0891b2', '/app/debts': '#dc2626',
+                    '/app/budget': '#d97706', '/app/export': '#64748b', '/app/banks': '#0891b2',
+                  };
+                  const color = tileColors[item.path] || 'var(--color-text-muted)';
+                  return (
+                    <Link key={item.path} to={item.path} onClick={() => setShowMoreDrawer(false)}
+                      className="flex flex-col items-center transition-colors tap-target"
+                      style={{
+                        gap: 6, padding: '14px 8px', borderRadius: 'var(--radius-xl)',
+                        background: 'var(--color-bg-sunken)',
+                        border: '1px solid var(--color-border-weak)',
+                      }}>
+                      <div className="flex items-center justify-center" style={{
+                        width: 40, height: 40, borderRadius: 'var(--radius-lg)',
+                        background: color + '18',
+                      }}>
+                        <item.icon style={{ width: 20, height: 20, color }} />
+                      </div>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--color-text-muted)', textAlign: 'center', lineHeight: 1.3 }}>{item.label}</span>
+                    </Link>
+                  );
+                })}
               </div>
 
               {/* Account section */}
