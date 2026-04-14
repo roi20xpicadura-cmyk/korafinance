@@ -177,20 +177,20 @@ export default function OverviewPage() {
 
   // Stats cards
   const statCards = showPersonal && !showBusiness ? [
-    { label: 'Score', value: scoreResult.total, suffix: '/1000', icon: Shield, color: '#16a34a', bg: '#f0fdf4' },
-    { label: 'Metas ativas', value: activeGoals.length, suffix: '', icon: Target, color: '#7c3aed', bg: '#f5f3ff' },
-    { label: 'Streak', value: streak, suffix: ' dias', icon: Flame, color: '#ea580c', bg: '#fff7ed' },
-    { label: 'Economizado', value: savedAmount, prefix: 'R$ ', icon: PiggyBank, color: '#0891b2', bg: '#ecfeff', isCurrency: true },
+    { label: 'Score', value: scoreResult.total, suffix: '/1000', icon: Shield, color: 'var(--color-green-600)', bg: 'var(--color-success-bg)' },
+    { label: 'Metas ativas', value: activeGoals.length, suffix: '', icon: Target, color: '#7c3aed', bg: 'hsl(263 90% 51% / 0.12)' },
+    { label: 'Streak', value: streak, suffix: ' dias', icon: Flame, color: '#ea580c', bg: 'hsl(21 90% 48% / 0.12)' },
+    { label: 'Economizado', value: savedAmount, prefix: 'R$ ', icon: PiggyBank, color: '#0891b2', bg: 'hsl(189 94% 43% / 0.12)', isCurrency: true },
   ] : showBusiness && !showPersonal ? [
-    { label: 'Receita', value: stats.bizIncome, prefix: 'R$ ', icon: TrendingUp, color: '#16a34a', bg: '#f0fdf4', isCurrency: true },
-    { label: 'Lucro', value: stats.bizProfit, prefix: 'R$ ', icon: DollarSign, color: '#16a34a', bg: '#f0fdf4', isCurrency: true },
-    { label: 'ROI', value: stats.roiBiz, suffix: '%', icon: Percent, color: '#7c3aed', bg: '#f5f3ff' },
-    { label: 'Lançamentos', value: stats.txCount, suffix: '', icon: Hash, color: '#64748b', bg: '#f1f5f9' },
+    { label: 'Receita', value: stats.bizIncome, prefix: 'R$ ', icon: TrendingUp, color: 'var(--color-green-600)', bg: 'var(--color-success-bg)', isCurrency: true },
+    { label: 'Lucro', value: stats.bizProfit, prefix: 'R$ ', icon: DollarSign, color: 'var(--color-green-600)', bg: 'var(--color-success-bg)', isCurrency: true },
+    { label: 'ROI', value: stats.roiBiz, suffix: '%', icon: Percent, color: '#7c3aed', bg: 'hsl(263 90% 51% / 0.12)' },
+    { label: 'Lançamentos', value: stats.txCount, suffix: '', icon: Hash, color: 'var(--color-text-muted)', bg: 'var(--color-bg-sunken)' },
   ] : [
-    { label: 'Score', value: scoreResult.total, suffix: '/1000', icon: Shield, color: '#16a34a', bg: '#f0fdf4' },
-    { label: 'Lucro Neg.', value: stats.bizProfit, prefix: 'R$ ', icon: DollarSign, color: '#16a34a', bg: '#f0fdf4', isCurrency: true },
-    { label: 'Metas ativas', value: activeGoals.length, suffix: '', icon: Target, color: '#7c3aed', bg: '#f5f3ff' },
-    { label: 'Economizado', value: savedAmount, prefix: 'R$ ', icon: PiggyBank, color: '#0891b2', bg: '#ecfeff', isCurrency: true },
+    { label: 'Score', value: scoreResult.total, suffix: '/1000', icon: Shield, color: 'var(--color-green-600)', bg: 'var(--color-success-bg)' },
+    { label: 'Lucro Neg.', value: stats.bizProfit, prefix: 'R$ ', icon: DollarSign, color: 'var(--color-green-600)', bg: 'var(--color-success-bg)', isCurrency: true },
+    { label: 'Metas ativas', value: activeGoals.length, suffix: '', icon: Target, color: '#7c3aed', bg: 'hsl(263 90% 51% / 0.12)' },
+    { label: 'Economizado', value: savedAmount, prefix: 'R$ ', icon: PiggyBank, color: '#0891b2', bg: 'hsl(189 94% 43% / 0.12)', isCurrency: true },
   ];
 
   const recent = transactions.slice(0, 5);
