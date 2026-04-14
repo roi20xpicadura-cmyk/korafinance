@@ -9,6 +9,9 @@ interface Profile {
   plan: string;
   plan_expires_at: string | null;
   stripe_customer_id: string | null;
+  terms_accepted_at: string | null;
+  terms_version: string | null;
+  marketing_emails: boolean;
 }
 
 interface UserConfig {
