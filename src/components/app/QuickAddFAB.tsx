@@ -9,7 +9,11 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import BottomSheet from './BottomSheet';
 
-export default function QuickAddFAB() {
+interface QuickAddFABProps {
+  embedded?: boolean;
+}
+
+export default function QuickAddFAB({ embedded }: QuickAddFABProps = {}) {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
   const { config } = useProfile();
