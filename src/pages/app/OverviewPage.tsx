@@ -348,7 +348,7 @@ export default function OverviewPage() {
         <div className="px-5 pb-4 pt-2 h-[200px]">
           {transactions.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full gap-2">
-              <BarChart2 className="w-8 h-8 text-[#e2e8f0]" />
+              <BarChart2 className="w-8 h-8 text-border" />
               <p className="text-[12px] text-muted-foreground">Adicione lançamentos para ver o gráfico</p>
             </div>
           ) : (
@@ -360,8 +360,8 @@ export default function OverviewPage() {
                     <stop offset="95%" stopColor="#16a34a" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} interval="preserveStartEnd" />
-                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} tickFormatter={(v: number) => v >= 1000 ? `R$${(v / 1000).toFixed(0)}k` : `R$${v}`} />
+                <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: 'var(--text-hint)' }} interval="preserveStartEnd" />
+                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: 'var(--text-hint)' }} tickFormatter={(v: number) => v >= 1000 ? `R$${(v / 1000).toFixed(0)}k` : `R$${v}`} />
                 <Tooltip content={<ChartTooltip />} />
                 <Area type="monotone" dataKey="saldo" stroke="#16a34a" strokeWidth={2.5} fill="url(#greenGradient)" />
               </AreaChart>
@@ -439,7 +439,7 @@ export default function OverviewPage() {
                         const ck = cks.find((c: any) => c.date === dayStr);
                         return (
                           <div key={idx} className="flex-1 h-[6px] rounded-full transition-all"
-                            style={{ background: ck ? (Number(ck.amount) > 0 ? color : color + '60') : '#f1f5f9' }} />
+                            style={{ background: ck ? (Number(ck.amount) > 0 ? color : color + '60') : 'var(--bg-elevated)' }} />
                         );
                       })}
                     </div>

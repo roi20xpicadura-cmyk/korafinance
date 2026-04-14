@@ -319,7 +319,7 @@ export default function AppLayout() {
             <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               className="fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-2xl shadow-xl p-4 pb-8 lg:hidden">
-              <div className="w-10 h-1 rounded-full bg-[#e2e8f0] mx-auto mb-4" />
+              <div className="w-10 h-1 rounded-full bg-border mx-auto mb-4" />
               <div className="grid grid-cols-4 gap-3">
                 {navItems.filter(i => !MOBILE_NAV.find(m => m.path === i.path)).map(item => (
                   <Link key={item.path} to={item.path} onClick={() => setShowMoreDrawer(false)}
