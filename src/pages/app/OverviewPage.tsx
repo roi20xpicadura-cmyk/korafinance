@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
+import { useEffect, useState, useMemo, useRef, useCallback, lazy, Suspense } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
@@ -14,7 +14,26 @@ import { motion } from 'framer-motion';
 import { format, parseISO, startOfMonth, endOfMonth, subDays, differenceInDays, eachDayOfInterval, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Link, useNavigate } from 'react-router-dom';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+
+// Lazy-load recharts (222KB) — only loads when chart is visible
+const LazyChart = lazy(() => import('recharts').then(m => ({
+  default: ({ data, tooltipContent }: { data: any[]; tooltipContent: React.ReactElement }) => (
+    <m.ResponsiveContainer width="100%" height="100%">
+      <m.AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -10 }}>
+        <defs>
+          <linearGradient id="greenGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
+            <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <m.XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: 'var(--color-text-subtle)' }} interval="preserveStartEnd" />
+        <m.YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: 'var(--color-text-subtle)' }} tickFormatter={(v: number) => v >= 1000 ? `R$${(v / 1000).toFixed(0)}k` : `R$${v}`} />
+        <m.Tooltip content={tooltipContent} />
+        <m.Area type="monotone" dataKey="saldo" stroke="#22c55e" strokeWidth={2.5} fill="url(#greenGradient)" />
+      </m.AreaChart>
+    </m.ResponsiveContainer>
+  )
+})));
 
 /* ── helpers ───────────────────────────────────────────── */
 
@@ -358,20 +377,9 @@ export default function OverviewPage() {
               <p className="text-[12px] text-muted-foreground">Adicione lançamentos para ver o gráfico</p>
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -10 }}>
-                <defs>
-                  <linearGradient id="greenGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: 'var(--color-text-subtle)' }} interval="preserveStartEnd" />
-                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: 'var(--color-text-subtle)' }} tickFormatter={(v: number) => v >= 1000 ? `R$${(v / 1000).toFixed(0)}k` : `R$${v}`} />
-                <Tooltip content={<ChartTooltip />} />
-                <Area type="monotone" dataKey="saldo" stroke="#22c55e" strokeWidth={2.5} fill="url(#greenGradient)" />
-              </AreaChart>
-            </ResponsiveContainer>
+            <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="skeleton-shimmer" style={{ width: '100%', height: '100%', borderRadius: 8 }} /></div>}>
+              <LazyChart data={chartData} tooltipContent={<ChartTooltip />} />
+            </Suspense>
           )}
         </div>
       </motion.div>

@@ -1,19 +1,26 @@
+import { lazy, Suspense } from 'react';
 import Navbar from '@/components/landing/Navbar';
 import HeroSection from '@/components/landing/HeroSection';
 import TrustStrip from '@/components/landing/TrustStrip';
-import MetricsSection from '@/components/landing/MetricsSection';
-import FeaturesSection from '@/components/landing/FeaturesSection';
-import UseCasesSection from '@/components/landing/UseCasesSection';
-import HowItWorks from '@/components/landing/HowItWorks';
-import PricingSection from '@/components/landing/PricingSection';
-import TestimonialsSection from '@/components/landing/TestimonialsSection';
-import FAQSection from '@/components/landing/FAQSection';
-import CTASection from '@/components/landing/CTASection';
-import Footer from '@/components/landing/Footer';
 import SEO from '@/components/SEO';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, X } from 'lucide-react';
+
+// Lazy-load below-the-fold sections
+const MetricsSection = lazy(() => import('@/components/landing/MetricsSection'));
+const FeaturesSection = lazy(() => import('@/components/landing/FeaturesSection'));
+const UseCasesSection = lazy(() => import('@/components/landing/UseCasesSection'));
+const HowItWorks = lazy(() => import('@/components/landing/HowItWorks'));
+const PricingSection = lazy(() => import('@/components/landing/PricingSection'));
+const TestimonialsSection = lazy(() => import('@/components/landing/TestimonialsSection'));
+const FAQSection = lazy(() => import('@/components/landing/FAQSection'));
+const CTASection = lazy(() => import('@/components/landing/CTASection'));
+const Footer = lazy(() => import('@/components/landing/Footer'));
+
+function SectionFallback() {
+  return <div className="py-20" />;
+}
 
 export default function LandingPage() {
   return (
@@ -22,15 +29,17 @@ export default function LandingPage() {
       <Navbar />
       <HeroSection />
       <TrustStrip />
-      <MetricsSection />
-      <FeaturesSection />
-      <UseCasesSection />
-      <HowItWorks />
-      <TestimonialsSection />
-      <PricingSection />
-      <FAQSection />
-      <CTASection />
-      <Footer />
+      <Suspense fallback={<SectionFallback />}>
+        <MetricsSection />
+        <FeaturesSection />
+        <UseCasesSection />
+        <HowItWorks />
+        <TestimonialsSection />
+        <PricingSection />
+        <FAQSection />
+        <CTASection />
+        <Footer />
+      </Suspense>
     </div>
   );
 }
@@ -96,7 +105,7 @@ export function PricingCards({ currentPlan, onUpgrade }: { currentPlan?: string;
                 <span className={`text-3xl font-black ${p.dark ? 'text-white' : isPro ? 'text-[#16a34a]' : 'text-[#0f172a]'}`}>
                   {price === 0 ? 'Grátis' : `R$ ${price}`}
                 </span>
-                {price > 0 && <span className={`text-sm ${p.dark ? 'text-[#94a3b8]' : 'text-[#94a3b8]'}`}>/mês</span>}
+                {price > 0 && <span className="text-sm text-[#94a3b8]">/mês</span>}
               </div>
               <ul className="space-y-2.5 mb-7">
                 {p.features.map(f => (
