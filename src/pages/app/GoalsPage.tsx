@@ -227,7 +227,7 @@ export default function GoalsPage() {
   if (loading) return <div className="p-7 space-y-4"><div className="h-20 rounded-xl bg-muted/30 animate-pulse" /><div className="h-48 rounded-xl bg-muted/30 animate-pulse" /><div className="grid grid-cols-3 gap-4"><div className="h-64 rounded-xl bg-muted/30 animate-pulse" /><div className="h-64 rounded-xl bg-muted/30 animate-pulse" /><div className="h-64 rounded-xl bg-muted/30 animate-pulse" /></div></div>;
 
   return (
-    <div className="p-5 md:p-7 space-y-5" style={{ background: '#f8faf8', minHeight: '100vh' }}>
+    <div className="p-5 md:p-7 space-y-5" style={{ background: 'var(--bg-page)', minHeight: '100vh' }}>
       {/* STATS STRIP */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
@@ -237,30 +237,30 @@ export default function GoalsPage() {
           { label: 'MAIOR META', value: biggestGoal ? (biggestGoal.name.length > 16 ? biggestGoal.name.slice(0, 16) + '…' : biggestGoal.name) : '—', subValue: biggestGoal ? formatCurrency(Number(biggestGoal.target_amount)) : undefined, Icon: Star, iconBg: '#f5f3ff', iconColor: '#7c3aed' },
         ].map((s, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
-            className="flex items-center gap-3.5 bg-white border border-[#e2e8f0] rounded-xl p-4" style={{ borderWidth: '1.5px' }}>
+            className="flex items-center gap-3.5 bg-card border border-border rounded-xl p-4" style={{ borderWidth: '1.5px' }}>
             <div className="flex items-center justify-center rounded-[10px]" style={{ width: 40, height: 40, background: s.iconBg }}>
               <s.Icon size={18} style={{ color: s.iconColor }} />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] font-bold tracking-wider" style={{ color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px' }}>{s.label}</p>
-              <p className="text-lg font-black tracking-tight truncate" style={{ color: '#14532d', letterSpacing: '-0.5px' }}>{s.value}</p>
-              {s.subValue && <p className="text-xs" style={{ color: '#94a3b8' }}>{s.subValue}</p>}
+              <p className="text-[10px] font-bold tracking-wider" style={{ color: 'var(--text-hint)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>{s.label}</p>
+              <p className="text-lg font-black tracking-tight truncate" style={{ color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>{s.value}</p>
+              {s.subValue && <p className="text-xs" style={{ color: 'var(--text-hint)' }}>{s.subValue}</p>}
             </div>
           </motion.div>
         ))}
       </div>
 
       {/* NOVA META CARD */}
-      <div ref={formRef} className="bg-white rounded-2xl overflow-hidden" style={{ border: '1.5px solid #e2e8f0' }}>
+      <div ref={formRef} className="bg-card rounded-2xl overflow-hidden" style={{ border: '1.5px solid var(--border-default)' }}>
         <button onClick={() => setFormOpen(!formOpen)}
-          className="w-full flex items-center justify-between p-[18px_20px] cursor-pointer hover:bg-[#fafcfa] transition-colors">
+          className="w-full flex items-center justify-between p-[18px_20px] cursor-pointer hover:bg-background transition-colors">
           <div className="flex items-center gap-2">
             <PlusCircle size={18} className="text-[#16a34a]" />
-            <span className="text-[15px] font-extrabold" style={{ color: '#14532d' }}>Nova Meta</span>
-            {!formOpen && <span className="text-xs" style={{ color: '#94a3b8', marginLeft: 4 }}>Clique para adicionar uma nova meta financeira</span>}
+            <span className="text-[15px] font-extrabold" style={{ color: 'var(--text-primary)' }}>Nova Meta</span>
+            {!formOpen && <span className="text-xs" style={{ color: 'var(--text-hint)', marginLeft: 4 }}>Clique para adicionar uma nova meta financeira</span>}
           </div>
           <motion.div animate={{ rotate: formOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
-            <ChevronDown size={16} style={{ color: '#94a3b8' }} />
+            <ChevronDown size={16} style={{ color: 'var(--text-hint)' }} />
           </motion.div>
         </button>
 
@@ -305,30 +305,30 @@ export default function GoalsPage() {
                   <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: '#6b8f6b', letterSpacing: '0.6px' }}>2. Detalhes da meta</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                     <div className="sm:col-span-2">
-                      <label className="text-[11px] font-semibold text-[#64748b] mb-1 block">Nome da meta</label>
+                      <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Nome da meta</label>
                       <input value={name} onChange={e => setName(e.target.value)} placeholder="Ex: Reserva de emergência"
-                        className="w-full px-3 py-2.5 text-sm rounded-lg border border-[#e2e8f0] bg-white focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none transition-colors" />
+                        className="w-full px-3 py-2.5 text-sm rounded-lg border border-border bg-card focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none transition-colors" />
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-[#64748b] mb-1 block">Valor alvo (R$)</label>
+                      <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Valor alvo (R$)</label>
                       <input type="number" value={target} onChange={e => setTarget(e.target.value)} placeholder="10.000,00"
-                        className="w-full px-3 py-2.5 text-sm rounded-lg border border-[#e2e8f0] bg-white focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none transition-colors" />
+                        className="w-full px-3 py-2.5 text-sm rounded-lg border border-border bg-card focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none transition-colors" />
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-[#64748b] mb-1 block">Já tenho (R$)</label>
+                      <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Já tenho (R$)</label>
                       <input type="number" value={current} onChange={e => setCurrent(e.target.value)} placeholder="0,00"
-                        className="w-full px-3 py-2.5 text-sm rounded-lg border border-[#e2e8f0] bg-white focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none transition-colors" />
-                      <p className="text-[11px] mt-1" style={{ color: '#94a3b8' }}>Quanto você já tem guardado</p>
+                        className="w-full px-3 py-2.5 text-sm rounded-lg border border-border bg-card focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none transition-colors" />
+                      <p className="text-[11px] mt-1" style={{ color: 'var(--text-hint)' }}>Quanto você já tem guardado</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
                     <div>
-                      <label className="text-[11px] font-semibold text-[#64748b] mb-1 block">Data limite</label>
+                      <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Data limite</label>
                       <input type="date" value={deadline} onChange={e => setDeadline(e.target.value)}
-                        className="w-full px-3 py-2.5 text-sm rounded-lg border border-[#e2e8f0] bg-white focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none transition-colors" />
+                        className="w-full px-3 py-2.5 text-sm rounded-lg border border-border bg-card focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none transition-colors" />
                     </div>
                     <div>
-                      <label className="text-[11px] font-semibold text-[#64748b] mb-1 block">Cor da meta</label>
+                      <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Cor da meta</label>
                       <div className="flex gap-2 mt-1">
                         {GOAL_COLORS.map(c => (
                           <button key={c} onClick={() => setGoalColor(c)}
@@ -350,19 +350,19 @@ export default function GoalsPage() {
 
                 {/* STEP 3: Preview & Submit */}
                 {name.trim() && target && (
-                  <div className="rounded-xl p-4" style={{ background: '#f8faf8', border: '1.5px solid #e2e8f0' }}>
-                    <p className="text-[11px] uppercase font-bold tracking-wide mb-3" style={{ color: '#94a3b8' }}>Prévia da sua meta</p>
-                    <div className="bg-white rounded-xl p-4" style={{ borderTop: `4px solid ${goalColor}`, border: '1.5px solid #e2e8f0', borderTopColor: goalColor }}>
+                  <div className="rounded-xl p-4" style={{ background: 'var(--bg-page)', border: '1.5px solid var(--border-default)' }}>
+                    <p className="text-[11px] uppercase font-bold tracking-wide mb-3" style={{ color: 'var(--text-hint)' }}>Prévia da sua meta</p>
+                    <div className="bg-card rounded-xl p-4" style={{ borderTop: `4px solid ${goalColor}`, border: '1.5px solid var(--border-default)', borderTopColor: goalColor }}>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-[10px] flex items-center justify-center text-xl" style={{ background: goalColor + '20', border: `1.5px solid ${goalColor}40` }}>
                           {OBJECTIVES.find(o => o.key === objectiveType)?.emoji || '🎯'}
                         </div>
                         <div>
-                          <p className="font-extrabold text-sm" style={{ color: '#14532d' }}>{name}</p>
-                          <p className="text-[10px]" style={{ color: '#94a3b8' }}>Meta: {formatCurrency(parseFloat(target) || 0)}</p>
+                          <p className="font-extrabold text-sm" style={{ color: 'var(--text-primary)' }}>{name}</p>
+                          <p className="text-[10px]" style={{ color: 'var(--text-hint)' }}>Meta: {formatCurrency(parseFloat(target) || 0)}</p>
                         </div>
                       </div>
-                      <div className="mt-3 h-2.5 rounded-full overflow-hidden" style={{ background: '#f1f5f9' }}>
+                      <div className="mt-3 h-2.5 rounded-full overflow-hidden" style={{ background: 'var(--bg-elevated)' }}>
                         <div className="h-full rounded-full" style={{ background: goalColor, width: `${Math.min(((parseFloat(current) || 0) / (parseFloat(target) || 1)) * 100, 100)}%` }} />
                       </div>
                     </div>
@@ -370,7 +370,7 @@ export default function GoalsPage() {
                 )}
 
                 <div className="flex items-center justify-between pt-2">
-                  <button onClick={clearForm} className="text-xs" style={{ color: '#94a3b8' }}>Limpar formulário</button>
+                  <button onClick={clearForm} className="text-xs" style={{ color: 'var(--text-hint)' }}>Limpar formulário</button>
                   <button onClick={handleAdd} disabled={creating}
                     className="flex items-center gap-1.5 px-5 py-2.5 rounded-[10px] text-white text-sm font-extrabold transition-all hover:brightness-110 disabled:opacity-50"
                     style={{ background: '#16a34a' }}>
@@ -387,13 +387,13 @@ export default function GoalsPage() {
       {goals.length > 0 && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-[15px] font-extrabold" style={{ color: '#14532d' }}>Minhas Metas</span>
+            <span className="text-[15px] font-extrabold" style={{ color: 'var(--text-primary)' }}>Minhas Metas</span>
             <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full" style={{ background: '#f0fdf4', color: '#166534', border: '1px solid #d4edda' }}>
               {completedGoals.length}/{goals.length} concluídas
             </span>
           </div>
           <select value={sortMode} onChange={e => setSortMode(e.target.value as SortMode)}
-            className="text-xs font-medium px-3 py-1.5 rounded-full border border-[#e2e8f0] bg-white text-[#64748b] cursor-pointer outline-none">
+            className="text-xs font-medium px-3 py-1.5 rounded-full border border-border bg-card text-muted-foreground cursor-pointer outline-none">
             <option value="recent">Mais recente</option>
             <option value="value">Maior valor</option>
             <option value="deadline">Prazo próximo</option>
@@ -422,12 +422,12 @@ export default function GoalsPage() {
               <Target size={36} style={{ color: '#16a34a' }} />
             </div>
           </div>
-          <h3 className="text-lg font-extrabold" style={{ color: '#14532d' }}>Nenhuma meta ainda</h3>
-          <p className="text-sm leading-relaxed max-w-[340px]" style={{ color: '#64748b', lineHeight: 1.7 }}>
+          <h3 className="text-lg font-extrabold" style={{ color: 'var(--text-primary)' }}>Nenhuma meta ainda</h3>
+          <p className="text-sm leading-relaxed max-w-[340px]" style={{ color: 'var(--text-secondary)', lineHeight: 1.7 }}>
             Defina seus objetivos financeiros e acompanhe cada passo da sua jornada rumo à liberdade financeira.
           </p>
           <div className="rounded-r-lg p-3 px-4 max-w-[400px]" style={{ background: '#f0fdf4', borderLeft: '3px solid #16a34a' }}>
-            <p className="text-[13px] italic" style={{ color: '#374151' }}>
+            <p className="text-[13px] italic" style={{ color: 'var(--text-primary)' }}>
               "Uma meta sem prazo é apenas um sonho. Com prazo, ela se torna um plano."
             </p>
           </div>
@@ -436,13 +436,13 @@ export default function GoalsPage() {
             + Criar minha primeira meta
           </button>
           <div className="mt-2">
-            <p className="text-[11px] mb-2" style={{ color: '#94a3b8' }}>Sugestões rápidas:</p>
+            <p className="text-[11px] mb-2" style={{ color: 'var(--text-hint)' }}>Sugestões rápidas:</p>
             <div className="flex flex-wrap justify-center gap-2">
               {['emergency_fund', 'pay_card', 'save_money', 'buy_house'].map(key => {
                 const obj = OBJECTIVES.find(o => o.key === key)!;
                 return (
                   <button key={key} onClick={() => openFormWithObjective(key)}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-colors hover:bg-[#f0fdf4]"
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-colors hover:bg-secondary"
                     style={{ border: '1px solid #d4edda', color: '#166534', background: 'white' }}>
                     {obj.emoji} {obj.label}
                   </button>
@@ -464,11 +464,11 @@ export default function GoalsPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4"
             style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }} onClick={() => setEditGoal(null)}>
             <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-2xl p-7 w-full max-w-[520px] space-y-4" onClick={e => e.stopPropagation()}>
+              className="bg-card rounded-2xl p-7 w-full max-w-[520px] space-y-4" onClick={e => e.stopPropagation()}>
               <div className="flex items-center justify-between">
-                <h3 className="text-base font-extrabold" style={{ color: '#14532d' }}>Editar Meta</h3>
-                <button onClick={() => setEditGoal(null)} className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#f8faf8] transition-colors">
-                  <X size={16} style={{ color: '#94a3b8' }} />
+                <h3 className="text-base font-extrabold" style={{ color: 'var(--text-primary)' }}>Editar Meta</h3>
+                <button onClick={() => setEditGoal(null)} className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-background transition-colors">
+                  <X size={16} style={{ color: 'var(--text-hint)' }} />
                 </button>
               </div>
 
@@ -486,23 +486,23 @@ export default function GoalsPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2">
-                  <label className="text-[11px] font-semibold text-[#64748b] mb-1 block">Nome</label>
-                  <input value={editName} onChange={e => setEditName(e.target.value)} className="w-full px-3 py-2.5 text-sm rounded-lg border border-[#e2e8f0] bg-white focus:border-[#16a34a] outline-none" />
+                  <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Nome</label>
+                  <input value={editName} onChange={e => setEditName(e.target.value)} className="w-full px-3 py-2.5 text-sm rounded-lg border border-border bg-card focus:border-[#16a34a] outline-none" />
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-[#64748b] mb-1 block">Valor alvo</label>
-                  <input type="number" value={editTarget} onChange={e => setEditTarget(e.target.value)} className="w-full px-3 py-2.5 text-sm rounded-lg border border-[#e2e8f0] bg-white focus:border-[#16a34a] outline-none" />
+                  <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Valor alvo</label>
+                  <input type="number" value={editTarget} onChange={e => setEditTarget(e.target.value)} className="w-full px-3 py-2.5 text-sm rounded-lg border border-border bg-card focus:border-[#16a34a] outline-none" />
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-[#64748b] mb-1 block">Valor atual</label>
-                  <input type="number" value={editCurrent} onChange={e => setEditCurrent(e.target.value)} className="w-full px-3 py-2.5 text-sm rounded-lg border border-[#e2e8f0] bg-white focus:border-[#16a34a] outline-none" />
+                  <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Valor atual</label>
+                  <input type="number" value={editCurrent} onChange={e => setEditCurrent(e.target.value)} className="w-full px-3 py-2.5 text-sm rounded-lg border border-border bg-card focus:border-[#16a34a] outline-none" />
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-[#64748b] mb-1 block">Prazo</label>
-                  <input type="date" value={editDeadline} onChange={e => setEditDeadline(e.target.value)} className="w-full px-3 py-2.5 text-sm rounded-lg border border-[#e2e8f0] bg-white focus:border-[#16a34a] outline-none" />
+                  <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Prazo</label>
+                  <input type="date" value={editDeadline} onChange={e => setEditDeadline(e.target.value)} className="w-full px-3 py-2.5 text-sm rounded-lg border border-border bg-card focus:border-[#16a34a] outline-none" />
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-[#64748b] mb-1 block">Cor</label>
+                  <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Cor</label>
                   <div className="flex gap-2 mt-1">
                     {GOAL_COLORS.map(c => (
                       <button key={c} onClick={() => setEditColor(c)} className="rounded-full transition-transform"
@@ -513,7 +513,7 @@ export default function GoalsPage() {
               </div>
 
               <div className="flex justify-end gap-2 pt-2">
-                <button onClick={() => setEditGoal(null)} className="px-4 py-2 text-sm font-semibold rounded-lg text-[#64748b] hover:bg-[#f8faf8] transition-colors">Cancelar</button>
+                <button onClick={() => setEditGoal(null)} className="px-4 py-2 text-sm font-semibold rounded-lg text-muted-foreground hover:bg-background transition-colors">Cancelar</button>
                 <button onClick={handleSaveEdit} className="px-5 py-2 text-sm font-extrabold rounded-lg text-white transition-all hover:brightness-110" style={{ background: '#16a34a' }}>Salvar alterações</button>
               </div>
             </motion.div>
@@ -563,7 +563,7 @@ function GoalCard({ goal: g, index: i, openMenu, setOpenMenu, onQuickAdd, onCust
       const daily = remaining / daysLeft;
       return { bg: '#fef2f2', border: '#fecaca', color: '#991b1b', text: `Precisa de ${formatCurrency(daily)}/dia para atingir` };
     }
-    return { bg: '#f8fafc', border: '#e2e8f0', color: '#64748b', text: 'Começando a jornada 💪' };
+    return { bg: '#f8fafc', border: '#e2e8f0', color: 'var(--text-secondary)', text: 'Começando a jornada 💪' };
   };
 
   const status = getStatusBadge();
@@ -571,7 +571,7 @@ function GoalCard({ goal: g, index: i, openMenu, setOpenMenu, onQuickAdd, onCust
 
   return (
     <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08, duration: 0.4 }}
-      className="bg-white rounded-2xl p-5 relative group transition-all duration-200 hover:-translate-y-0.5"
+      className="bg-card rounded-2xl p-5 relative group transition-all duration-200 hover:-translate-y-0.5"
       style={{ borderTop: `4px solid ${color}`, border: `1.5px solid #e2e8f0`, borderTopColor: color, borderTopWidth: 4 }}>
       {/* Top */}
       <div className="flex items-start justify-between">
@@ -580,11 +580,11 @@ function GoalCard({ goal: g, index: i, openMenu, setOpenMenu, onQuickAdd, onCust
         </div>
         <div className="relative">
           <button onClick={e => { e.stopPropagation(); setOpenMenu(openMenu === g.id ? null : g.id); }}
-            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#f8faf8] transition-colors">
-            <MoreHorizontal size={16} style={{ color: '#94a3b8' }} />
+            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-background transition-colors">
+            <MoreHorizontal size={16} style={{ color: 'var(--text-hint)' }} />
           </button>
           {openMenu === g.id && (
-            <div className="absolute right-0 top-9 bg-white rounded-[10px] py-1 z-50 min-w-[180px]" style={{ border: '1px solid #e2e8f0', boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
+            <div className="absolute right-0 top-9 bg-card rounded-[10px] py-1 z-50 min-w-[180px]" style={{ border: '1px solid var(--border-default)', boxShadow: '0 8px 24px rgba(0,0,0,0.08)' }}
               onClick={e => e.stopPropagation()}>
               {[
                 { icon: Pencil, label: '✏️ Editar meta', action: () => onEdit(g), danger: false },
@@ -593,7 +593,7 @@ function GoalCard({ goal: g, index: i, openMenu, setOpenMenu, onQuickAdd, onCust
                 { icon: Trash2, label: '🗑️ Excluir meta', action: () => { if (confirm('Excluir esta meta?')) onRemove(g.id); }, danger: true },
               ].map((item, idx) => (
                 <button key={idx} onClick={item.action}
-                  className="w-full text-left px-3 py-2 text-xs font-medium hover:bg-[#f8faf8] transition-colors"
+                  className="w-full text-left px-3 py-2 text-xs font-medium hover:bg-background transition-colors"
                   style={{ color: item.danger ? '#dc2626' : '#374151' }}>
                   {item.label}
                 </button>
@@ -604,7 +604,7 @@ function GoalCard({ goal: g, index: i, openMenu, setOpenMenu, onQuickAdd, onCust
       </div>
 
       {/* Name */}
-      <p className="mt-3 text-base font-extrabold leading-tight" style={{ color: '#14532d', letterSpacing: '-0.3px' }}>{g.name}</p>
+      <p className="mt-3 text-base font-extrabold leading-tight" style={{ color: 'var(--text-primary)', letterSpacing: '-0.3px' }}>{g.name}</p>
 
       {/* Objective badge */}
       {obj && (
@@ -615,11 +615,11 @@ function GoalCard({ goal: g, index: i, openMenu, setOpenMenu, onQuickAdd, onCust
 
       {/* Target + deadline */}
       <div className="flex flex-wrap gap-3 mt-2">
-        <span className="flex items-center gap-1 text-xs" style={{ color: '#64748b' }}>
-          <Target size={12} style={{ color: '#94a3b8' }} /> Meta: {formatCurrency(targetNum)}
+        <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
+          <Target size={12} style={{ color: 'var(--text-hint)' }} /> Meta: {formatCurrency(targetNum)}
         </span>
-        <span className="flex items-center gap-1 text-xs" style={{ color: '#64748b' }}>
-          <Calendar size={12} style={{ color: '#94a3b8' }} /> {g.deadline ? format(parseISO(g.deadline), 'dd/MM/yyyy') : 'Sem prazo'}
+        <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--text-secondary)' }}>
+          <Calendar size={12} style={{ color: 'var(--text-hint)' }} /> {g.deadline ? format(parseISO(g.deadline), 'dd/MM/yyyy') : 'Sem prazo'}
         </span>
         <span className="flex items-center gap-1 text-xs font-medium" style={{ color: getDaysColor() }}>
           <Clock size={12} /> {getDaysText()}
@@ -632,13 +632,13 @@ function GoalCard({ goal: g, index: i, openMenu, setOpenMenu, onQuickAdd, onCust
       {/* Progress */}
       <div className="flex items-baseline justify-between">
         <span className="text-[32px] font-black leading-none" style={{ color, letterSpacing: '-1px' }}>{pct.toFixed(0)}%</span>
-        <span className="text-xs text-right" style={{ color: '#64748b' }}>
+        <span className="text-xs text-right" style={{ color: 'var(--text-secondary)' }}>
           <span className="font-bold" style={{ color }}>{formatCurrency(Number(g.current_amount))}</span>
-          <span style={{ color: '#94a3b8' }}> / {formatCurrency(targetNum)}</span>
+          <span style={{ color: 'var(--text-hint)' }}> / {formatCurrency(targetNum)}</span>
         </span>
       </div>
 
-      <div className="mt-2.5 h-2.5 rounded-full overflow-hidden relative" style={{ background: '#f1f5f9' }}>
+      <div className="mt-2.5 h-2.5 rounded-full overflow-hidden relative" style={{ background: 'var(--bg-elevated)' }}>
         <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
           className="h-full rounded-full relative overflow-hidden" style={{ background: color }}>
           <div className="absolute inset-0 opacity-30" style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)', animation: 'shimmer 2s infinite' }} />
@@ -646,8 +646,8 @@ function GoalCard({ goal: g, index: i, openMenu, setOpenMenu, onQuickAdd, onCust
       </div>
 
       <div className="flex justify-between mt-1.5">
-        <span className="text-[11px]" style={{ color: '#94a3b8' }}>{formatCurrency(Number(g.current_amount))} guardados</span>
-        <span className="text-[11px]" style={{ color: '#94a3b8' }}>Faltam {formatCurrency(remaining)}</span>
+        <span className="text-[11px]" style={{ color: 'var(--text-hint)' }}>{formatCurrency(Number(g.current_amount))} guardados</span>
+        <span className="text-[11px]" style={{ color: 'var(--text-hint)' }}>Faltam {formatCurrency(remaining)}</span>
       </div>
 
       {/* Status badge */}
@@ -662,7 +662,7 @@ function GoalCard({ goal: g, index: i, openMenu, setOpenMenu, onQuickAdd, onCust
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-1.5">
             <Flame size={13} style={{ color: '#d97706' }} />
-            <span className="text-[11px] font-bold" style={{ color: '#14532d' }}>Streak diário</span>
+            <span className="text-[11px] font-bold" style={{ color: 'var(--text-primary)' }}>Streak diário</span>
             {(() => {
               let streak = 0;
               for (let d = 0; d < 30; d++) {
@@ -697,7 +697,7 @@ function GoalCard({ goal: g, index: i, openMenu, setOpenMenu, onQuickAdd, onCust
             const dayLabel = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'][day.getDay()];
             return (
               <div key={idx} className="flex-1 flex flex-col items-center gap-1">
-                <span className="text-[9px] font-medium" style={{ color: '#94a3b8' }}>{dayLabel}</span>
+                <span className="text-[9px] font-medium" style={{ color: 'var(--text-hint)' }}>{dayLabel}</span>
                 <div className="w-full aspect-square rounded-lg flex items-center justify-center transition-all"
                   style={{
                     background: ck ? (Number(ck.amount) > 0 ? '#16a34a' : '#86efac') : (isToday ? '#f8faf8' : '#f1f5f9'),
@@ -718,7 +718,7 @@ function GoalCard({ goal: g, index: i, openMenu, setOpenMenu, onQuickAdd, onCust
         </div>
       </div>
       <div className="mt-3.5 pt-3.5 flex flex-wrap items-center gap-2" style={{ borderTop: '1px solid #f8fafc' }}>
-        <span className="text-[11px]" style={{ color: '#94a3b8' }}>Adicionar:</span>
+        <span className="text-[11px]" style={{ color: 'var(--text-hint)' }}>Adicionar:</span>
         {presets.map(p => (
           <button key={p} onClick={() => onQuickAdd(g.id, p)}
             className="text-[11px] font-bold px-2.5 py-1 rounded-full cursor-pointer transition-colors active:scale-95 hover:bg-[#dcfce7]"
@@ -727,7 +727,7 @@ function GoalCard({ goal: g, index: i, openMenu, setOpenMenu, onQuickAdd, onCust
           </button>
         ))}
         <div className="flex items-center gap-1 flex-1 min-w-[100px]">
-          <input ref={customInputRef} type="number" placeholder="R$ ___" className="flex-1 h-8 text-xs px-2 rounded-lg border border-[#e2e8f0] outline-none focus:border-[#16a34a]"
+          <input ref={customInputRef} type="number" placeholder="R$ ___" className="flex-1 h-8 text-xs px-2 rounded-lg border border-border outline-none focus:border-[#16a34a]"
             onKeyDown={e => { if (e.key === 'Enter') { onCustomAdd(g.id, (e.target as HTMLInputElement).value); (e.target as HTMLInputElement).value = ''; } }} />
           <button onClick={() => { if (customInputRef.current) { onCustomAdd(g.id, customInputRef.current.value); customInputRef.current.value = ''; } }}
             className="w-7 h-7 rounded-md flex items-center justify-center text-white text-sm font-bold" style={{ background: '#16a34a' }}>+</button>
@@ -756,14 +756,14 @@ function CompletedSection({ goals }: { goals: any[] }) {
               const obj = OBJECTIVES.find(o => o.key === g.objective_type);
               return (
                 <motion.div key={g.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }}
-                  className="bg-white rounded-2xl p-5 opacity-75" style={{ borderTop: '4px solid #d97706', border: '1.5px solid #e2e8f0', borderTopColor: '#d97706', borderTopWidth: 4 }}>
+                  className="bg-card rounded-2xl p-5 opacity-75" style={{ borderTop: '4px solid #d97706', border: '1.5px solid var(--border-default)', borderTopColor: '#d97706', borderTopWidth: 4 }}>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style={{ background: '#fefce820', border: '1.5px solid #fde68a' }}>
                       {obj?.emoji || '🎯'}
                     </div>
                     <div>
-                      <p className="font-extrabold text-sm" style={{ color: '#14532d' }}>{g.name}</p>
-                      <p className="text-[10px]" style={{ color: '#94a3b8' }}>{formatCurrency(Number(g.target_amount))}</p>
+                      <p className="font-extrabold text-sm" style={{ color: 'var(--text-primary)' }}>{g.name}</p>
+                      <p className="text-[10px]" style={{ color: 'var(--text-hint)' }}>{formatCurrency(Number(g.target_amount))}</p>
                     </div>
                   </div>
                   <div className="mt-3 h-2.5 rounded-full" style={{ background: '#d97706' }} />

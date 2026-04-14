@@ -52,7 +52,7 @@ function ProgressBar({ pct, delay = 0 }: { pct: number; delay?: number }) {
   useEffect(() => { const t = setTimeout(() => setW(Math.min(pct, 100)), delay); return () => clearTimeout(t); }, [pct, delay]);
   const color = pct < 30 ? 'bg-[#ef4444]' : pct < 70 ? 'bg-[#f59e0b]' : 'bg-[#16a34a]';
   return (
-    <div className="h-[6px] bg-[#f1f5f9] rounded-full overflow-hidden">
+    <div className="h-[6px] bg-muted/30 rounded-full overflow-hidden">
       <div className={`h-full rounded-full transition-all duration-[800ms] ease-out ${color}`} style={{ width: `${w}%` }} />
     </div>
   );
@@ -64,9 +64,9 @@ const stagger = (i: number) => ({ initial: { opacity: 0, y: 16 }, animate: { opa
 function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-[#e2e8f0] rounded-lg px-3 py-2 shadow-[0_4px_12px_rgba(0,0,0,0.08)]">
-      <p className="text-[11px] text-[#94a3b8] mb-0.5">{label}</p>
-      <p className="text-[13px] font-bold text-[#14532d]">{formatCurrency(payload[0].value, 'R$')}</p>
+    <div className="bg-card border border-border rounded-lg px-3 py-2 shadow-[0_4px_12px_rgba(0,0,0,0.08)]">
+      <p className="text-[11px] text-muted-foreground mb-0.5">{label}</p>
+      <p className="text-[13px] font-bold text-foreground">{formatCurrency(payload[0].value, 'R$')}</p>
     </div>
   );
 }
@@ -187,14 +187,14 @@ export default function OverviewPage() {
     { label: 'Total Receitas', value: stats.totalIncome, icon: DollarSign, iconBg: 'bg-[#dcfce7]', iconColor: 'text-[#16a34a]' },
     { label: 'Total Despesas', value: stats.totalExpense, icon: TrendingDown, iconBg: 'bg-[#fee2e2]', iconColor: 'text-[#dc2626]' },
     { label: 'Total Guardado', value: Math.max(0, stats.netBalance), icon: DollarSign, iconBg: 'bg-[#dcfce7]', iconColor: 'text-[#16a34a]' },
-    { label: 'Metas Ativas', value: goals.filter(g => Number(g.current_amount) < Number(g.target_amount)).length, icon: Hash, iconBg: 'bg-[#f1f5f9]', iconColor: 'text-[#64748b]', isCount: true },
+    { label: 'Metas Ativas', value: goals.filter(g => Number(g.current_amount) < Number(g.target_amount)).length, icon: Hash, iconBg: 'bg-muted/30', iconColor: 'text-muted-foreground', isCount: true },
     { label: 'Taxa Poupança', value: stats.savingsRate, icon: Percent, iconBg: 'bg-[#ede9fe]', iconColor: 'text-[#7c3aed]', isPct: true, bar: Math.min(stats.savingsRate, 100) },
   ] : [
     { label: 'Receita', value: stats.totalIncome, icon: TrendingUp, iconBg: 'bg-[#dcfce7]', iconColor: 'text-[#16a34a]' },
     { label: 'Custos', value: stats.totalExpense, icon: TrendingDown, iconBg: 'bg-[#fee2e2]', iconColor: 'text-[#dc2626]' },
     { label: 'Lucro', value: stats.bizProfit, icon: DollarSign, iconBg: 'bg-[#dcfce7]', iconColor: 'text-[#16a34a]' },
     { label: 'ROI', value: stats.roiBiz, icon: Percent, iconBg: 'bg-[#ede9fe]', iconColor: 'text-[#7c3aed]', isPct: true },
-    { label: 'Lançamentos', value: stats.txCount, icon: Hash, iconBg: 'bg-[#f1f5f9]', iconColor: 'text-[#64748b]', isCount: true },
+    { label: 'Lançamentos', value: stats.txCount, icon: Hash, iconBg: 'bg-muted/30', iconColor: 'text-muted-foreground', isCount: true },
     { label: 'Média/Dia', value: stats.avgPerDay, icon: Zap, iconBg: 'bg-[#fef9c3]', iconColor: 'text-[#ca8a04]' },
   ];
 
@@ -203,13 +203,13 @@ export default function OverviewPage() {
       {/* ── Tip Bar ────────────────────────────────── */}
       {activeTip && (
         <motion.div {...stagger(0)}
-          className="bg-white border border-[#e2e8f0] border-l-[3px] border-l-[#16a34a] rounded-r-[10px] rounded-l-none flex items-center gap-2.5 px-4 py-2.5">
+          className="bg-card border border-border border-l-[3px] border-l-[#16a34a] rounded-r-[10px] rounded-l-none flex items-center gap-2.5 px-4 py-2.5">
           <Lightbulb className="w-3.5 h-3.5 text-[#16a34a] flex-shrink-0" />
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <span className="text-[9px] uppercase font-extrabold text-[#16a34a] tracking-[1px] flex-shrink-0">DICA</span>
-            <p className="text-[12px] text-[#374151] font-medium truncate">{SMART_TIPS[activeTip]?.replace(/^💡\s*/, '')}</p>
+            <p className="text-[12px] text-foreground font-medium truncate">{SMART_TIPS[activeTip]?.replace(/^💡\s*/, '')}</p>
           </div>
-          <button onClick={() => dismissTip(activeTip)} className="text-[#cbd5e1] hover:text-[#94a3b8] transition-colors flex-shrink-0">
+          <button onClick={() => dismissTip(activeTip)} className="text-muted-foreground/50 hover:text-muted-foreground transition-colors flex-shrink-0">
             <XIcon className="w-3 h-3" />
           </button>
         </motion.div>
@@ -248,14 +248,14 @@ export default function OverviewPage() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {kpis.map((k, i) => (
           <motion.div key={k.label} {...stagger(i + 3)}
-            className="bg-white border-[1.5px] border-[#e2e8f0] rounded-[14px] p-[18px] transition-all duration-200 hover:border-[#86efac] hover:-translate-y-[2px]">
+            className="bg-card border-[1.5px] border-border rounded-[14px] p-[18px] transition-all duration-200 hover:border-[#86efac] hover:-translate-y-[2px]">
             <div className="flex items-center justify-between">
-              <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-[0.8px]">{k.label}</p>
+              <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-[0.8px]">{k.label}</p>
               <div className={`w-8 h-8 rounded-[9px] ${k.iconBg} flex items-center justify-center`}>
                 <k.icon className={`w-[15px] h-[15px] ${k.iconColor}`} />
               </div>
             </div>
-            <p className="text-[22px] font-black tracking-tight mt-2.5 leading-none text-[#14532d]">
+            <p className="text-[22px] font-black tracking-tight mt-2.5 leading-none text-foreground">
               {k.isCount ? <AnimatedNumber value={k.value} /> : k.isPct ? <AnimatedNumber value={k.value} suffix="%" /> : <AnimatedCurrency value={k.value} currency={currency} />}
             </p>
             {k.bar !== undefined && (
@@ -268,18 +268,18 @@ export default function OverviewPage() {
       </div>
 
       {/* ── Financial Health Score ──────────────────── */}
-      <motion.div {...stagger(8)} className="bg-white border-[1.5px] border-[#e2e8f0] rounded-[14px] p-6">
+      <motion.div {...stagger(8)} className="bg-card border-[1.5px] border-border rounded-[14px] p-6">
         <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-6">
           {/* Left — Score */}
           <div>
-            <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-[1px] flex items-center gap-1.5">
+            <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-[1px] flex items-center gap-1.5">
               <Shield className="w-3.5 h-3.5" /> Score de Saúde Financeira
             </p>
             <div className="flex items-end gap-3 mt-3">
               <span className="text-[56px] font-black tracking-tighter leading-none" style={{ color: getScoreColor(scoreResult.total) }}>
                 <AnimatedNumber value={scoreResult.total} />
               </span>
-              <span className="text-[13px] font-bold text-[#94a3b8] mb-2">/1000</span>
+              <span className="text-[13px] font-bold text-muted-foreground mb-2">/1000</span>
             </div>
             <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 rounded-full text-[12px] font-bold"
               style={{ background: getScoreColor(scoreResult.total) + '18', color: getScoreColor(scoreResult.total), border: `1px solid ${getScoreColor(scoreResult.total)}40` }}>
@@ -292,10 +292,10 @@ export default function OverviewPage() {
             {scoreResult.criteria.map((c, i) => (
               <div key={c.label}>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[11px] font-semibold text-[#64748b]">{c.label}</span>
-                  <span className="text-[11px] font-bold text-[#374151]">{c.points}/{c.max}</span>
+                  <span className="text-[11px] font-semibold text-muted-foreground">{c.label}</span>
+                  <span className="text-[11px] font-bold text-foreground">{c.points}/{c.max}</span>
                 </div>
-                <div className="h-[5px] bg-[#f1f5f9] rounded-full overflow-hidden">
+                <div className="h-[5px] bg-muted/30 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: '0%' }}
                     animate={{ width: `${(c.points / c.max) * 100}%` }}
@@ -333,14 +333,14 @@ export default function OverviewPage() {
       </motion.div>
 
       {/* ── Balance Chart ──────────────────────────── */}
-      <motion.div {...stagger(9)} className="bg-white border-[1.5px] border-[#e2e8f0] rounded-[14px]">
+      <motion.div {...stagger(9)} className="bg-card border-[1.5px] border-border rounded-[14px]">
         <div className="flex items-center justify-between px-5 pt-[18px] pb-0">
-          <h3 className="text-[15px] font-extrabold text-[#14532d]">Evolução do Saldo</h3>
-          <div className="flex items-center gap-1 bg-[#f8faf8] border border-[#e2e8f0] rounded-lg p-[3px]">
+          <h3 className="text-[15px] font-extrabold text-foreground">Evolução do Saldo</h3>
+          <div className="flex items-center gap-1 bg-background border border-border rounded-lg p-[3px]">
             {(['7d', '30d', '90d'] as const).map(p => (
               <button key={p} onClick={() => setChartPeriod(p)}
                 className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
-                  chartPeriod === p ? 'bg-[#f0fdf4] text-[#16a34a] border border-[#d4edda]' : 'text-[#94a3b8] border border-transparent'
+                  chartPeriod === p ? 'bg-secondary text-[#16a34a] border border-[#d4edda]' : 'text-muted-foreground border border-transparent'
                 }`}>{p}</button>
             ))}
           </div>
@@ -349,7 +349,7 @@ export default function OverviewPage() {
           {transactions.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full gap-2">
               <BarChart2 className="w-8 h-8 text-[#e2e8f0]" />
-              <p className="text-[12px] text-[#94a3b8]">Adicione lançamentos para ver o gráfico</p>
+              <p className="text-[12px] text-muted-foreground">Adicione lançamentos para ver o gráfico</p>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
@@ -375,7 +375,7 @@ export default function OverviewPage() {
         <motion.div {...stagger(10)}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <h3 className="text-[15px] font-extrabold text-[#14532d]">Minhas Metas</h3>
+              <h3 className="text-[15px] font-extrabold text-foreground">Minhas Metas</h3>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#f0fdf4', color: '#166534', border: '1px solid #d4edda' }}>
                 {goals.filter(g => Number(g.current_amount) >= Number(g.target_amount)).length}/{goals.length} concluídas
               </span>
@@ -403,7 +403,7 @@ export default function OverviewPage() {
               return (
                 <Link to="/app/goals" key={goal.id}>
                   <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 + i * 0.05 }}
-                    className="flex-shrink-0 w-[240px] min-w-[240px] rounded-[14px] p-[18px] bg-white border-[1.5px] border-[#e2e8f0] transition-all duration-200 hover:-translate-y-[2px] hover:border-[#86efac] cursor-pointer"
+                    className="flex-shrink-0 w-[240px] min-w-[240px] rounded-[14px] p-[18px] bg-card border-[1.5px] border-border transition-all duration-200 hover:-translate-y-[2px] hover:border-[#86efac] cursor-pointer"
                     style={{ borderTopWidth: 4, borderTopColor: done ? '#d97706' : color }}>
                     <div className="flex items-start gap-2.5">
                       <div className="w-10 h-10 rounded-[10px] flex items-center justify-center text-xl flex-shrink-0"
@@ -411,7 +411,7 @@ export default function OverviewPage() {
                         {obj?.emoji || '🎯'}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[13px] font-extrabold text-[#14532d] leading-[1.3] truncate">{goal.name}</p>
+                        <p className="text-[13px] font-extrabold text-foreground leading-[1.3] truncate">{goal.name}</p>
                         {streak > 0 && (
                           <span className="inline-flex items-center gap-0.5 mt-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: '#fefce8', color: '#d97706', border: '1px solid #fde68a' }}>
                             <Flame className="w-2.5 h-2.5" /> {streak} dias
@@ -424,9 +424,9 @@ export default function OverviewPage() {
                       <ProgressBar pct={pct} delay={500 + i * 100} />
                       <div className="flex items-center justify-between mt-1.5">
                         <span className="text-[13px] font-extrabold" style={{ color }}>{formatCurrency(Number(goal.current_amount), currency)}</span>
-                        <span className="text-[12px] font-bold text-[#94a3b8]">{pct.toFixed(0)}%</span>
+                        <span className="text-[12px] font-bold text-muted-foreground">{pct.toFixed(0)}%</span>
                       </div>
-                      <p className="text-[11px] text-[#94a3b8] mt-1">
+                      <p className="text-[11px] text-muted-foreground mt-1">
                         {done ? '🏆 Meta atingida!' : daysLeft !== null ? `${daysLeft} dias restantes` : `Faltam ${formatCurrency(Number(goal.target_amount) - Number(goal.current_amount), currency)}`}
                       </p>
                     </div>
@@ -449,7 +449,7 @@ export default function OverviewPage() {
             })}
             {/* CTA to create more */}
             <Link to="/app/goals">
-              <div className="flex-shrink-0 w-[180px] min-w-[180px] min-h-[170px] rounded-[14px] p-[18px] bg-white border-[1.5px] border-dashed border-[#d4edda] hover:border-[#16a34a] transition-all flex flex-col items-center justify-center gap-2 cursor-pointer">
+              <div className="flex-shrink-0 w-[180px] min-w-[180px] min-h-[170px] rounded-[14px] p-[18px] bg-card border-[1.5px] border-dashed border-[#d4edda] hover:border-[#16a34a] transition-all flex flex-col items-center justify-center gap-2 cursor-pointer">
                 <PlusCircle className="w-8 h-8 text-[#86efac]" />
                 <p className="text-[12px] font-bold text-[#16a34a]">Nova meta</p>
               </div>
@@ -462,7 +462,7 @@ export default function OverviewPage() {
       {goals.length === 0 && objectives.length > 0 && (
         <motion.div {...stagger(10)}>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-[15px] font-extrabold text-[#14532d]">Seus Objetivos</h3>
+            <h3 className="text-[15px] font-extrabold text-foreground">Seus Objetivos</h3>
             <Link to="/app/goals" className="text-[12px] font-bold text-[#16a34a] hover:underline flex items-center gap-1">
               Criar metas <ArrowRight className="w-3 h-3" />
             </Link>
@@ -474,13 +474,13 @@ export default function OverviewPage() {
               return (
                 <Link to="/app/goals" key={key}>
                   <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 + i * 0.05 }}
-                    className="flex-shrink-0 w-[200px] min-w-[200px] min-h-[120px] rounded-[14px] p-[18px] bg-white border-[1.5px] border-dashed border-[#d4edda] hover:border-[#16a34a] transition-all cursor-pointer">
+                    className="flex-shrink-0 w-[200px] min-w-[200px] min-h-[120px] rounded-[14px] p-[18px] bg-card border-[1.5px] border-dashed border-[#d4edda] hover:border-[#16a34a] transition-all cursor-pointer">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl bg-[#f0fdf4]">{obj.emoji}</div>
-                      <p className="text-[13px] font-extrabold text-[#14532d] leading-tight">{obj.label}</p>
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl bg-secondary">{obj.emoji}</div>
+                      <p className="text-[13px] font-extrabold text-foreground leading-tight">{obj.label}</p>
                     </div>
                     <div className="flex flex-col items-center mt-4">
-                      <PlusCircle className="w-5 h-5 text-[#cbd5e1]" />
+                      <PlusCircle className="w-5 h-5 text-muted-foreground/50" />
                       <p className="text-[11px] font-bold text-[#16a34a] mt-1">Criar meta</p>
                     </div>
                   </motion.div>
@@ -492,9 +492,9 @@ export default function OverviewPage() {
       )}
 
       {/* ── Recent Transactions ────────────────────── */}
-      <motion.div {...stagger(11)} className="bg-white border-[1.5px] border-[#e2e8f0] rounded-[14px] overflow-hidden">
-        <div className="flex items-center justify-between px-5 pt-[18px] pb-3.5 border-b border-[#f8fafc]">
-          <h3 className="text-[15px] font-extrabold text-[#14532d]">Lançamentos Recentes</h3>
+      <motion.div {...stagger(11)} className="bg-card border-[1.5px] border-border rounded-[14px] overflow-hidden">
+        <div className="flex items-center justify-between px-5 pt-[18px] pb-3.5 border-b border-border/30">
+          <h3 className="text-[15px] font-extrabold text-foreground">Lançamentos Recentes</h3>
           <Link to="/app/transactions" className="text-[12px] font-bold text-[#16a34a] hover:underline flex items-center gap-1">
             Ver todos <ArrowRight className="w-3 h-3" />
           </Link>
@@ -502,11 +502,11 @@ export default function OverviewPage() {
 
         {recent.length === 0 ? (
           <div className="py-12 flex flex-col items-center justify-center gap-3">
-            <div className="w-[72px] h-[72px] rounded-full bg-[#f0fdf4] flex items-center justify-center">
+            <div className="w-[72px] h-[72px] rounded-full bg-secondary flex items-center justify-center">
               <ReceiptText className="w-8 h-8 text-[#86efac]" />
             </div>
-            <p className="text-[15px] font-bold text-[#374151]">Nenhum lançamento ainda</p>
-            <p className="text-[13px] text-[#94a3b8] max-w-[260px] text-center leading-relaxed">Comece adicionando sua primeira receita ou despesa.</p>
+            <p className="text-[15px] font-bold text-foreground">Nenhum lançamento ainda</p>
+            <p className="text-[13px] text-muted-foreground max-w-[260px] text-center leading-relaxed">Comece adicionando sua primeira receita ou despesa.</p>
             <button onClick={() => navigate('/app/transactions')}
               className="mt-1 inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#16a34a] text-white rounded-[9px] text-[13px] font-bold hover:bg-[#14532d] transition-colors">
               <PlusCircle className="w-4 h-4" /> Adicionar primeiro lançamento
@@ -516,11 +516,11 @@ export default function OverviewPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-[#fafcfa]">
-                  <th className="text-left px-5 py-2.5 text-[10px] uppercase tracking-[0.7px] font-bold text-[#94a3b8]">Data</th>
-                  <th className="text-left px-5 py-2.5 text-[10px] uppercase tracking-[0.7px] font-bold text-[#94a3b8]">Descrição</th>
-                  <th className="text-left px-5 py-2.5 text-[10px] uppercase tracking-[0.7px] font-bold text-[#94a3b8]">Categoria</th>
-                  <th className="text-right px-5 py-2.5 text-[10px] uppercase tracking-[0.7px] font-bold text-[#94a3b8]">Valor</th>
+                <tr className="bg-background">
+                  <th className="text-left px-5 py-2.5 text-[10px] uppercase tracking-[0.7px] font-bold text-muted-foreground">Data</th>
+                  <th className="text-left px-5 py-2.5 text-[10px] uppercase tracking-[0.7px] font-bold text-muted-foreground">Descrição</th>
+                  <th className="text-left px-5 py-2.5 text-[10px] uppercase tracking-[0.7px] font-bold text-muted-foreground">Categoria</th>
+                  <th className="text-right px-5 py-2.5 text-[10px] uppercase tracking-[0.7px] font-bold text-muted-foreground">Valor</th>
                 </tr>
               </thead>
               <tbody>
@@ -528,14 +528,14 @@ export default function OverviewPage() {
                   const isIncome = tx.type === 'income';
                   return (
                     <tr key={tx.id}
-                      className={`border-b border-[#f8fafc] hover:bg-[#fafffe] transition-colors border-l-[3px] ${isIncome ? 'border-l-[#16a34a]' : 'border-l-[#ef4444]'}`}>
-                      <td className="px-5 py-3 text-[12px] font-medium text-[#94a3b8]">
+                      className={`border-b border-border/30 hover:bg-accent/50 transition-colors border-l-[3px] ${isIncome ? 'border-l-[#16a34a]' : 'border-l-[#ef4444]'}`}>
+                      <td className="px-5 py-3 text-[12px] font-medium text-muted-foreground">
                         {format(parseISO(tx.date), 'dd/MM', { locale: ptBR })}
                       </td>
-                      <td className="px-5 py-3 text-[13px] font-bold text-[#1a2e1a]">{tx.description}</td>
+                      <td className="px-5 py-3 text-[13px] font-bold text-foreground">{tx.description}</td>
                       <td className="px-5 py-3">
                         <span className={`inline-block px-2.5 py-[3px] rounded-full text-[11px] font-bold border ${
-                          isIncome ? 'bg-[#f0fdf4] text-[#166534] border-[#d4edda]' : 'bg-[#fef2f2] text-[#991b1b] border-[#fecaca]'
+                          isIncome ? 'bg-secondary text-[#166534] border-[#d4edda]' : 'bg-[#fef2f2] text-[#991b1b] border-[#fecaca]'
                         }`}>{tx.category}</span>
                       </td>
                       <td className={`px-5 py-3 text-right text-[14px] font-black ${isIncome ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}>
@@ -575,7 +575,7 @@ function HeroCard({ type, balance, income, expense, currency, delay, single, sta
 
   return (
     <motion.div {...stagger(delay)}
-      className="bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl p-6 relative overflow-hidden">
+      className="bg-card border-[1.5px] border-border rounded-2xl p-6 relative overflow-hidden">
       {/* decorative circles */}
       <div className={`absolute -top-[50px] -right-[50px] w-[160px] h-[160px] rounded-full ${circleColor1} opacity-50 pointer-events-none`} />
       <div className={`absolute -bottom-[30px] -left-[20px] w-[100px] h-[100px] rounded-full ${circleColor2} opacity-30 pointer-events-none`} />
@@ -583,7 +583,7 @@ function HeroCard({ type, balance, income, expense, currency, delay, single, sta
         <p className={`text-[10px] font-extrabold tracking-widest ${labelColor} flex items-center gap-1.5`}>
           {heroLabel || label}
         </p>
-        <p className={`text-4xl font-black tracking-tighter mt-2 ${balance >= 0 ? 'text-[#14532d]' : 'text-[#dc2626]'}`}>
+        <p className={`text-4xl font-black tracking-tighter mt-2 ${balance >= 0 ? 'text-foreground' : 'text-[#dc2626]'}`}>
           <AnimatedCurrency value={balance} currency={currency} />
         </p>
         <div className="flex items-center gap-1 mt-1.5">
@@ -592,8 +592,8 @@ function HeroCard({ type, balance, income, expense, currency, delay, single, sta
         </div>
         <div className={`grid ${single ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-2'} gap-3 mt-4`}>
           {statItems.map(s => (
-            <div key={s.label} className="bg-white/70 backdrop-blur-sm border border-black/[0.06] rounded-[10px] px-3.5 py-2.5">
-              <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide">{s.label}</p>
+            <div key={s.label} className="bg-card/70 backdrop-blur-sm border border-black/[0.06] rounded-[10px] px-3.5 py-2.5">
+              <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wide">{s.label}</p>
               <p className={`text-base font-black ${s.color}`}>{formatCurrency(s.val, currency)}</p>
             </div>
           ))}
@@ -608,14 +608,14 @@ function HeroCard({ type, balance, income, expense, currency, delay, single, sta
 function Skeleton() {
   return (
     <div className="space-y-5">
-      <div className="bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl p-6 h-48 animate-pulse" />
+      <div className="bg-card border-[1.5px] border-border rounded-2xl p-6 h-48 animate-pulse" />
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="bg-white border-[1.5px] border-[#e2e8f0] rounded-[14px] p-[18px] h-24 animate-pulse" />
+          <div key={i} className="bg-card border-[1.5px] border-border rounded-[14px] p-[18px] h-24 animate-pulse" />
         ))}
       </div>
-      <div className="bg-white border-[1.5px] border-[#e2e8f0] rounded-[14px] p-5 h-[240px] animate-pulse" />
-      <div className="bg-white border-[1.5px] border-[#e2e8f0] rounded-[14px] p-5 h-64 animate-pulse" />
+      <div className="bg-card border-[1.5px] border-border rounded-[14px] p-5 h-[240px] animate-pulse" />
+      <div className="bg-card border-[1.5px] border-border rounded-[14px] p-5 h-64 animate-pulse" />
     </div>
   );
 }

@@ -96,10 +96,10 @@ export default function AppLayout() {
 
   const planBadge = plan.toUpperCase();
   const planBadgeClass = plan === 'pro'
-    ? 'bg-[#f0fdf4] text-[#16a34a] border border-[#d4edda]'
+    ? 'bg-secondary text-[#16a34a] border border-[#d4edda]'
     : plan === 'business'
     ? 'bg-[#faf5ff] text-[#7c3aed] border border-[#e9d5ff]'
-    : 'bg-[#f1f5f9] text-[#64748b] border border-[#e2e8f0]';
+    : 'bg-muted/30 text-muted-foreground border border-border';
 
   const initial = (profile?.full_name || user?.email || '?')[0].toUpperCase();
 
@@ -108,11 +108,11 @@ export default function AppLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8faf8] flex">
+    <div className="min-h-screen bg-background flex">
       {sidebarOpen && <div className="fixed inset-0 bg-black/20 z-40 lg:hidden backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />}
 
       {/* ═══ SIDEBAR ═══ */}
-      <aside className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-white border-r border-[#f1f5f9] flex flex-col transition-transform duration-200 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+      <aside className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-card border-r border-border/50 flex flex-col transition-transform duration-200 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         {/* Top */}
         <div className="px-4 pt-5 pb-3">
           <div className="flex items-center gap-2.5">
@@ -120,7 +120,7 @@ export default function AppLayout() {
               <BarChart3 className="w-[18px] h-[18px] text-white" />
             </div>
             <div className="flex items-center gap-0.5">
-              <span className="text-[17px] font-black text-[#14532d]">FinDash</span>
+              <span className="text-[17px] font-black text-foreground">FinDash</span>
               <span className="text-[17px] font-black text-[#16a34a]">Pro</span>
             </div>
             <span className={`ml-auto text-[10px] font-extrabold px-2 py-[3px] rounded-md tracking-wide ${planBadgeClass}`}>
@@ -130,7 +130,7 @@ export default function AppLayout() {
 
 
           {/* User info */}
-          <div className="mt-4 flex items-center gap-2.5 bg-[#f8faf8] rounded-[10px] px-3 py-2.5">
+          <div className="mt-4 flex items-center gap-2.5 bg-background rounded-[10px] px-3 py-2.5">
             <div className="relative flex-shrink-0">
               <div className="w-[34px] h-[34px] rounded-full bg-gradient-to-br from-[#16a34a] to-[#14532d] flex items-center justify-center">
                 <span className="text-white text-[13px] font-extrabold">{initial}</span>
@@ -139,10 +139,10 @@ export default function AppLayout() {
               <div className="absolute bottom-[2px] right-[2px] w-[6px] h-[6px] rounded-full bg-[#22c55e] border-2 border-white" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[13px] font-bold text-[#1a2e1a] truncate">{profile?.full_name || 'Usuário'}</p>
-              <p className="text-[11px] text-[#94a3b8] truncate">{user?.email}</p>
+              <p className="text-[13px] font-bold text-foreground truncate">{profile?.full_name || 'Usuário'}</p>
+              <p className="text-[11px] text-muted-foreground truncate">{user?.email}</p>
             </div>
-            <ChevronRight className="w-3.5 h-3.5 text-[#cbd5e1] flex-shrink-0" />
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0" />
           </div>
         </div>
 
@@ -153,16 +153,16 @@ export default function AppLayout() {
             return (
               <Link key={item.path} to={item.path} onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-2.5 h-10 px-3 rounded-[9px] mb-[2px] transition-all duration-150 group ${
-                  active ? 'bg-[#f0fdf4]' : 'hover:bg-[#f8faf8]'
+                  active ? 'bg-secondary' : 'hover:bg-background'
                 }`}>
                 <div className={`w-[22px] h-[22px] rounded-md flex items-center justify-center flex-shrink-0 ${active ? 'bg-[#dcfce7]' : ''}`}>
                   <item.icon className={`w-[15px] h-[15px] ${
                     item.path === '/app/debts' && activeDebtCount > 0
                       ? 'text-[#dc2626]'
-                      : active ? 'text-[#16a34a]' : 'text-[#94a3b8] group-hover:text-[#16a34a]'
+                      : active ? 'text-[#16a34a]' : 'text-muted-foreground group-hover:text-[#16a34a]'
                   }`} />
                 </div>
-                <span className={`text-[13px] flex-1 ${active ? 'font-bold text-[#16a34a]' : 'font-medium text-[#64748b] group-hover:text-[#14532d]'}`}>
+                <span className={`text-[13px] flex-1 ${active ? 'font-bold text-[#16a34a]' : 'font-medium text-muted-foreground group-hover:text-foreground'}`}>
                   {item.label}
                 </span>
                 {item.path === '/app/debts' && activeDebtCount > 0 && (
@@ -181,9 +181,9 @@ export default function AppLayout() {
             <div className="mx-1 mb-2 rounded-xl bg-gradient-to-b from-[#f0fdf4] to-[#dcfce7] border border-[#d4edda] p-3.5">
               <div className="flex items-center gap-2 mb-1">
                 <Crown className="w-5 h-5 text-[#d97706]" />
-                <span className="text-[13px] font-extrabold text-[#14532d]">Upgrade para Pro</span>
+                <span className="text-[13px] font-extrabold text-foreground">Upgrade para Pro</span>
               </div>
-              <p className="text-[11px] text-[#6b8f6b] leading-relaxed">Lançamentos ilimitados e muito mais.</p>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">Lançamentos ilimitados e muito mais.</p>
               <Link to="/app/billing" onClick={() => setSidebarOpen(false)}
                 className="block mt-2.5 text-center bg-[#16a34a] hover:bg-[#14532d] text-white text-[11px] font-bold py-[6px] rounded-[7px] transition-colors">
                 Ver planos →
@@ -191,10 +191,10 @@ export default function AppLayout() {
             </div>
           )}
 
-          <div className="border-t border-[#f1f5f9] mx-3 mb-1" />
+          <div className="border-t border-border/50 mx-3 mb-1" />
 
           {/* CONTA section label */}
-          <p className="text-[9px] font-extrabold text-[#cbd5e1] tracking-[1.2px] uppercase px-4 pt-3.5 pb-1">CONTA</p>
+          <p className="text-[9px] font-extrabold text-muted-foreground/50 tracking-[1.2px] uppercase px-4 pt-3.5 pb-1">CONTA</p>
 
           {bottomItems.map(item => {
             const active = isActive(item.path);
@@ -202,13 +202,13 @@ export default function AppLayout() {
             return (
               <Link key={item.path} to={item.path} onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-2.5 h-10 px-3 rounded-[9px] mb-[2px] transition-all duration-150 group ${
-                  active ? 'bg-[#f0fdf4]' : 'hover:bg-[#f8faf8]'
+                  active ? 'bg-secondary' : 'hover:bg-background'
                 }`}>
                 <item.icon className={`w-[15px] h-[15px] ${
-                  active ? 'text-[#16a34a]' : isBilling && plan !== 'free' ? 'text-[#d97706]' : 'text-[#94a3b8] group-hover:text-[#16a34a]'
+                  active ? 'text-[#16a34a]' : isBilling && plan !== 'free' ? 'text-[#d97706]' : 'text-muted-foreground group-hover:text-[#16a34a]'
                 }`} />
                 <span className={`text-[13px] flex-1 ${
-                  active ? 'font-bold text-[#16a34a]' : 'font-medium text-[#64748b] group-hover:text-[#14532d]'
+                  active ? 'font-bold text-[#16a34a]' : 'font-medium text-muted-foreground group-hover:text-foreground'
                 }`}>{item.label}</span>
                 {isBilling && plan === 'free' && (
                   <span className="text-[9px] font-extrabold bg-[#fffbeb] text-[#92400e] px-[7px] py-[2px] rounded-[5px]">Upgrade</span>
@@ -219,24 +219,24 @@ export default function AppLayout() {
 
           <button onClick={() => signOut()}
             className="flex items-center gap-2.5 h-10 px-3 rounded-[9px] w-full transition-all duration-150 group hover:bg-[#fef2f2]">
-            <LogOut className="w-[15px] h-[15px] text-[#94a3b8] group-hover:text-[#dc2626]" />
-            <span className="text-[13px] font-medium text-[#64748b] group-hover:text-[#dc2626]">Sair</span>
+            <LogOut className="w-[15px] h-[15px] text-muted-foreground group-hover:text-[#dc2626]" />
+            <span className="text-[13px] font-medium text-muted-foreground group-hover:text-[#dc2626]">Sair</span>
           </button>
         </div>
       </aside>
 
       {/* ═══ MAIN ═══ */}
       <div className="flex-1 min-w-0 pb-16 lg:pb-0">
-        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-[#f1f5f9] h-[58px] flex items-center px-5 md:px-7 gap-4">
-          <button className="lg:hidden text-[#94a3b8]" onClick={() => setSidebarOpen(!sidebarOpen)}>
+        <header className="sticky top-0 z-30 bg-card/95 backdrop-blur-sm border-b border-border/50 h-[58px] flex items-center px-5 md:px-7 gap-4">
+          <button className="lg:hidden text-muted-foreground" onClick={() => setSidebarOpen(!sidebarOpen)}>
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
           <div className="min-w-0">
-            <h1 className="text-[20px] font-black text-[#14532d] tracking-tight leading-none">
+            <h1 className="text-[20px] font-black text-foreground tracking-tight leading-none">
               {pageTitles[location.pathname] || 'FinDash Pro'}
             </h1>
-            <p className="text-[11px] text-[#94a3b8] hidden md:block">FinDash Pro / {pageTitles[location.pathname] || ''}</p>
+            <p className="text-[11px] text-muted-foreground hidden md:block">FinDash Pro / {pageTitles[location.pathname] || ''}</p>
           </div>
 
           <div className="ml-auto flex items-center gap-2">
@@ -244,12 +244,12 @@ export default function AppLayout() {
             <button
               onClick={cycleTheme}
               title={`Tema: ${theme === 'light' ? 'Claro' : theme === 'dark' ? 'Escuro' : 'Sistema'}`}
-              className="relative w-9 h-9 rounded-[9px] bg-[#f8faf8] border border-[#e2e8f0] flex items-center justify-center hover:bg-[#f0fdf4] hover:border-[#d4edda] transition-all">
-              {theme === 'dark' ? <Sun className="w-4 h-4 text-[#fbbf24]" /> : theme === 'system' ? <Monitor className="w-4 h-4 text-[#64748b]" /> : <Moon className="w-4 h-4 text-[#64748b]" />}
+              className="relative w-9 h-9 rounded-[9px] bg-background border border-border flex items-center justify-center hover:bg-secondary hover:border-[#d4edda] transition-all">
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-[#fbbf24]" /> : theme === 'system' ? <Monitor className="w-4 h-4 text-muted-foreground" /> : <Moon className="w-4 h-4 text-muted-foreground" />}
             </button>
             {/* Bell */}
-            <button className="relative w-9 h-9 rounded-[9px] bg-[#f8faf8] border border-[#e2e8f0] flex items-center justify-center hover:bg-[#f0fdf4] hover:border-[#d4edda] transition-all">
-              <Bell className="w-4 h-4 text-[#64748b]" />
+            <button className="relative w-9 h-9 rounded-[9px] bg-background border border-border flex items-center justify-center hover:bg-secondary hover:border-[#d4edda] transition-all">
+              <Bell className="w-4 h-4 text-muted-foreground" />
             </button>
 
             {/* User dropdown */}
@@ -262,20 +262,20 @@ export default function AppLayout() {
               {showUserMenu && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
-                  <div className="absolute right-0 top-11 z-50 w-56 bg-white border border-[#e2e8f0] rounded-xl shadow-lg py-1.5 overflow-hidden">
-                    <div className="px-3.5 py-2.5 border-b border-[#f1f5f9]">
-                      <p className="text-[13px] font-bold text-[#14532d] truncate">{profile?.full_name || 'Usuário'}</p>
-                      <p className="text-[11px] text-[#94a3b8] truncate">{user?.email}</p>
+                  <div className="absolute right-0 top-11 z-50 w-56 bg-card border border-border rounded-xl shadow-lg py-1.5 overflow-hidden">
+                    <div className="px-3.5 py-2.5 border-b border-border/50">
+                      <p className="text-[13px] font-bold text-foreground truncate">{profile?.full_name || 'Usuário'}</p>
+                      <p className="text-[11px] text-muted-foreground truncate">{user?.email}</p>
                     </div>
                     <button onClick={() => { navigate('/app/settings'); setShowUserMenu(false); }}
-                      className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] text-[#374151] hover:bg-[#f8faf8] transition-colors">
-                      <Settings2 className="w-4 h-4 text-[#94a3b8]" /> Configurações
+                      className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] text-foreground hover:bg-background transition-colors">
+                      <Settings2 className="w-4 h-4 text-muted-foreground" /> Configurações
                     </button>
                     <button onClick={() => { navigate('/app/billing'); setShowUserMenu(false); }}
-                      className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] text-[#374151] hover:bg-[#f8faf8] transition-colors">
-                      <Crown className="w-4 h-4 text-[#94a3b8]" /> Meu plano
+                      className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] text-foreground hover:bg-background transition-colors">
+                      <Crown className="w-4 h-4 text-muted-foreground" /> Meu plano
                     </button>
-                    <div className="border-t border-[#f1f5f9] my-1" />
+                    <div className="border-t border-border/50 my-1" />
                     <button onClick={() => { signOut(); setShowUserMenu(false); }}
                       className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-[13px] text-[#ef4444] hover:bg-[#fef2f2] transition-colors">
                       <LogOut className="w-4 h-4" /> Sair
@@ -293,20 +293,20 @@ export default function AppLayout() {
       </div>
 
       {/* ═══ MOBILE BOTTOM NAV ═══ */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white border-t border-[#f1f5f9] h-16 flex items-center justify-around px-2">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-card border-t border-border/50 h-16 flex items-center justify-around px-2">
         {MOBILE_NAV.map(item => {
           const active = isActive(item.path);
           return (
             <Link key={item.path} to={item.path}
               className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg transition-colors">
-              <item.icon className={`w-5 h-5 ${active ? 'text-[#16a34a]' : 'text-[#94a3b8]'}`} />
+              <item.icon className={`w-5 h-5 ${active ? 'text-[#16a34a]' : 'text-muted-foreground'}`} />
               {active && <div className="w-1 h-1 rounded-full bg-[#16a34a]" />}
             </Link>
           );
         })}
         <button onClick={() => setShowMoreDrawer(true)}
           className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg">
-          <MoreHorizontal className="w-5 h-5 text-[#94a3b8]" />
+          <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
         </button>
       </nav>
 
@@ -318,21 +318,21 @@ export default function AppLayout() {
               className="fixed inset-0 bg-black/20 z-50 lg:hidden backdrop-blur-sm" onClick={() => setShowMoreDrawer(false)} />
             <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-xl p-4 pb-8 lg:hidden">
+              className="fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-2xl shadow-xl p-4 pb-8 lg:hidden">
               <div className="w-10 h-1 rounded-full bg-[#e2e8f0] mx-auto mb-4" />
               <div className="grid grid-cols-4 gap-3">
                 {navItems.filter(i => !MOBILE_NAV.find(m => m.path === i.path)).map(item => (
                   <Link key={item.path} to={item.path} onClick={() => setShowMoreDrawer(false)}
-                    className="flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl hover:bg-[#f8faf8] transition-colors">
-                    <item.icon className="w-5 h-5 text-[#64748b]" />
-                    <span className="text-[10px] font-semibold text-[#64748b] text-center leading-tight">{item.label}</span>
+                    className="flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl hover:bg-background transition-colors">
+                    <item.icon className="w-5 h-5 text-muted-foreground" />
+                    <span className="text-[10px] font-semibold text-muted-foreground text-center leading-tight">{item.label}</span>
                   </Link>
                 ))}
                 {bottomItems.map(item => (
                   <Link key={item.path} to={item.path} onClick={() => setShowMoreDrawer(false)}
-                    className="flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl hover:bg-[#f8faf8] transition-colors">
-                    <item.icon className="w-5 h-5 text-[#64748b]" />
-                    <span className="text-[10px] font-semibold text-[#64748b] text-center leading-tight">{item.label}</span>
+                    className="flex flex-col items-center gap-1.5 py-3 px-1 rounded-xl hover:bg-background transition-colors">
+                    <item.icon className="w-5 h-5 text-muted-foreground" />
+                    <span className="text-[10px] font-semibold text-muted-foreground text-center leading-tight">{item.label}</span>
                   </Link>
                 ))}
               </div>

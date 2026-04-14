@@ -285,7 +285,7 @@ export default function DebtsPage() {
     setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-[#94a3b8]">Carregando...</div>;
+  if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>;
 
   const totalPaid = payments.reduce((s, p) => s + Number(p.amount), 0);
 
@@ -295,11 +295,11 @@ export default function DebtsPage() {
       {/* ═══ 1. HERO BANNER ═══ */}
       {debts.length === 0 ? (
         <div className="text-center py-10 flex flex-col items-center gap-3.5">
-          <div className="w-[88px] h-[88px] rounded-full bg-[#f0fdf4] flex items-center justify-center">
+          <div className="w-[88px] h-[88px] rounded-full bg-secondary flex items-center justify-center">
             <Shield className="w-10 h-10 text-[#86efac]" />
           </div>
-          <h2 className="text-[17px] font-black text-[#374151]">Nenhuma dívida cadastrada</h2>
-          <p className="text-[14px] text-[#94a3b8] max-w-[320px] leading-relaxed">
+          <h2 className="text-[17px] font-black text-foreground">Nenhuma dívida cadastrada</h2>
+          <p className="text-[14px] text-muted-foreground max-w-[320px] leading-relaxed">
             Se você tem dívidas, cadastre-as aqui para receber um plano personalizado para quitá-las.
           </p>
           <button onClick={scrollToForm}
@@ -308,21 +308,21 @@ export default function DebtsPage() {
           </button>
         </div>
       ) : activeDebts.length === 0 ? (
-        <div className="bg-[#f0fdf4] border-[1.5px] border-[#d4edda] rounded-2xl p-8 text-center">
+        <div className="bg-secondary border-[1.5px] border-[#d4edda] rounded-2xl p-8 text-center">
           <div className="text-5xl mb-3">🎉</div>
-          <h2 className="text-2xl font-black text-[#14532d]">Você está livre das dívidas!</h2>
-          <p className="text-[14px] text-[#6b8f6b] mt-2">Parabéns! Agora é hora de investir e construir riqueza.</p>
+          <h2 className="text-2xl font-black text-foreground">Você está livre das dívidas!</h2>
+          <p className="text-[14px] text-muted-foreground mt-2">Parabéns! Agora é hora de investir e construir riqueza.</p>
           <a href="/app/investments" className="inline-block mt-4 bg-[#16a34a] text-white font-bold text-[13px] px-5 py-2.5 rounded-[9px] hover:bg-[#14532d] transition-colors">
             Começar a investir →
           </a>
         </div>
       ) : (
-        <div className="bg-white border-l-4 border-l-[#dc2626] border-[1.5px] border-[#fecaca] rounded-r-2xl px-6 py-5 flex items-center gap-4 flex-wrap">
+        <div className="bg-card border-l-4 border-l-[#dc2626] border-[1.5px] border-[#fecaca] rounded-r-2xl px-6 py-5 flex items-center gap-4 flex-wrap">
           <AlertCircle className="w-8 h-8 text-[#dc2626] flex-shrink-0" />
           <div className="flex-1 min-w-[200px]">
             <h2 className="text-[17px] font-black text-[#991b1b]">Você tem {activeDebts.length} dívida(s) ativa(s)</h2>
             <p className="text-[13px] text-[#dc2626] font-medium">Total: {fmt(totalRemaining)} em dívidas. Juros acumulando {fmt(monthlyInterest)}/mês.</p>
-            <p className="text-[12px] text-[#64748b] mt-1">Cada pagamento extra te aproxima da liberdade financeira. Você consegue! 💪</p>
+            <p className="text-[12px] text-muted-foreground mt-1">Cada pagamento extra te aproxima da liberdade financeira. Você consegue! 💪</p>
           </div>
           <button onClick={() => document.getElementById('strategy-section')?.scrollIntoView({ behavior: 'smooth' })}
             className="bg-[#dc2626] text-white font-bold text-[12px] px-4 py-2 rounded-lg hover:bg-[#b91c1c] transition-colors flex-shrink-0">
@@ -341,14 +341,14 @@ export default function DebtsPage() {
             { icon: Target, bg: '#f0fdf4', ic: '#16a34a', label: 'Menor Dívida', value: smallestDebt ? fmt(Number(smallestDebt.remaining_amount)) : '-', sub: smallestDebt?.name || '-', color: '#16a34a' },
             { icon: Calendar, bg: '#eff6ff', ic: '#2563eb', label: 'Previsão Quitação', value: estimatedPayoff, sub: 'Pagando o mínimo', color: '#2563eb' },
           ].map((c, i) => (
-            <div key={i} className="bg-white border-[1.5px] border-[#e2e8f0] rounded-xl p-4 flex items-center gap-3.5 hover:border-[#86efac] transition-colors">
+            <div key={i} className="bg-card border-[1.5px] border-border rounded-xl p-4 flex items-center gap-3.5 hover:border-[#86efac] transition-colors">
               <div className="w-10 h-10 rounded-[10px] flex items-center justify-center flex-shrink-0" style={{ background: c.bg }}>
                 <c.icon className="w-[18px] h-[18px]" style={{ color: c.ic }} />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wide">{c.label}</p>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">{c.label}</p>
                 <p className="text-[18px] font-black truncate" style={{ color: c.color }}>{c.value}</p>
-                <p className="text-[11px] text-[#94a3b8] truncate">{c.sub}</p>
+                <p className="text-[11px] text-muted-foreground truncate">{c.sub}</p>
               </div>
             </div>
           ))}
@@ -357,9 +357,9 @@ export default function DebtsPage() {
 
       {/* ═══ 3. STRATEGY ═══ */}
       {activeDebts.length > 0 && (
-        <div id="strategy-section" className="bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl p-6">
-          <h3 className="text-[15px] font-black text-[#14532d]">Escolha sua estratégia de quitação</h3>
-          <p className="text-[13px] text-[#64748b] mb-5">A estratégia define a ordem em que você deve priorizar o pagamento das dívidas.</p>
+        <div id="strategy-section" className="bg-card border-[1.5px] border-border rounded-2xl p-6">
+          <h3 className="text-[15px] font-black text-foreground">Escolha sua estratégia de quitação</h3>
+          <p className="text-[13px] text-muted-foreground mb-5">A estratégia define a ordem em que você deve priorizar o pagamento das dívidas.</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {[
               { key: 'snowball' as const, emoji: '❄️', name: 'Bola de Neve', badge: 'Mais popular', badgeBg: '#dcfce7', badgeColor: '#166534',
@@ -377,25 +377,25 @@ export default function DebtsPage() {
             ].map(s => (
               <button key={s.key} onClick={() => setStrategy(s.key)}
                 className={`text-left border-[1.5px] rounded-[14px] p-[18px] transition-all cursor-pointer ${
-                  strategy === s.key ? 'border-[#16a34a] border-2 bg-[#f0fdf4]' : 'border-[#e2e8f0] hover:border-[#d4edda]'
+                  strategy === s.key ? 'border-[#16a34a] border-2 bg-secondary' : 'border-border hover:border-[#d4edda]'
                 }`}>
                 {s.badge && (
                   <span className="text-[10px] font-extrabold px-2 py-[2px] rounded-md mb-2 inline-block" style={{ background: s.badgeBg, color: s.badgeColor }}>{s.badge}</span>
                 )}
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-11 h-11 rounded-full bg-[#eff6ff] flex items-center justify-center text-2xl">{s.emoji}</div>
-                  <span className="text-[14px] font-extrabold text-[#14532d]">{s.name}</span>
+                  <span className="text-[14px] font-extrabold text-foreground">{s.name}</span>
                 </div>
-                <p className="text-[13px] text-[#64748b] leading-relaxed mb-3">{s.desc}</p>
+                <p className="text-[13px] text-muted-foreground leading-relaxed mb-3">{s.desc}</p>
                 {s.pros.map((p, i) => (
                   <p key={i} className="text-[12px] text-[#16a34a] font-semibold">✓ {p}</p>
                 ))}
-                <p className="text-[11px] italic text-[#94a3b8] mt-2">{s.use}</p>
+                <p className="text-[11px] italic text-muted-foreground mt-2">{s.use}</p>
               </button>
             ))}
           </div>
           {orderedDebts.length > 0 && (
-            <div className="mt-4 bg-[#f8faf8] rounded-lg p-3 text-[13px] text-[#374151]">
+            <div className="mt-4 bg-background rounded-lg p-3 text-[13px] text-foreground">
               <span className="font-bold">Com esta estratégia, você quitará primeiro: </span>
               {orderedDebts.slice(0, 3).map(d => d.name).join(' → ')}
             </div>
@@ -405,9 +405,9 @@ export default function DebtsPage() {
 
       {/* ═══ 4. STEP-BY-STEP GUIDE ═══ */}
       {debts.length > 0 && (
-        <div className="bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl p-6">
-          <h3 className="text-[15px] font-black text-[#14532d]">Seu plano passo a passo</h3>
-          <p className="text-[13px] text-[#64748b] mb-5">Siga estes passos na ordem para sair das dívidas o mais rápido possível.</p>
+        <div className="bg-card border-[1.5px] border-border rounded-2xl p-6">
+          <h3 className="text-[15px] font-black text-foreground">Seu plano passo a passo</h3>
+          <p className="text-[13px] text-muted-foreground mb-5">Siga estes passos na ordem para sair das dívidas o mais rápido possível.</p>
           <div className="space-y-0">
             {[
               {
@@ -451,22 +451,22 @@ export default function DebtsPage() {
               <div key={step.num} className="flex gap-4 pb-6 relative">
                 <div className="flex flex-col items-center">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-black flex-shrink-0 ${
-                    step.done ? 'bg-[#16a34a] text-white' : step.current ? 'bg-[#dc2626] text-white' : 'bg-[#f1f5f9] text-[#94a3b8]'
+                    step.done ? 'bg-[#16a34a] text-white' : step.current ? 'bg-[#dc2626] text-white' : 'bg-muted/30 text-muted-foreground'
                   }`}>
                     {step.done ? <Check className="w-5 h-5" /> : step.num}
                   </div>
-                  {idx < 4 && <div className={`w-[2px] flex-1 mt-1 ${step.done ? 'bg-[#d4edda]' : 'bg-[#f1f5f9]'}`} />}
+                  {idx < 4 && <div className={`w-[2px] flex-1 mt-1 ${step.done ? 'bg-[#d4edda]' : 'bg-muted/30'}`} />}
                 </div>
                 <div className="flex-1 min-w-0 pb-2">
-                  <h4 className={`text-[15px] font-extrabold ${step.done ? 'text-[#14532d]' : step.current ? 'text-[#991b1b]' : 'text-[#94a3b8]'}`}>{step.title}</h4>
-                  <p className="text-[13px] text-[#64748b] leading-relaxed mt-1">{step.desc}</p>
+                  <h4 className={`text-[15px] font-extrabold ${step.done ? 'text-foreground' : step.current ? 'text-[#991b1b]' : 'text-muted-foreground'}`}>{step.title}</h4>
+                  <p className="text-[13px] text-muted-foreground leading-relaxed mt-1">{step.desc}</p>
                   {step.action && (
-                    <div className="mt-2 border border-[#d4edda] rounded-lg p-2.5 bg-[#fafffe]">
+                    <div className="mt-2 border border-[#d4edda] rounded-lg p-2.5 bg-accent/50">
                       <p className="text-[10px] uppercase font-bold text-[#16a34a]">Faça isso agora:</p>
-                      <p className="text-[13px] text-[#14532d] font-semibold">{step.action}</p>
+                      <p className="text-[13px] text-foreground font-semibold">{step.action}</p>
                     </div>
                   )}
-                  {step.progress && <p className="text-[12px] text-[#64748b] mt-2 font-semibold">{step.progress}</p>}
+                  {step.progress && <p className="text-[12px] text-muted-foreground mt-2 font-semibold">{step.progress}</p>}
                   {step.done && <span className="inline-block mt-2 text-[11px] font-bold text-[#16a34a] bg-[#dcfce7] px-2.5 py-1 rounded-md">✓ Concluído</span>}
                   {step.cta && step.current && (
                     <button onClick={step.cta.fn} className="mt-2 text-[12px] font-bold text-white bg-[#dc2626] px-4 py-1.5 rounded-lg hover:bg-[#b91c1c] transition-colors">
@@ -479,8 +479,8 @@ export default function DebtsPage() {
                         <label key={ci} className="flex items-center gap-2.5 cursor-pointer">
                           <input type="checkbox" checked={step2Checks[ci] || false}
                             onChange={() => { const n = [...step2Checks]; n[ci] = !n[ci]; setStep2Checks(n); }}
-                            className="w-4 h-4 rounded border-[#e2e8f0] text-[#16a34a] focus:ring-[#16a34a]" />
-                          <span className={`text-[13px] ${step2Checks[ci] ? 'text-[#16a34a] line-through' : 'text-[#374151]'}`}>{item}</span>
+                            className="w-4 h-4 rounded border-border text-[#16a34a] focus:ring-[#16a34a]" />
+                          <span className={`text-[13px] ${step2Checks[ci] ? 'text-[#16a34a] line-through' : 'text-foreground'}`}>{item}</span>
                         </label>
                       ))}
                     </div>
@@ -492,12 +492,12 @@ export default function DebtsPage() {
 
           {/* Step 4 extra payment calculator */}
           {step4Active && activeDebts.length > 0 && (
-            <div className="mt-4 bg-[#f8faf8] rounded-xl p-4 border border-[#e2e8f0]">
-              <p className="text-[13px] font-bold text-[#14532d] mb-2">Quanto você pode pagar extra por mês?</p>
+            <div className="mt-4 bg-background rounded-xl p-4 border border-border">
+              <p className="text-[13px] font-bold text-foreground mb-2">Quanto você pode pagar extra por mês?</p>
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[13px] text-[#94a3b8] font-semibold">R$</span>
+                <span className="text-[13px] text-muted-foreground font-semibold">R$</span>
                 <input type="number" value={extraPayment || ''} onChange={e => setExtraPayment(Number(e.target.value))}
-                  placeholder="0" className="w-32 h-9 border-[1.5px] border-[#e2e8f0] rounded-lg px-3 text-[14px] font-bold focus:border-[#16a34a] outline-none" />
+                  placeholder="0" className="w-32 h-9 border-[1.5px] border-border rounded-lg px-3 text-[14px] font-bold focus:border-[#16a34a] outline-none" />
               </div>
               {extraPayment > 0 && orderedDebts[0] && (
                 <p className="text-[13px] text-[#16a34a] font-semibold">
@@ -509,22 +509,22 @@ export default function DebtsPage() {
 
           {/* Step 5 compound interest calculator */}
           {paidDebts.length > 0 && (
-            <div className="mt-4 bg-[#f0fdf4] rounded-xl p-4 border border-[#d4edda]">
-              <p className="text-[13px] font-bold text-[#14532d] mb-3">Calculadora de investimento</p>
+            <div className="mt-4 bg-secondary rounded-xl p-4 border border-[#d4edda]">
+              <p className="text-[13px] font-bold text-foreground mb-3">Calculadora de investimento</p>
               <div className="grid grid-cols-3 gap-3 mb-3">
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-[#94a3b8]">Aporte mensal</label>
+                  <label className="text-[10px] uppercase font-bold text-muted-foreground">Aporte mensal</label>
                   <input type="number" value={compMonthly} onChange={e => setCompMonthly(Number(e.target.value))}
                     className="w-full h-9 border-[1.5px] border-[#d4edda] rounded-lg px-3 text-[13px] font-bold focus:border-[#16a34a] outline-none" />
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-[#94a3b8]">Anos</label>
+                  <label className="text-[10px] uppercase font-bold text-muted-foreground">Anos</label>
                   <input type="range" min={1} max={30} value={compYears} onChange={e => setCompYears(Number(e.target.value))}
                     className="w-full mt-2" />
-                  <p className="text-[12px] text-center font-bold text-[#14532d]">{compYears} anos</p>
+                  <p className="text-[12px] text-center font-bold text-foreground">{compYears} anos</p>
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-[#94a3b8]">Taxa %/mês</label>
+                  <label className="text-[10px] uppercase font-bold text-muted-foreground">Taxa %/mês</label>
                   <input type="number" value={compRate} onChange={e => setCompRate(Number(e.target.value))} step={0.1}
                     className="w-full h-9 border-[1.5px] border-[#d4edda] rounded-lg px-3 text-[13px] font-bold focus:border-[#16a34a] outline-none" />
                 </div>
@@ -537,15 +537,15 @@ export default function DebtsPage() {
 
       {/* ═══ 5. MY DEBTS LIST ═══ */}
       {debts.length > 0 && (
-        <div className="bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#f1f5f9] flex items-center justify-between">
+        <div className="bg-card border-[1.5px] border-border rounded-2xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-border/50 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <h3 className="text-[15px] font-black text-[#14532d]">Minhas Dívidas</h3>
+              <h3 className="text-[15px] font-black text-foreground">Minhas Dívidas</h3>
               {activeDebts.length > 0 && (
                 <span className="text-[10px] font-extrabold bg-[#dc2626] text-white px-[6px] py-[1px] rounded-full">{activeDebts.length}</span>
               )}
             </div>
-            <span className="text-[11px] text-[#94a3b8] font-semibold">
+            <span className="text-[11px] text-muted-foreground font-semibold">
               {strategy === 'snowball' ? '❄️ Bola de Neve' : strategy === 'avalanche' ? '🏔️ Avalanche' : '🎯 Personalizada'}
             </span>
           </div>
@@ -568,11 +568,11 @@ export default function DebtsPage() {
               <AnimatePresence>
                 {showCategoryBreakdown && paidDebts.map(debt => (
                   <motion.div key={debt.id} initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
-                    className="px-5 py-3 border-t border-[#f8fafc] bg-[#fffbeb]/30 flex items-center gap-3">
+                    className="px-5 py-3 border-t border-border/30 bg-[#fffbeb]/30 flex items-center gap-3">
                     <span className="text-[14px]">🏆</span>
                     <div className="flex-1">
                       <p className="text-[13px] font-bold text-[#92400e]">{debt.name}</p>
-                      <p className="text-[11px] text-[#94a3b8]">{debt.creditor} · {fmt(Number(debt.total_amount))}</p>
+                      <p className="text-[11px] text-muted-foreground">{debt.creditor} · {fmt(Number(debt.total_amount))}</p>
                     </div>
                     <span className="text-[12px] font-bold text-[#16a34a]">✓ Quitada</span>
                   </motion.div>
@@ -584,29 +584,29 @@ export default function DebtsPage() {
       )}
 
       {/* ═══ 6. ADD DEBT FORM ═══ */}
-      <div ref={formRef} className="bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl overflow-hidden">
+      <div ref={formRef} className="bg-card border-[1.5px] border-border rounded-2xl overflow-hidden">
         <button onClick={() => setShowForm(!showForm)}
           className="w-full px-5 py-4 flex items-center justify-between hover:bg-[#fafafa] transition-colors">
           <div className="flex items-center gap-2">
             <PlusCircle className="w-4 h-4 text-[#dc2626]" />
-            <span className="text-[14px] font-extrabold text-[#14532d]">Cadastrar Nova Dívida</span>
+            <span className="text-[14px] font-extrabold text-foreground">Cadastrar Nova Dívida</span>
           </div>
-          <ChevronDown className={`w-4 h-4 text-[#94a3b8] transition-transform ${showForm ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showForm ? 'rotate-180' : ''}`} />
         </button>
         <AnimatePresence>
           {showForm && (
             <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
-              <div className="p-5 border-t border-[#f1f5f9]">
+              <div className="p-5 border-t border-border/50">
                 {/* Type tiles */}
-                <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide mb-2">Tipo de dívida</p>
+                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wide mb-2">Tipo de dívida</p>
                 <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-2 mb-5">
                   {DEBT_TYPES.map(t => (
                     <button key={t.val} onClick={() => setFormType(t.val)}
                       className={`min-h-[80px] flex flex-col items-center justify-center gap-1.5 rounded-xl border-[1.5px] transition-all ${
-                        formType === t.val ? 'border-2 border-[#dc2626] bg-[#fef2f2]' : 'border-[#e2e8f0] hover:border-[#fecaca]'
+                        formType === t.val ? 'border-2 border-[#dc2626] bg-[#fef2f2]' : 'border-border hover:border-[#fecaca]'
                       }`}>
                       <span className="text-2xl">{t.emoji}</span>
-                      <span className="text-[11px] font-semibold text-[#374151] text-center leading-tight px-1">{t.label}</span>
+                      <span className="text-[11px] font-semibold text-foreground text-center leading-tight px-1">{t.label}</span>
                     </button>
                   ))}
                 </div>
@@ -617,13 +617,13 @@ export default function DebtsPage() {
                   <FormField label="Valor total" value={formTotal} onChange={setFormTotal} placeholder="0,00" type="number" prefix="R$" />
                   <div>
                     <FormField label="Quanto ainda devo" value={formRemaining} onChange={setFormRemaining} placeholder="0,00" type="number" prefix="R$" />
-                    <p className="text-[10px] text-[#94a3b8] mt-0.5">Se não sabe, use o valor total</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">Se não sabe, use o valor total</p>
                   </div>
                   <div className="relative">
                     <FormField label="Taxa de juros (% a.m.)" value={formInterest} onChange={setFormInterest} placeholder="0,00" type="number" />
                     <div className="group relative inline-block ml-1">
                       <span className="text-[10px] text-[#16a34a] font-bold cursor-help underline">Como encontrar?</span>
-                      <div className="hidden group-hover:block absolute left-0 bottom-full mb-1 w-64 bg-white border border-[#e2e8f0] rounded-lg p-3 shadow-lg z-10 text-[11px] text-[#64748b] leading-relaxed">
+                      <div className="hidden group-hover:block absolute left-0 bottom-full mb-1 w-64 bg-card border border-border rounded-lg p-3 shadow-lg z-10 text-[11px] text-muted-foreground leading-relaxed">
                         Cartão de crédito: 15-20%/mês<br />Cheque especial: 8-12%/mês<br />Empréstimo pessoal: 2-8%/mês<br />Financiamento: 0.8-3%/mês
                       </div>
                     </div>
@@ -631,7 +631,7 @@ export default function DebtsPage() {
                   <FormField label="Pagamento mínimo (R$/mês)" value={formMinPayment} onChange={setFormMinPayment} placeholder="0,00" type="number" prefix="R$" />
                   <FormField label="Dia de vencimento" value={formDueDay} onChange={setFormDueDay} placeholder="1-31" type="number" />
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide mb-1">Cor</p>
+                    <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wide mb-1">Cor</p>
                     <div className="flex gap-2">
                       {COLORS.map(c => (
                         <button key={c} onClick={() => setFormColor(c)}
@@ -658,32 +658,32 @@ export default function DebtsPage() {
 
       {/* ═══ 7. PAYMENT HISTORY ═══ */}
       {payments.length > 0 && (
-        <div className="bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl overflow-hidden">
+        <div className="bg-card border-[1.5px] border-border rounded-2xl overflow-hidden">
           <button onClick={() => setShowHistory(!showHistory)}
             className="w-full px-5 py-4 flex items-center justify-between hover:bg-[#fafafa] transition-colors">
             <div className="flex items-center gap-2">
-              <span className="text-[15px] font-black text-[#14532d]">Histórico de Pagamentos</span>
+              <span className="text-[15px] font-black text-foreground">Histórico de Pagamentos</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="text-[13px] font-bold text-[#16a34a]">Total pago: {fmt(totalPaid)}</span>
-              <ChevronDown className={`w-4 h-4 text-[#94a3b8] transition-transform ${showHistory ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showHistory ? 'rotate-180' : ''}`} />
             </div>
           </button>
           <AnimatePresence>
             {showHistory && (
               <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
-                <div className="border-t border-[#f1f5f9]">
-                  <div className="grid grid-cols-5 gap-2 px-5 py-2.5 bg-[#fafcfa] text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide">
+                <div className="border-t border-border/50">
+                  <div className="grid grid-cols-5 gap-2 px-5 py-2.5 bg-background text-[10px] uppercase font-bold text-muted-foreground tracking-wide">
                     <span>Data</span><span>Dívida</span><span>Valor Pago</span><span>Notas</span><span></span>
                   </div>
                   {payments.slice(0, 20).map(p => {
                     const debt = debts.find(d => d.id === p.debt_id);
                     return (
-                      <div key={p.id} className="grid grid-cols-5 gap-2 px-5 py-3 border-t border-[#f8fafc] items-center text-[13px] border-l-[3px] border-l-[#16a34a]">
-                        <span className="text-[#64748b] font-medium">{new Date(p.payment_date).toLocaleDateString('pt-BR')}</span>
-                        <span className="font-bold text-[#14532d] truncate">{debt?.name || '-'}</span>
+                      <div key={p.id} className="grid grid-cols-5 gap-2 px-5 py-3 border-t border-border/30 items-center text-[13px] border-l-[3px] border-l-[#16a34a]">
+                        <span className="text-muted-foreground font-medium">{new Date(p.payment_date).toLocaleDateString('pt-BR')}</span>
+                        <span className="font-bold text-foreground truncate">{debt?.name || '-'}</span>
                         <span className="font-black text-[#16a34a]">{fmt(Number(p.amount))}</span>
-                        <span className="text-[#94a3b8] text-[12px] truncate">{p.notes || '-'}</span>
+                        <span className="text-muted-foreground text-[12px] truncate">{p.notes || '-'}</span>
                         <span></span>
                       </div>
                     );
@@ -697,15 +697,15 @@ export default function DebtsPage() {
 
       {/* ═══ 8. PROJECTION CHART ═══ */}
       {activeDebts.length > 0 && projectionData.length > 1 && (
-        <div className="bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl p-6">
-          <h3 className="text-[15px] font-black text-[#14532d]">Projeção de Quitação</h3>
-          <p className="text-[13px] text-[#64748b] mb-4">Simule quanto tempo vai levar para quitar tudo</p>
+        <div className="bg-card border-[1.5px] border-border rounded-2xl p-6">
+          <h3 className="text-[15px] font-black text-foreground">Projeção de Quitação</h3>
+          <p className="text-[13px] text-muted-foreground mb-4">Simule quanto tempo vai levar para quitar tudo</p>
           <div className="flex items-center gap-3 mb-4">
-            <label className="text-[12px] font-bold text-[#64748b]">Pagamento extra mensal:</label>
+            <label className="text-[12px] font-bold text-muted-foreground">Pagamento extra mensal:</label>
             <div className="flex items-center gap-1">
-              <span className="text-[12px] text-[#94a3b8]">R$</span>
+              <span className="text-[12px] text-muted-foreground">R$</span>
               <input type="number" value={extraPayment || ''} onChange={e => setExtraPayment(Number(e.target.value))}
-                placeholder="0" className="w-28 h-8 border-[1.5px] border-[#e2e8f0] rounded-lg px-2 text-[13px] font-bold focus:border-[#16a34a] outline-none" />
+                placeholder="0" className="w-28 h-8 border-[1.5px] border-border rounded-lg px-2 text-[13px] font-bold focus:border-[#16a34a] outline-none" />
             </div>
           </div>
           <div className="h-[280px]">
@@ -730,7 +730,7 @@ export default function DebtsPage() {
                 <p className="text-[12px] font-bold text-[#991b1b] mb-1">Só o mínimo</p>
                 <p className="text-[11px] text-[#dc2626]">Total restante ao final: {fmt(projectionData[projectionData.length - 1]?.minOnly || 0)}</p>
               </div>
-              <div className="bg-[#f0fdf4] rounded-xl p-4">
+              <div className="bg-secondary rounded-xl p-4">
                 <p className="text-[12px] font-bold text-[#166534] mb-1">Com {fmt(extraPayment)} extra</p>
                 <p className="text-[11px] text-[#16a34a]">Total restante ao final: {fmt(projectionData[projectionData.length - 1]?.withExtra || 0)}</p>
               </div>
@@ -741,13 +741,13 @@ export default function DebtsPage() {
 
       {/* ═══ 9. TIPS CAROUSEL ═══ */}
       <div>
-        <h3 className="text-[15px] font-black text-[#14532d] mb-3">Dicas para sair das dívidas mais rápido</h3>
+        <h3 className="text-[15px] font-black text-foreground mb-3">Dicas para sair das dívidas mais rápido</h3>
         <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-hide">
           {TIPS.map((tip, i) => (
-            <div key={i} className="bg-white border-[1.5px] border-[#e2e8f0] rounded-[14px] p-[18px] min-w-[280px] flex-shrink-0">
+            <div key={i} className="bg-card border-[1.5px] border-border rounded-[14px] p-[18px] min-w-[280px] flex-shrink-0">
               <span className="text-[28px] block mb-2">{tip.emoji}</span>
-              <h4 className="text-[13px] font-extrabold text-[#14532d] mb-1.5">{tip.title}</h4>
-              <p className="text-[12px] text-[#64748b] leading-relaxed">{tip.body}</p>
+              <h4 className="text-[13px] font-extrabold text-foreground mb-1.5">{tip.title}</h4>
+              <p className="text-[12px] text-muted-foreground leading-relaxed">{tip.body}</p>
             </div>
           ))}
         </div>
@@ -761,23 +761,23 @@ export default function DebtsPage() {
               className="fixed inset-0 bg-black/30 z-50 backdrop-blur-sm" onClick={() => setPaymentModal(null)} />
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={e => e.target === e.currentTarget && setPaymentModal(null)}>
-              <div className="bg-white rounded-[20px] p-7 w-full max-w-[440px] shadow-2xl" onClick={e => e.stopPropagation()}>
+              <div className="bg-card rounded-[20px] p-7 w-full max-w-[440px] shadow-2xl" onClick={e => e.stopPropagation()}>
                 <div className="flex items-center justify-between mb-1">
-                  <h3 className="text-[17px] font-black text-[#14532d]">Registrar Pagamento</h3>
-                  <button onClick={() => setPaymentModal(null)} className="text-[#94a3b8] hover:text-[#dc2626]"><X className="w-5 h-5" /></button>
+                  <h3 className="text-[17px] font-black text-foreground">Registrar Pagamento</h3>
+                  <button onClick={() => setPaymentModal(null)} className="text-muted-foreground hover:text-[#dc2626]"><X className="w-5 h-5" /></button>
                 </div>
-                <p className="text-[14px] text-[#14532d] font-bold mb-3">{paymentModal.name}</p>
+                <p className="text-[14px] text-foreground font-bold mb-3">{paymentModal.name}</p>
 
                 <div className="bg-[#fef2f2] rounded-[10px] p-3 mb-4">
                   <p className="text-[13px] font-bold text-[#dc2626]">Saldo atual: {fmt(Number(paymentModal.remaining_amount))}</p>
-                  <p className="text-[11px] text-[#94a3b8]">Juros estimados este mês: {fmt(Number(paymentModal.remaining_amount) * Number(paymentModal.interest_rate) / 100)}</p>
+                  <p className="text-[11px] text-muted-foreground">Juros estimados este mês: {fmt(Number(paymentModal.remaining_amount) * Number(paymentModal.interest_rate) / 100)}</p>
                 </div>
 
-                <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide mb-1">Valor pago</p>
-                <div className="flex items-center border-b-2 border-[#e2e8f0] pb-2 mb-2">
-                  <span className="text-[16px] text-[#94a3b8] mr-2">R$</span>
+                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wide mb-1">Valor pago</p>
+                <div className="flex items-center border-b-2 border-border pb-2 mb-2">
+                  <span className="text-[16px] text-muted-foreground mr-2">R$</span>
                   <input type="number" value={payAmount} onChange={e => setPayAmount(e.target.value)}
-                    placeholder="0,00" className="flex-1 text-[20px] font-black text-[#14532d] outline-none bg-transparent" autoFocus />
+                    placeholder="0,00" className="flex-1 text-[20px] font-black text-foreground outline-none bg-transparent" autoFocus />
                 </div>
                 <div className="flex gap-2 mb-4 flex-wrap">
                   {[
@@ -795,20 +795,20 @@ export default function DebtsPage() {
 
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide mb-1">Data</p>
+                    <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wide mb-1">Data</p>
                     <input type="date" value={payDate} onChange={e => setPayDate(e.target.value)}
-                      className="w-full h-9 border-[1.5px] border-[#e2e8f0] rounded-lg px-3 text-[13px] font-semibold focus:border-[#16a34a] outline-none" />
+                      className="w-full h-9 border-[1.5px] border-border rounded-lg px-3 text-[13px] font-semibold focus:border-[#16a34a] outline-none" />
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide mb-1">Observação</p>
+                    <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wide mb-1">Observação</p>
                     <input type="text" value={payNotes} onChange={e => setPayNotes(e.target.value)} placeholder="Opcional"
-                      className="w-full h-9 border-[1.5px] border-[#e2e8f0] rounded-lg px-3 text-[13px] focus:border-[#16a34a] outline-none" />
+                      className="w-full h-9 border-[1.5px] border-border rounded-lg px-3 text-[13px] focus:border-[#16a34a] outline-none" />
                   </div>
                 </div>
 
                 {payAmount && (
-                  <div className="bg-[#f0fdf4] rounded-[10px] p-3 mb-4">
-                    <p className="text-[12px] font-bold text-[#14532d] mb-1">Após este pagamento:</p>
+                  <div className="bg-secondary rounded-[10px] p-3 mb-4">
+                    <p className="text-[12px] font-bold text-foreground mb-1">Após este pagamento:</p>
                     <p className="text-[13px] text-[#16a34a] font-black">
                       Novo saldo: {fmt(Math.max(0, Number(paymentModal.remaining_amount) - Number(payAmount)))}
                     </p>
@@ -846,7 +846,7 @@ function DebtRow({ debt, isFocus, onPay, onDelete, onStatusChange }: {
 
   return (
     <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-      className="px-5 py-4 border-b border-[#f8fafc] hover:bg-[#fafafa] transition-colors group"
+      className="px-5 py-4 border-b border-border/30 hover:bg-[#fafafa] transition-colors group"
       style={{ borderLeft: `4px solid ${debt.color}` }}>
       <div className="flex items-start gap-3">
         {/* Priority */}
@@ -854,7 +854,7 @@ function DebtRow({ debt, isFocus, onPay, onDelete, onStatusChange }: {
           {isFocus ? (
             <span className="text-[10px] font-extrabold bg-[#dc2626] text-white px-2 py-[3px] rounded-[5px] animate-pulse">FOCO</span>
           ) : (
-            <div className="w-7 h-7 rounded-full bg-[#f1f5f9] flex items-center justify-center text-[13px] font-extrabold text-[#94a3b8]">
+            <div className="w-7 h-7 rounded-full bg-muted/30 flex items-center justify-center text-[13px] font-extrabold text-muted-foreground">
               {debt.priority + 1}
             </div>
           )}
@@ -863,18 +863,18 @@ function DebtRow({ debt, isFocus, onPay, onDelete, onStatusChange }: {
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[14px] font-extrabold text-[#14532d]">{debt.name}</span>
-            <span className="text-[10px] font-bold text-[#94a3b8] bg-[#f8faf8] px-1.5 py-[1px] rounded">{debt.creditor}</span>
-            {typeInfo && <span className="text-[10px] font-bold text-[#64748b] bg-[#f1f5f9] px-1.5 py-[1px] rounded">{typeInfo.emoji} {typeInfo.label}</span>}
+            <span className="text-[14px] font-extrabold text-foreground">{debt.name}</span>
+            <span className="text-[10px] font-bold text-muted-foreground bg-background px-1.5 py-[1px] rounded">{debt.creditor}</span>
+            {typeInfo && <span className="text-[10px] font-bold text-muted-foreground bg-muted/30 px-1.5 py-[1px] rounded">{typeInfo.emoji} {typeInfo.label}</span>}
           </div>
           <div className="flex items-center gap-3 mt-1.5 text-[12px]">
             {Number(debt.interest_rate) > 0 && <span className="text-[#d97706] font-bold">💰 {debt.interest_rate}% a.m.</span>}
-            {Number(debt.min_payment) > 0 && <span className="text-[#64748b]">Min: {fmt(Number(debt.min_payment))}/mês</span>}
-            {debt.due_day && <span className="text-[#64748b]">Vence dia {debt.due_day}</span>}
+            {Number(debt.min_payment) > 0 && <span className="text-muted-foreground">Min: {fmt(Number(debt.min_payment))}/mês</span>}
+            {debt.due_day && <span className="text-muted-foreground">Vence dia {debt.due_day}</span>}
           </div>
           {/* Progress */}
           <div className="mt-2.5">
-            <div className="w-full h-2 bg-[#f1f5f9] rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-muted/30 rounded-full overflow-hidden">
               <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.6 }}
                 className="h-full rounded-full" style={{ background: debt.color }} />
             </div>
@@ -888,37 +888,37 @@ function DebtRow({ debt, isFocus, onPay, onDelete, onStatusChange }: {
         {/* Right */}
         <div className="flex flex-col items-end gap-2 flex-shrink-0">
           <p className="text-[18px] font-black text-[#dc2626]">{fmt(Number(debt.remaining_amount))}</p>
-          <p className="text-[12px] text-[#94a3b8]">de {fmt(Number(debt.total_amount))}</p>
+          <p className="text-[12px] text-muted-foreground">de {fmt(Number(debt.total_amount))}</p>
           <p className={`text-[13px] font-bold ${pct > 50 ? 'text-[#16a34a]' : pct > 25 ? 'text-[#d97706]' : 'text-[#dc2626]'}`}>
             {pct.toFixed(0)}% pago
           </p>
 
           <div className="flex items-center gap-2">
             <button onClick={onPay}
-              className="text-[12px] font-bold text-[#166534] bg-[#f0fdf4] border-[1.5px] border-[#d4edda] px-3 py-1.5 rounded-lg hover:bg-[#dcfce7] transition-colors">
+              className="text-[12px] font-bold text-[#166534] bg-secondary border-[1.5px] border-[#d4edda] px-3 py-1.5 rounded-lg hover:bg-[#dcfce7] transition-colors">
               Registrar pagamento
             </button>
             <div className="relative">
-              <button onClick={() => setShowMenu(!showMenu)} className="p-1.5 rounded-lg hover:bg-[#f1f5f9] transition-colors">
-                <MoreVertical className="w-4 h-4 text-[#94a3b8]" />
+              <button onClick={() => setShowMenu(!showMenu)} className="p-1.5 rounded-lg hover:bg-muted/30 transition-colors">
+                <MoreVertical className="w-4 h-4 text-muted-foreground" />
               </button>
               {showMenu && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
-                  <div className="absolute right-0 top-8 z-50 w-48 bg-white border border-[#e2e8f0] rounded-xl shadow-lg py-1 overflow-hidden">
+                  <div className="absolute right-0 top-8 z-50 w-48 bg-card border border-border rounded-xl shadow-lg py-1 overflow-hidden">
                     {debt.status === 'active' ? (
                       <button onClick={() => { onStatusChange('paused'); setShowMenu(false); }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-[#64748b] hover:bg-[#f8faf8]">
+                        className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-muted-foreground hover:bg-background">
                         <Pause className="w-3.5 h-3.5" /> Pausar
                       </button>
                     ) : (
                       <button onClick={() => { onStatusChange('active'); setShowMenu(false); }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-[#64748b] hover:bg-[#f8faf8]">
+                        className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-muted-foreground hover:bg-background">
                         <Play className="w-3.5 h-3.5" /> Reativar
                       </button>
                     )}
                     <button onClick={() => { onStatusChange('paid'); setShowMenu(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-[#16a34a] hover:bg-[#f0fdf4]">
+                      className="w-full flex items-center gap-2 px-3 py-2 text-[12px] text-[#16a34a] hover:bg-secondary">
                       <Check className="w-3.5 h-3.5" /> Marcar como quitada
                     </button>
                     <button onClick={() => { setConfirmDelete(true); setShowMenu(false); }}
@@ -935,7 +935,7 @@ function DebtRow({ debt, isFocus, onPay, onDelete, onStatusChange }: {
             <div className="flex items-center gap-2 mt-1">
               <span className="text-[11px] text-[#dc2626] font-bold">Excluir?</span>
               <button onClick={() => { onDelete(); setConfirmDelete(false); }} className="text-[11px] font-bold text-white bg-[#dc2626] px-2 py-0.5 rounded">Sim</button>
-              <button onClick={() => setConfirmDelete(false)} className="text-[11px] font-bold text-[#64748b] bg-[#f1f5f9] px-2 py-0.5 rounded">Não</button>
+              <button onClick={() => setConfirmDelete(false)} className="text-[11px] font-bold text-muted-foreground bg-muted/30 px-2 py-0.5 rounded">Não</button>
             </div>
           )}
         </div>
@@ -950,15 +950,15 @@ function FormField({ label, value, onChange, placeholder, type = 'text', prefix,
 }) {
   return (
     <div>
-      <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide mb-1">{label}</p>
+      <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wide mb-1">{label}</p>
       {textarea ? (
         <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-          rows={2} className="w-full border-[1.5px] border-[#e2e8f0] rounded-[9px] px-3 py-2 text-[13px] font-semibold focus:border-[#16a34a] outline-none resize-none" />
+          rows={2} className="w-full border-[1.5px] border-border rounded-[9px] px-3 py-2 text-[13px] font-semibold focus:border-[#16a34a] outline-none resize-none" />
       ) : (
         <div className="relative">
-          {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94a3b8] font-semibold">{prefix}</span>}
+          {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-muted-foreground font-semibold">{prefix}</span>}
           <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-            className={`w-full h-[42px] border-[1.5px] border-[#e2e8f0] rounded-[9px] text-[13px] font-semibold focus:border-[#16a34a] outline-none ${prefix ? 'pl-8 pr-3' : 'px-3'}`} />
+            className={`w-full h-[42px] border-[1.5px] border-border rounded-[9px] text-[13px] font-semibold focus:border-[#16a34a] outline-none ${prefix ? 'pl-8 pr-3' : 'px-3'}`} />
         </div>
       )}
     </div>
