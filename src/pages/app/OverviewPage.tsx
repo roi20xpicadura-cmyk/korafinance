@@ -79,6 +79,7 @@ export default function OverviewPage() {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [investments, setInvestments] = useState<any[]>([]);
   const [goals, setGoals] = useState<any[]>([]);
+  const [goalCheckins, setGoalCheckins] = useState<Record<string, any[]>>({});
   const [loading, setLoading] = useState(true);
   const [chartPeriod, setChartPeriod] = useState<'7d' | '30d' | '90d'>('30d');
   const [dismissedTips, setDismissedTips] = useState<string[]>(() => {
