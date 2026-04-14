@@ -337,15 +337,17 @@ export default function OverviewPage() {
       </motion.div>
 
       {/* ── Balance Chart ──────────────────────────── */}
-      <motion.div {...stagger(9)} className="bg-card border-[1.5px] border-border rounded-[14px]">
+      <motion.div {...stagger(9)} className="card-premium" style={{ borderRadius: 'var(--radius-xl)' }}>
         <div className="flex items-center justify-between px-5 pt-[18px] pb-0">
           <h3 className="text-[15px] font-extrabold text-foreground">Evolução do Saldo</h3>
-          <div className="flex items-center gap-1 bg-background border border-border rounded-lg p-[3px]">
+          <div className="flex items-center gap-1 p-[3px]" style={{ background: 'var(--color-bg-sunken)', border: '1px solid var(--color-border-weak)', borderRadius: 'var(--radius-lg)' }}>
             {(['7d', '30d', '90d'] as const).map(p => (
               <button key={p} onClick={() => setChartPeriod(p)}
-                className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
-                  chartPeriod === p ? 'bg-secondary text-[#16a34a] border border-[#d4edda]' : 'text-muted-foreground border border-transparent'
-                }`}>{p}</button>
+                style={{
+                  padding: '4px 10px', borderRadius: 'var(--radius-md)', fontSize: 11, fontWeight: 600,
+                  transition: 'all 150ms',
+                  ...(chartPeriod === p ? { background: 'var(--color-green-50)', color: 'var(--color-green-700)', border: '1px solid var(--color-green-200)' } : { color: 'var(--color-text-muted)', border: '1px solid transparent' })
+                }}>{p}</button>
             ))}
           </div>
         </div>
@@ -364,8 +366,8 @@ export default function OverviewPage() {
                     <stop offset="95%" stopColor="#22c55e" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: 'var(--text-hint)' }} interval="preserveStartEnd" />
-                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: 'var(--text-hint)' }} tickFormatter={(v: number) => v >= 1000 ? `R$${(v / 1000).toFixed(0)}k` : `R$${v}`} />
+                <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: 'var(--color-text-subtle)' }} interval="preserveStartEnd" />
+                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: 'var(--color-text-subtle)' }} tickFormatter={(v: number) => v >= 1000 ? `R$${(v / 1000).toFixed(0)}k` : `R$${v}`} />
                 <Tooltip content={<ChartTooltip />} />
                 <Area type="monotone" dataKey="saldo" stroke="#22c55e" strokeWidth={2.5} fill="url(#greenGradient)" />
               </AreaChart>
