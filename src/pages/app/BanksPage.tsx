@@ -290,7 +290,7 @@ export default function BanksPage() {
 
   if (loading) {
     return (
-      <div className="space-y-5 pb-28">
+      <div className="space-y-5 pb-4">
         {[1,2,3].map(i => (
           <div key={i} className="card-premium" style={{ padding: 20 }}>
             <div className="skeleton-shimmer" style={{ width: '40%', height: 14, borderRadius: 6 }} />
@@ -302,7 +302,7 @@ export default function BanksPage() {
   }
 
   return (
-    <div className="space-y-5 pb-28">
+    <div className="space-y-5 pb-4">
       {/* STATS STRIP */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
