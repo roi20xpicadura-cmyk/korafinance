@@ -419,27 +419,36 @@ export type Database = {
           created_at: string | null
           full_name: string | null
           id: string
+          marketing_emails: boolean | null
           plan: string | null
           plan_expires_at: string | null
           stripe_customer_id: string | null
+          terms_accepted_at: string | null
+          terms_version: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string | null
           full_name?: string | null
           id: string
+          marketing_emails?: boolean | null
           plan?: string | null
           plan_expires_at?: string | null
           stripe_customer_id?: string | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string | null
           full_name?: string | null
           id?: string
+          marketing_emails?: boolean | null
           plan?: string | null
           plan_expires_at?: string | null
           stripe_customer_id?: string | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
         }
         Relationships: []
       }
