@@ -237,38 +237,39 @@ export default function TransactionsPage() {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-page)' }}>
-      <div className="px-4 py-5 md:p-7 flex flex-col gap-4 md:gap-5 max-w-[1400px] mx-auto">
+      <div className="px-3 py-3 md:px-7 md:py-5 flex flex-col gap-3 md:gap-5 max-w-[1400px] mx-auto">
 
         {/* ── 1. STATS STRIP ── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-3">
+        {/* Mobile: compact 2x2 grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
           {[
             { label: 'Receitas', value: totals.inc, color: '#16a34a', bg: '#dcfce7', icon: TrendingUp, sub: `${totals.incCount} receitas`, valColor: '#16a34a' },
             { label: 'Despesas', value: totals.exp, color: '#dc2626', bg: '#fee2e2', icon: TrendingDown, sub: `${totals.expCount} despesas`, valColor: '#dc2626' },
             { label: 'Saldo', value: totals.net, color: '#2563eb', bg: '#eff6ff', icon: Scale, sub: 'Resultado líquido', valColor: totals.net >= 0 ? '#16a34a' : '#dc2626' },
           ].map((s, i) => (
-            <div key={i} className="flex items-center gap-2.5 md:gap-3.5 bg-card border-[1.5px] border-border rounded-xl p-3 md:p-4 hover:border-[#86efac] transition-colors duration-200">
-              <div className="w-9 h-9 md:w-10 md:h-10 rounded-[10px] flex items-center justify-center shrink-0" style={{ background: s.bg }}>
-                <s.icon className="w-4 h-4 md:w-[18px] md:h-[18px]" style={{ color: s.color }} />
+            <div key={i} className="flex items-center gap-2 md:gap-3.5 bg-card border border-border rounded-xl p-2.5 md:p-4 hover:border-[#86efac] transition-colors duration-200">
+              <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: s.bg }}>
+                <s.icon className="w-3.5 h-3.5 md:w-[18px] md:h-[18px]" style={{ color: s.color }} />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-[9px] md:text-[10px] uppercase font-bold text-muted-foreground tracking-wide truncate">{s.label}</p>
-                <p className="text-sm md:text-[20px] font-black truncate" style={{ color: s.valColor }}>{formatCurrency(s.value)}</p>
+                <p className="text-[13px] md:text-[20px] font-black truncate leading-tight" style={{ color: s.valColor }}>{formatCurrency(s.value)}</p>
                 <p className="text-[10px] md:text-[11px] text-muted-foreground hidden md:block">{s.sub}</p>
               </div>
             </div>
           ))}
           {/* Card 4: count */}
-          <div className="flex items-center gap-2.5 md:gap-3.5 bg-card border-[1.5px] border-border rounded-xl p-3 md:p-4 hover:border-[#86efac] transition-colors duration-200">
-            <div className="w-9 h-9 md:w-10 md:h-10 rounded-[10px] flex items-center justify-center shrink-0 bg-muted/30">
-              <Receipt className="w-4 h-4 md:w-[18px] md:h-[18px] text-muted-foreground" />
+          <div className="flex items-center gap-2 md:gap-3.5 bg-card border border-border rounded-xl p-2.5 md:p-4 hover:border-[#86efac] transition-colors duration-200">
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg flex items-center justify-center shrink-0 bg-muted/30">
+              <Receipt className="w-3.5 h-3.5 md:w-[18px] md:h-[18px] text-muted-foreground" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-[9px] md:text-[10px] uppercase font-bold text-muted-foreground tracking-wide">Lançamentos</p>
-              <p className="text-sm md:text-[20px] font-black text-foreground">{txs.length}</p>
+              <p className="text-[13px] md:text-[20px] font-black text-foreground leading-tight">{txs.length}</p>
               {limits.transactions_per_month !== Infinity ? (
                 <div>
                   <p className="text-[10px] md:text-[11px] text-muted-foreground">{txs.length}/{limits.transactions_per_month}</p>
-                  <div className="mt-1 h-[3px] rounded-full bg-muted/30 overflow-hidden">
+                  <div className="mt-0.5 h-[3px] rounded-full bg-muted/30 overflow-hidden">
                     <div className="h-full rounded-full transition-all duration-500" style={{
                       width: `${Math.min(limitPct, 100)}%`,
                       background: limitPct > 90 ? '#dc2626' : limitPct > 80 ? '#f59e0b' : '#16a34a'
