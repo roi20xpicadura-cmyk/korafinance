@@ -12,7 +12,7 @@ import {
   LayoutDashboard, ArrowLeftRight, Target, TrendingUp, FileText,
   CreditCard, Briefcase, BarChart2, Download, Settings2, Crown,
   LogOut, Menu, X, Bell, ChevronRight, BarChart3, Home, MoreHorizontal, Sparkles,
-  AlertCircle, CalendarDays, Trophy, Gift, Sun, Moon, Monitor, Plus, Building2
+  AlertCircle, CalendarDays, Trophy, Gift, Sun, Moon, Monitor, Plus, Building2, Plug
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -21,6 +21,7 @@ const ALL_NAV_ITEMS = [
   { label: 'Visão Geral', path: '/app', icon: LayoutDashboard, profiles: ['personal', 'business', 'both'] },
   { label: 'Lançamentos', path: '/app/transactions', icon: ArrowLeftRight, profiles: ['personal', 'business', 'both'] },
   { label: 'Contas Bancárias', path: '/app/banks', icon: Building2, profiles: ['personal', 'business', 'both'] },
+  { label: 'Integrações', path: '/app/integrations', icon: Plug, profiles: ['personal', 'business', 'both'] },
   { label: 'Orçamento', path: '/app/budget', icon: CalendarDays, profiles: ['personal', 'business', 'both'] },
   { label: 'Metas', path: '/app/goals', icon: Target, profiles: ['personal', 'business', 'both'] },
   { label: 'Dívidas', path: '/app/debts', icon: AlertCircle, profiles: ['personal', 'business', 'both'] },
@@ -63,6 +64,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/app/referral': 'Indicar Amigos',
   '/app/settings': 'Configurações',
   '/app/banks': 'Contas Bancárias',
+  '/app/integrations': 'Integrações',
   '/app/billing': 'Planos e Assinatura',
 };
 
