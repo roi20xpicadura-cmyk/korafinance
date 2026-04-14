@@ -125,8 +125,8 @@ export default function ReferralPage() {
                     <td className="px-5 py-3 text-sm" style={{ color: 'var(--text-primary)' }}>{r.referred_email}</td>
                     <td className="px-5 py-3">
                       <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{
-                        background: r.status === 'subscribed' ? '#f0fdf4' : r.status === 'registered' ? '#eff6ff' : '#f1f5f9',
-                        color: r.status === 'subscribed' ? '#16a34a' : r.status === 'registered' ? '#2563eb' : '#94a3b8',
+                        background: r.status === 'subscribed' ? '#f0fdf4' : r.status === 'registered' ? '#eff6ff' : 'var(--bg-elevated)',
+                        color: r.status === 'subscribed' ? '#16a34a' : r.status === 'registered' ? '#2563eb' : 'var(--text-hint)',
                       }}>{r.status === 'subscribed' ? 'Assinou Pro ✓' : r.status === 'registered' ? 'Registrado' : 'Cadastrou'}</span>
                     </td>
                     <td className="px-5 py-3 text-xs" style={{ color: 'var(--text-hint)' }}>{format(new Date(r.created_at), 'dd/MM/yyyy')}</td>

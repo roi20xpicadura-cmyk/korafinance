@@ -146,13 +146,13 @@ function FormField({ label, value, onChange, placeholder, type = 'text', prefix,
 }) {
   return (
     <div>
-      <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide mb-1">{label}</p>
+      <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wide mb-1">{label}</p>
       <div className="relative">
-        {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94a3b8] font-semibold">{prefix}</span>}
+        {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-muted-foreground font-semibold">{prefix}</span>}
         <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-          className={`w-full h-[42px] border-[1.5px] border-[#e2e8f0] rounded-[9px] text-[13px] font-semibold focus:border-[#16a34a] outline-none ${prefix ? 'pl-8 pr-3' : 'px-3'}`} />
+          className={`w-full h-[42px] border-[1.5px] border-border rounded-[9px] text-[13px] font-semibold focus:border-[#16a34a] outline-none ${prefix ? 'pl-8 pr-3' : 'px-3'}`} />
       </div>
-      {helper && <p className="text-[10px] text-[#94a3b8] mt-0.5">{helper}</p>}
+      {helper && <p className="text-[10px] text-muted-foreground mt-0.5">{helper}</p>}
     </div>
   );
 }
@@ -320,7 +320,7 @@ export default function CardsPage() {
   // Chart data
   const pieData = cards.map(c => ({ name: c.name, value: c.used_amount, color: c.color })).filter(d => d.value > 0);
 
-  if (loading) return <div className="flex items-center justify-center h-64 text-[#94a3b8]">Carregando...</div>;
+  if (loading) return <div className="flex items-center justify-center h-64 text-muted-foreground">Carregando...</div>;
 
   // ─── EMPTY STATE ───
   if (!cards.length) return (
@@ -331,11 +331,11 @@ export default function CardsPage() {
           <div key={i} className="absolute inset-0 rounded-xl" style={{ background: c.bg, transform: `rotate(${c.rot}deg)`, zIndex: c.z, width: 160, height: 96, left: 20, top: 12 }} />
         ))}
       </div>
-      <h2 className="text-[18px] font-extrabold text-[#14532d]">Nenhum cartão cadastrado</h2>
-      <p className="text-[14px] text-[#64748b] max-w-[340px] leading-relaxed">
+      <h2 className="text-[18px] font-extrabold text-foreground">Nenhum cartão cadastrado</h2>
+      <p className="text-[14px] text-muted-foreground max-w-[340px] leading-relaxed">
         Cadastre seus cartões de crédito para controlar limites, faturas e vencimentos em um só lugar.
       </p>
-      <div className="flex gap-5 text-[13px] font-semibold text-[#6b8f6b]">
+      <div className="flex gap-5 text-[13px] font-semibold text-muted-foreground">
         <span>✓ Controle de limite</span><span>✓ Alertas de vencimento</span><span>✓ Histórico de faturas</span>
       </div>
       <button onClick={scrollToForm}
@@ -352,19 +352,19 @@ export default function CardsPage() {
   function CardForm() {
     return (
       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
-        className="overflow-hidden bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl">
+        className="overflow-hidden bg-card border-[1.5px] border-border rounded-2xl">
         <div className="p-5">
           <div className="flex flex-col md:flex-row gap-5">
             <div className="flex-1 space-y-3">
               <FormField label="Nome do cartão" value={fName} onChange={setFName} placeholder="Ex: Nubank Roxo" />
               {/* Network selector */}
               <div>
-                <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide mb-1">Bandeira</p>
+                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wide mb-1">Bandeira</p>
                 <div className="flex gap-2 flex-wrap">
                   {NETWORKS.map(n => (
                     <button key={n.val} onClick={() => setFNetwork(n.val)}
                       className={`w-[70px] py-2 rounded-lg border-[1.5px] text-[12px] font-bold text-center transition-all ${
-                        fNetwork === n.val ? 'border-[#16a34a] bg-[#f0fdf4] text-[#16a34a]' : 'border-[#e2e8f0] text-[#64748b] hover:border-[#d4edda]'
+                        fNetwork === n.val ? 'border-[#16a34a] bg-secondary text-[#16a34a]' : 'border-border text-muted-foreground hover:border-[#d4edda]'
                       }`}>{n.label}</button>
                   ))}
                 </div>
@@ -380,7 +380,7 @@ export default function CardsPage() {
               </div>
               {/* Colors */}
               <div>
-                <p className="text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide mb-1">Cor do cartão</p>
+                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wide mb-1">Cor do cartão</p>
                 <div className="flex gap-2">
                   {CARD_COLORS.map(c => (
                     <button key={c} onClick={() => setFColor(c)}
@@ -397,7 +397,7 @@ export default function CardsPage() {
                   {submitting ? 'Salvando...' : editCard ? 'Salvar alterações' : 'Salvar Cartão'}
                 </button>
                 <button onClick={() => { setShowForm(false); setEditCard(null); resetForm(); }}
-                  className="text-[13px] font-semibold text-[#94a3b8] hover:text-[#dc2626] transition-colors">
+                  className="text-[13px] font-semibold text-muted-foreground hover:text-[#dc2626] transition-colors">
                   Cancelar
                 </button>
               </div>
@@ -425,8 +425,8 @@ export default function CardsPage() {
           'bg-[#fffbeb] border-[#fde68a] border-l-4 border-l-[#d97706]'
         }`}>
           {al.type === 'today' || al.type === 'high' ? <AlertTriangle className="w-4 h-4 text-[#dc2626] flex-shrink-0" /> : <Clock className="w-4 h-4 text-[#d97706] flex-shrink-0" />}
-          <span className="text-[13px] text-[#374151] font-medium flex-1">{al.msg}</span>
-          <button onClick={() => dismissAlert(al.id)} className="text-[#94a3b8] hover:text-[#dc2626]"><X className="w-4 h-4" /></button>
+          <span className="text-[13px] text-foreground font-medium flex-1">{al.msg}</span>
+          <button onClick={() => dismissAlert(al.id)} className="text-muted-foreground hover:text-[#dc2626]"><X className="w-4 h-4" /></button>
         </div>
       ))}
 
@@ -441,16 +441,16 @@ export default function CardsPage() {
             sub: nearestDue ? (nearestDue.card as Card).name : '-',
             color: nearestDue && nearestDue.days <= 1 ? '#dc2626' : nearestDue && nearestDue.days <= 3 ? '#d97706' : '#2563eb' },
         ].map((c, i) => (
-          <div key={i} className={`bg-white border-[1.5px] border-[#e2e8f0] rounded-xl p-4 flex items-center gap-3.5 hover:border-[#86efac] transition-colors ${
+          <div key={i} className={`bg-card border-[1.5px] border-border rounded-xl p-4 flex items-center gap-3.5 hover:border-[#86efac] transition-colors ${
             i === 3 && nearestDue && nearestDue.days <= 3 ? 'border-[#d97706]' : ''
           }`}>
             <div className="w-10 h-10 rounded-[10px] flex items-center justify-center flex-shrink-0" style={{ background: c.bg }}>
               <c.icon className="w-[18px] h-[18px]" style={{ color: c.ic }} />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wide">{c.label}</p>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">{c.label}</p>
               <p className="text-[18px] font-black truncate" style={{ color: c.color }}>{c.value}</p>
-              <p className="text-[11px] text-[#94a3b8] truncate">{c.sub}</p>
+              <p className="text-[11px] text-muted-foreground truncate">{c.sub}</p>
             </div>
           </div>
         ))}
@@ -459,7 +459,7 @@ export default function CardsPage() {
       {/* ═══ 2. CARDS GALLERY ═══ */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-[15px] font-black text-[#14532d]">Meus Cartões</h3>
+          <h3 className="text-[15px] font-black text-foreground">Meus Cartões</h3>
           <button onClick={scrollToForm} className="text-[12px] font-bold text-[#16a34a] hover:underline">+ Adicionar cartão</button>
         </div>
         <div className="flex gap-5 overflow-x-auto pb-2 scrollbar-hide">
@@ -468,7 +468,7 @@ export default function CardsPage() {
           ))}
           {/* Add placeholder */}
           <div onClick={scrollToForm}
-            className="flex-shrink-0 w-[300px] h-[178px] rounded-[18px] border-2 border-dashed border-[#d4edda] bg-white flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-[#f0fdf4] hover:border-[#16a34a] transition-all">
+            className="flex-shrink-0 w-[300px] h-[178px] rounded-[18px] border-2 border-dashed border-[#d4edda] bg-card flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-secondary hover:border-[#16a34a] transition-all">
             <PlusCircle className="w-8 h-8 text-[#86efac]" />
             <span className="text-[13px] text-[#16a34a] font-bold">Adicionar cartão</span>
           </div>
@@ -479,12 +479,12 @@ export default function CardsPage() {
       <div ref={formRef}>
         {!showForm ? (
           <button onClick={() => { resetForm(); setEditCard(null); setShowForm(true); }}
-            className="w-full bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl px-5 py-4 flex items-center justify-between hover:bg-[#fafafa] transition-colors">
+            className="w-full bg-card border-[1.5px] border-border rounded-2xl px-5 py-4 flex items-center justify-between hover:bg-[#fafafa] transition-colors">
             <div className="flex items-center gap-2">
               <PlusCircle className="w-4 h-4 text-[#16a34a]" />
-              <span className="text-[14px] font-extrabold text-[#14532d]">{editCard ? 'Editar Cartão' : '+ Novo Cartão'}</span>
+              <span className="text-[14px] font-extrabold text-foreground">{editCard ? 'Editar Cartão' : '+ Novo Cartão'}</span>
             </div>
-            <ChevronDown className="w-4 h-4 text-[#94a3b8]" />
+            <ChevronDown className="w-4 h-4 text-muted-foreground" />
           </button>
         ) : (
           <CardForm />
@@ -492,12 +492,12 @@ export default function CardsPage() {
       </div>
 
       {/* ═══ 4. DETAIL TABLE ═══ */}
-      <div className="bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#f1f5f9]">
-          <h3 className="text-[15px] font-black text-[#14532d]">Detalhes dos Cartões</h3>
+      <div className="bg-card border-[1.5px] border-border rounded-2xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-border/50">
+          <h3 className="text-[15px] font-black text-foreground">Detalhes dos Cartões</h3>
         </div>
         {/* Header */}
-        <div className="hidden md:grid grid-cols-8 gap-2 px-5 py-2.5 bg-[#fafcfa] text-[10px] uppercase font-bold text-[#94a3b8] tracking-wide border-b border-[#f1f5f9]">
+        <div className="hidden md:grid grid-cols-8 gap-2 px-5 py-2.5 bg-background text-[10px] uppercase font-bold text-muted-foreground tracking-wide border-b border-border/50">
           <span>Cartão</span><span>Limite</span><span>Utilizado</span><span>Disponível</span>
           <span>Utilização</span><span>Vencimento</span><span>Fatura</span><span>Ações</span>
         </div>
@@ -506,16 +506,16 @@ export default function CardsPage() {
           const uColor = u < 30 ? '#16a34a' : u < 70 ? '#d97706' : '#dc2626';
           const days = daysUntilDue(c.due_day);
           return (
-            <div key={c.id} className="grid grid-cols-2 md:grid-cols-8 gap-2 px-5 py-3.5 border-b border-[#f8fafc] items-center hover:bg-[#fafffe] transition-colors"
+            <div key={c.id} className="grid grid-cols-2 md:grid-cols-8 gap-2 px-5 py-3.5 border-b border-border/30 items-center hover:bg-accent/50 transition-colors"
               style={{ borderLeft: `4px solid ${c.color}` }}>
               {/* Card name */}
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: c.color }} />
-                <span className="text-[13px] font-bold text-[#14532d] truncate">{c.name}</span>
-                <span className="text-[9px] font-bold text-[#94a3b8] bg-[#f1f5f9] px-1.5 py-[1px] rounded hidden md:inline">{c.network?.toUpperCase()}</span>
+                <span className="text-[13px] font-bold text-foreground truncate">{c.name}</span>
+                <span className="text-[9px] font-bold text-muted-foreground bg-muted/30 px-1.5 py-[1px] rounded hidden md:inline">{c.network?.toUpperCase()}</span>
               </div>
               {/* Limit */}
-              <span className="text-[13px] font-bold text-[#374151]">{fmt(c.credit_limit)}</span>
+              <span className="text-[13px] font-bold text-foreground">{fmt(c.credit_limit)}</span>
               {/* Used - inline editable */}
               <div className="flex items-center gap-1 group">
                 {editingUsed === c.id ? (
@@ -525,7 +525,7 @@ export default function CardsPage() {
                 ) : (
                   <>
                     <span className="text-[13px] font-bold" style={{ color: uColor }}>{fmt(c.used_amount)}</span>
-                    <Pencil className="w-3 h-3 text-[#94a3b8] opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
+                    <Pencil className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
                       onClick={() => { setEditingUsed(c.id); setEditUsedVal(String(c.used_amount)); }} />
                   </>
                 )}
@@ -534,33 +534,33 @@ export default function CardsPage() {
               <span className="text-[13px] font-bold text-[#16a34a] hidden md:block">{fmt(c.credit_limit - c.used_amount)}</span>
               {/* Utilization bar */}
               <div className="hidden md:block">
-                <div className="w-full h-1.5 bg-[#f1f5f9] rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-muted/30 rounded-full overflow-hidden">
                   <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(u, 100)}%`, background: uColor }} />
                 </div>
                 <span className="text-[11px] font-bold" style={{ color: uColor }}>{u.toFixed(0)}%</span>
               </div>
               {/* Due */}
               <div className="hidden md:flex items-center gap-1.5">
-                <span className="text-[12px] text-[#64748b]">Dia {c.due_day || '-'}</span>
+                <span className="text-[12px] text-muted-foreground">Dia {c.due_day || '-'}</span>
                 {c.due_day && (
                   <span className={`text-[10px] font-bold px-1.5 py-[1px] rounded ${
-                    days === 0 ? 'bg-[#fee2e2] text-[#dc2626]' : days <= 3 ? 'bg-[#fef2f2] text-[#dc2626]' : days <= 7 ? 'bg-[#fffbeb] text-[#d97706]' : 'bg-[#f1f5f9] text-[#64748b]'
+                    days === 0 ? 'bg-[#fee2e2] text-[#dc2626]' : days <= 3 ? 'bg-[#fef2f2] text-[#dc2626]' : days <= 7 ? 'bg-[#fffbeb] text-[#d97706]' : 'bg-muted/30 text-muted-foreground'
                   }`}>{days === 0 ? 'HOJE!' : days === 1 ? 'AMANHÃ' : `${days}d`}</span>
                 )}
               </div>
               {/* Bill */}
-              <span className="text-[13px] font-bold text-[#374151] hidden md:block">{fmt(c.used_amount)}</span>
+              <span className="text-[13px] font-bold text-foreground hidden md:block">{fmt(c.used_amount)}</span>
               {/* Actions */}
               <div className="flex items-center gap-1.5 justify-end md:justify-start">
                 <button onClick={() => { setPayBillCard(c); setPayOption('total'); setPayCustom(''); setPayDate(new Date().toISOString().split('T')[0]); }}
-                  className="text-[11px] font-bold text-[#166534] bg-[#f0fdf4] border border-[#d4edda] px-2.5 py-1 rounded-[7px] hover:bg-[#dcfce7] transition-colors">
+                  className="text-[11px] font-bold text-[#166534] bg-secondary border border-[#d4edda] px-2.5 py-1 rounded-[7px] hover:bg-[#dcfce7] transition-colors">
                   Pagar
                 </button>
-                <button onClick={() => handleEditCard(c)} className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-[#f0fdf4] transition-colors">
-                  <Pencil className="w-3.5 h-3.5 text-[#64748b]" />
+                <button onClick={() => handleEditCard(c)} className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-secondary transition-colors">
+                  <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
                 </button>
                 <button onClick={() => handleDeleteCard(c.id)} className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-[#fef2f2] transition-colors">
-                  <Trash2 className="w-3.5 h-3.5 text-[#94a3b8] hover:text-[#dc2626]" />
+                  <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-[#dc2626]" />
                 </button>
               </div>
             </div>
@@ -569,18 +569,18 @@ export default function CardsPage() {
       </div>
 
       {/* ═══ 5. BILL TRACKING ═══ */}
-      <div className="bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#f1f5f9] flex items-center justify-between">
-          <h3 className="text-[15px] font-black text-[#14532d]">Faturas</h3>
+      <div className="bg-card border-[1.5px] border-border rounded-2xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-border/50 flex items-center justify-between">
+          <h3 className="text-[15px] font-black text-foreground">Faturas</h3>
           <div className="flex items-center gap-3">
             <button onClick={() => setBillMonth(getMonthYear(parseInt(billMonth.split('-')[1]) - 1 - new Date().getMonth() - 1))}
-              className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-[#f0fdf4] border border-[#e2e8f0]">
-              <ChevronLeft className="w-4 h-4 text-[#64748b]" />
+              className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-secondary border border-border">
+              <ChevronLeft className="w-4 h-4 text-muted-foreground" />
             </button>
-            <span className="text-[13px] font-bold text-[#14532d] min-w-[100px] text-center">{fmtMonth(billMonth)}</span>
+            <span className="text-[13px] font-bold text-foreground min-w-[100px] text-center">{fmtMonth(billMonth)}</span>
             <button onClick={() => setBillMonth(getMonthYear(parseInt(billMonth.split('-')[1]) - new Date().getMonth()))}
-              className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-[#f0fdf4] border border-[#e2e8f0]">
-              <ChevronRight className="w-4 h-4 text-[#64748b]" />
+              className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-secondary border border-border">
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
         </div>
@@ -588,12 +588,12 @@ export default function CardsPage() {
           const bill = bills.find(b => b.card_id === c.id && b.month_year === billMonth);
           const amount = bill ? bill.total_amount : c.used_amount;
           return (
-            <div key={c.id} className="px-5 py-4 border-b border-[#f8fafc] flex items-center gap-4 flex-wrap">
+            <div key={c.id} className="px-5 py-4 border-b border-border/30 flex items-center gap-4 flex-wrap">
               <div className="flex items-center gap-2 min-w-[160px]">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: c.color }} />
                 <div>
-                  <p className="text-[14px] font-bold text-[#14532d]">{c.name}</p>
-                  <p className="text-[11px] text-[#94a3b8]">Fecha dia {c.closing_day || '-'} · Vence dia {c.due_day || '-'}</p>
+                  <p className="text-[14px] font-bold text-foreground">{c.name}</p>
+                  <p className="text-[11px] text-muted-foreground">Fecha dia {c.closing_day || '-'} · Vence dia {c.due_day || '-'}</p>
                 </div>
               </div>
               <div className="flex-1 text-center">
@@ -609,7 +609,7 @@ export default function CardsPage() {
                     <span className="text-[11px] font-bold text-[#d97706] bg-[#fffbeb] px-2.5 py-1 rounded-md">Em aberto</span>
                     {amount > 0 && (
                       <button onClick={() => { setPayBillCard(c); setPayOption('total'); }}
-                        className="text-[11px] font-bold text-[#166534] bg-[#f0fdf4] border border-[#d4edda] px-2.5 py-1 rounded-[7px] hover:bg-[#dcfce7] transition-colors">
+                        className="text-[11px] font-bold text-[#166534] bg-secondary border border-[#d4edda] px-2.5 py-1 rounded-[7px] hover:bg-[#dcfce7] transition-colors">
                         Pagar {fmt(amount)}
                       </button>
                     )}
@@ -620,7 +620,7 @@ export default function CardsPage() {
           );
         })}
         {/* Summary */}
-        <div className="px-5 py-3 bg-[#f8faf8] flex items-center justify-between text-[12px] text-[#64748b] font-semibold">
+        <div className="px-5 py-3 bg-background flex items-center justify-between text-[12px] text-muted-foreground font-semibold">
           <span>Total de faturas em {fmtMonth(billMonth)}: {fmt(cards.reduce((s, c) => {
             const bill = bills.find(b => b.card_id === c.id && b.month_year === billMonth);
             return s + (bill ? bill.total_amount : c.used_amount);
@@ -630,8 +630,8 @@ export default function CardsPage() {
 
       {/* ═══ 6. CHARTS ═══ */}
       {pieData.length > 0 && (
-        <div className="bg-white border-[1.5px] border-[#e2e8f0] rounded-2xl p-6">
-          <h3 className="text-[15px] font-black text-[#14532d] mb-4">Gastos por Cartão</h3>
+        <div className="bg-card border-[1.5px] border-border rounded-2xl p-6">
+          <h3 className="text-[15px] font-black text-foreground mb-4">Gastos por Cartão</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -646,8 +646,8 @@ export default function CardsPage() {
                 {pieData.map((d, i) => (
                   <div key={i} className="flex items-center gap-1.5 text-[11px]">
                     <div className="w-2.5 h-2.5 rounded-full" style={{ background: d.color }} />
-                    <span className="font-semibold text-[#374151]">{d.name}</span>
-                    <span className="text-[#94a3b8]">{fmt(d.value)}</span>
+                    <span className="font-semibold text-foreground">{d.name}</span>
+                    <span className="text-muted-foreground">{fmt(d.value)}</span>
                   </div>
                 ))}
               </div>
@@ -677,18 +677,18 @@ export default function CardsPage() {
               className="fixed inset-0 bg-black/30 z-50 backdrop-blur-sm" onClick={() => setPayBillCard(null)} />
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={e => e.target === e.currentTarget && setPayBillCard(null)}>
-              <div className="bg-white rounded-[20px] p-7 w-full max-w-[440px] shadow-2xl" onClick={e => e.stopPropagation()}>
+              <div className="bg-card rounded-[20px] p-7 w-full max-w-[440px] shadow-2xl" onClick={e => e.stopPropagation()}>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-[17px] font-black text-[#14532d]">Pagar Fatura</h3>
-                  <button onClick={() => setPayBillCard(null)} className="text-[#94a3b8] hover:text-[#dc2626]"><X className="w-5 h-5" /></button>
+                  <h3 className="text-[17px] font-black text-foreground">Pagar Fatura</h3>
+                  <button onClick={() => setPayBillCard(null)} className="text-muted-foreground hover:text-[#dc2626]"><X className="w-5 h-5" /></button>
                 </div>
                 {/* Mini card */}
                 <div className="flex justify-center mb-4" style={{ transform: 'scale(0.6)', transformOrigin: 'top center' }}>
                   <VisualCard card={payBillCard} />
                 </div>
                 {/* Bill summary */}
-                <div className="bg-[#f8faf8] rounded-[10px] p-3.5 mb-4">
-                  <p className="text-[12px] text-[#94a3b8]">Fatura de {fmtMonth(getMonthYear())}:</p>
+                <div className="bg-background rounded-[10px] p-3.5 mb-4">
+                  <p className="text-[12px] text-muted-foreground">Fatura de {fmtMonth(getMonthYear())}:</p>
                   <p className="text-[20px] font-black" style={{ color: payBillCard.color }}>{fmt(payBillCard.used_amount)}</p>
                 </div>
                 {/* Payment options */}
@@ -700,9 +700,9 @@ export default function CardsPage() {
                   ].map(o => (
                     <button key={o.key} onClick={() => setPayOption(o.key)}
                       className={`w-full text-left px-4 py-3 rounded-xl border-[1.5px] transition-all ${
-                        payOption === o.key ? (o.rec ? 'border-[#16a34a] bg-[#f0fdf4]' : 'border-[#d97706] bg-[#fffbeb]') : 'border-[#e2e8f0] hover:border-[#d4edda]'
+                        payOption === o.key ? (o.rec ? 'border-[#16a34a] bg-secondary' : 'border-[#d97706] bg-[#fffbeb]') : 'border-border hover:border-[#d4edda]'
                       }`}>
-                      <span className="text-[13px] font-bold text-[#14532d]">{o.label}</span>
+                      <span className="text-[13px] font-bold text-foreground">{o.label}</span>
                       {o.rec && <span className="ml-2 text-[10px] font-bold text-[#16a34a] bg-[#dcfce7] px-1.5 py-[1px] rounded">Recomendado</span>}
                     </button>
                   ))}

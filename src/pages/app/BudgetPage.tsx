@@ -145,7 +145,7 @@ export default function BudgetPage() {
             { label: 'Orçamento Total', value: formatCurrency(totalBudget), Icon: DollarSign, iconBg: '#eff6ff', iconColor: '#2563eb', valColor: '#2563eb' },
             { label: 'Total Gasto', value: formatCurrency(totalSpent), Icon: TrendingUp, iconBg: totalSpent > totalBudget ? '#fee2e2' : '#f0fdf4', iconColor: totalSpent > totalBudget ? '#dc2626' : '#16a34a', valColor: totalSpent > totalBudget ? '#dc2626' : '#16a34a' },
             { label: 'Disponível', value: formatCurrency(Math.max(0, totalBudget - totalSpent)), Icon: PieChart, iconBg: '#f0fdf4', iconColor: '#16a34a', valColor: '#16a34a' },
-            { label: 'No Limite', value: String(overBudgetCount), Icon: AlertCircle, iconBg: overBudgetCount > 0 ? '#fee2e2' : '#f1f5f9', iconColor: overBudgetCount > 0 ? '#dc2626' : '#64748b', valColor: overBudgetCount > 0 ? '#dc2626' : '#374151' },
+            { label: 'No Limite', value: String(overBudgetCount), Icon: AlertCircle, iconBg: overBudgetCount > 0 ? '#fee2e2' : 'var(--bg-elevated)', iconColor: overBudgetCount > 0 ? '#dc2626' : '#64748b', valColor: overBudgetCount > 0 ? '#dc2626' : 'var(--text-primary)' },
           ].map((s, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
               className="flex items-center gap-3.5 p-4 rounded-xl" style={{ background: 'var(--bg-surface)', border: '1.5px solid var(--border-default)' }}>
