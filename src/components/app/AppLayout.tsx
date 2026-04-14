@@ -17,6 +17,7 @@ const ALL_NAV_ITEMS = [
   { label: 'Visão Geral', path: '/app', icon: LayoutDashboard, profiles: ['personal', 'business', 'both'] },
   { label: 'Lançamentos', path: '/app/transactions', icon: ArrowLeftRight, profiles: ['personal', 'business', 'both'] },
   { label: 'Metas', path: '/app/goals', icon: Target, profiles: ['personal', 'business', 'both'] },
+  { label: 'Dívidas', path: '/app/debts', icon: AlertCircle, profiles: ['personal', 'business', 'both'] },
   { label: 'Fluxo de Caixa', path: '/app/cashflow', icon: TrendingUp, profiles: ['business', 'both'] },
   { label: 'DRE', path: '/app/dre', icon: FileText, profiles: ['business', 'both'] },
   { label: 'Cartões', path: '/app/cards', icon: CreditCard, profiles: ['personal', 'business', 'both'] },
