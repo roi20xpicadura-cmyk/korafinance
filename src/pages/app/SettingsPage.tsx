@@ -4,8 +4,9 @@ import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { OBJECTIVES } from '@/lib/objectives';
 import { PROFILE_TYPES } from '@/components/onboarding/OnboardingFlow';
-import { Check, Download, Trash2, FileText, Camera } from 'lucide-react';
+import { Check, Download, Trash2, FileText, Camera, Bell, BellOff } from 'lucide-react';
 import { toast } from 'sonner';
+import { requestPushPermission, checkNotificationSupport, sendLocalNotification } from '@/lib/pushNotifications';
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -27,6 +28,8 @@ export default function SettingsPage() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [notifPrefs, setNotifPrefs] = useState<Record<string, boolean>>({});
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const notifSupport = checkNotificationSupport();
 
   useEffect(() => {
     if (config) {
@@ -232,7 +235,87 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Security */}
+      {/* Notificações */}
+      <div className="card-surface p-6">
+        <h2 className="text-[13px] font-extrabold text-fin-green-dark mb-4">Notificações</h2>
+        <div className="space-y-3">
+          {notifSupport.local ? (
+            <>
+              <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: 'var(--color-bg-sunken)' }}>
+                <div className="flex items-center gap-3">
+                  {pushEnabled ? <Bell size={18} style={{ color: 'var(--color-green-600)' }} /> : <BellOff size={18} className="text-muted" />}
+                  <div>
+                    <p className="text-[13px] font-semibold" style={{ color: 'var(--color-text-base)' }}>Notificações push</p>
+                    <p className="text-[11px]" style={{ color: 'var(--color-text-muted)' }}>
+                      {pushEnabled ? 'Ativadas — você receberá alertas' : 'Desativadas'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={async () => {
+                    const granted = await requestPushPermission();
+                    setPushEnabled(granted);
+                    if (granted) {
+                      toast.success('Notificações ativadas!');
+                      sendLocalNotification('FinDash Pro', '🎉 Notificações ativadas com sucesso!');
+                    } else {
+                      toast.error('Permissão negada. Ative nas configurações do navegador.');
+                    }
+                  }}
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                  style={{
+                    background: pushEnabled ? 'var(--color-green-100)' : 'var(--color-bg-surface)',
+                    color: pushEnabled ? 'var(--color-green-700)' : 'var(--color-text-muted)',
+                    border: '1.5px solid var(--color-border-base)',
+                  }}
+                >
+                  {pushEnabled ? 'Ativado ✓' : 'Ativar'}
+                </button>
+              </div>
+
+              {/* Notification type preferences */}
+              {Object.keys(notifPrefs).length > 0 && (
+                <div className="space-y-2">
+                  {[
+                    { key: 'budget_alerts', label: 'Alertas de orçamento', emoji: '📊' },
+                    { key: 'goal_alerts', label: 'Progresso de metas', emoji: '🎯' },
+                    { key: 'card_due_alerts', label: 'Vencimento de cartões', emoji: '💳' },
+                    { key: 'debt_reminders', label: 'Lembretes de dívidas', emoji: '📋' },
+                    { key: 'streak_alerts', label: 'Sequência diária', emoji: '🔥' },
+                    { key: 'weekly_summary', label: 'Resumo semanal', emoji: '📈' },
+                  ].map(item => (
+                    <label key={item.key} className="flex items-center justify-between p-3 rounded-xl border-[1.5px] cursor-pointer transition-all"
+                      style={{ borderColor: notifPrefs[item.key] ? 'var(--color-green-300)' : 'var(--color-border-base)', background: notifPrefs[item.key] ? 'var(--color-green-50)' : 'var(--color-bg-surface)' }}>
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">{item.emoji}</span>
+                        <span className="text-[13px] font-medium" style={{ color: 'var(--color-text-base)' }}>{item.label}</span>
+                      </div>
+                      <input type="checkbox" checked={notifPrefs[item.key] ?? true}
+                        onChange={async (e) => {
+                          const updated = { ...notifPrefs, [item.key]: e.target.checked };
+                          setNotifPrefs(updated);
+                          if (user) {
+                            await supabase.from('notification_preferences').upsert({
+                              user_id: user.id,
+                              ...updated,
+                            }, { onConflict: 'user_id' });
+                          }
+                        }}
+                        className="rounded border-border accent-primary w-4 h-4" />
+                    </label>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-[13px]" style={{ color: 'var(--color-text-muted)' }}>
+              Seu navegador não suporta notificações push.
+            </p>
+          )}
+        </div>
+      </div>
+
+
       <div className="card-surface p-6">
         <h2 className="text-[13px] font-extrabold text-fin-green-dark mb-4">Segurança</h2>
         <div className="space-y-3">
