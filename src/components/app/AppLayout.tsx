@@ -45,6 +45,7 @@ export default function AppLayout() {
   const [viewFilter, setViewFilter] = useState<'all' | 'business' | 'personal'>('all');
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMoreDrawer, setShowMoreDrawer] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
 
   const profileType = config?.profile_type || 'personal';
   const navItems = ALL_NAV_ITEMS.filter(item => item.profiles.includes(profileType));
