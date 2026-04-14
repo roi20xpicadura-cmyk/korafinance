@@ -251,7 +251,7 @@ export default function BanksPage() {
   // PRO GATE
   if (!isPro) {
     return (
-      <div className="relative pb-28" style={{ minHeight: 400 }}>
+      <div className="relative pb-4" style={{ minHeight: 400 }}>
         <div style={{ filter: 'blur(4px)', opacity: 0.3, pointerEvents: 'none' }}>
           <div className="space-y-5">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

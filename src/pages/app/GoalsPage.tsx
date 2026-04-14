@@ -231,7 +231,7 @@ export default function GoalsPage() {
   if (loading) return <div className="p-7 space-y-4"><div className="h-20 rounded-xl bg-muted/30 animate-pulse" /><div className="h-48 rounded-xl bg-muted/30 animate-pulse" /><div className="grid grid-cols-3 gap-4"><div className="h-64 rounded-xl bg-muted/30 animate-pulse" /><div className="h-64 rounded-xl bg-muted/30 animate-pulse" /><div className="h-64 rounded-xl bg-muted/30 animate-pulse" /></div></div>;
 
   return (
-    <div className="px-4 py-5 md:p-7 pb-28 space-y-5" style={{ background: 'var(--bg-page)', minHeight: '100vh' }}>
+    <div className="px-4 py-5 md:p-7 pb-4 space-y-5" style={{ background: 'var(--bg-page)', minHeight: '100vh' }}>
       {/* STATS STRIP */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[

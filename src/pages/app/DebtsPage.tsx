@@ -291,7 +291,7 @@ export default function DebtsPage() {
   const totalPaid = payments.reduce((s, p) => s + Number(p.amount), 0);
 
   return (
-    <div className="flex flex-col gap-5 px-4 py-5 md:px-0 pb-28" style={{ maxWidth: 1100, margin: '0 auto' }}>
+    <div className="flex flex-col gap-5 px-4 py-5 md:px-0 pb-4" style={{ maxWidth: 1100, margin: '0 auto' }}>
 
       {/* ═══ 1. HERO BANNER ═══ */}
       {debts.length === 0 ? (
