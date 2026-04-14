@@ -244,7 +244,7 @@ export default function SettingsPage() {
             <div>
               <p className="text-[13px] font-semibold" style={{ color: 'var(--color-text-base)' }}>Aceitação dos Termos</p>
               <p className="text-[12px]" style={{ color: 'var(--color-text-muted)' }}>
-                Termos aceitos em {profile?.terms_accepted_at ? new Date((profile as any).terms_accepted_at).toLocaleDateString('pt-BR') : '—'}, versão {(profile as any)?.terms_version || '1.0'}
+                Termos aceitos em {profile?.terms_accepted_at ? new Date(profile.terms_accepted_at).toLocaleDateString('pt-BR') : '—'}, versão {profile?.terms_version || '1.0'}
               </p>
             </div>
           </div>
