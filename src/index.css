@@ -343,3 +343,45 @@
 /* ── Safe area padding for mobile ── */
 .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
 .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+
+/* ── Legal page typography ── */
+.legal-h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text-strong);
+  margin-bottom: 14px;
+  padding-top: 8px;
+}
+.legal-h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-base);
+  margin-bottom: 10px;
+  margin-top: 16px;
+}
+.legal-p {
+  font-size: 15px;
+  color: var(--color-text-muted);
+  line-height: 1.8;
+  margin-bottom: 14px;
+}
+.legal-ul {
+  padding-left: 20px;
+  margin-bottom: 14px;
+  list-style-type: disc;
+}
+.legal-ul li {
+  font-size: 15px;
+  color: var(--color-text-muted);
+  line-height: 1.8;
+  margin-bottom: 6px;
+}
+.legal-highlight {
+  background: var(--color-green-50);
+  border-left: 3px solid var(--color-green-500, #22c55e);
+  border-radius: 0 var(--radius-lg, 12px) var(--radius-lg, 12px) 0;
+  padding: 14px 18px;
+  margin: 20px 0;
+  font-size: 14px;
+  color: var(--color-green-800, #166534);
+}
