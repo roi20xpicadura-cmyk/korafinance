@@ -75,7 +75,7 @@ export function parseCSV(content: string): ParsedTransaction[] {
       }
     }
 
-    const type = amount > 0 ? 'income' : 'expense';
+    const type: 'income' | 'expense' = amount > 0 ? 'income' : 'expense';
     return {
       type,
       amount: Math.abs(amount),
