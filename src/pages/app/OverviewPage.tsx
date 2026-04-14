@@ -216,6 +216,9 @@ export default function OverviewPage() {
         </div>
       </motion.div>
 
+      {/* WELCOME CHECKLIST */}
+      <WelcomeChecklist />
+
       {/* 2. HERO BALANCE CARD */}
       <motion.div {...stagger(1)} style={{
         background: 'linear-gradient(135deg, #16a34a 0%, #14532d 100%)',
