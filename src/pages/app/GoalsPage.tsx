@@ -133,6 +133,10 @@ export default function GoalsPage() {
     } else {
       await supabase.from('goal_checkins').insert({ user_id: user!.id, goal_id: id, date: today, amount });
     }
+    // Save to goal_deposits history
+    await supabase.from('goal_deposits').insert({
+      user_id: user!.id, goal_id: id, amount, deposit_date: today,
+    });
     toast.success(`✓ ${formatCurrency(amount)} adicionado!`);
     if (newVal >= Number(goal.target_amount) && Number(goal.current_amount) < Number(goal.target_amount)) {
       triggerConfetti();

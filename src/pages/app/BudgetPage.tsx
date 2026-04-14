@@ -101,6 +101,35 @@ export default function BudgetPage() {
     setShowSetup(true);
   };
 
+  const handleCopyPrevMonth = async () => {
+    if (!user) return;
+    const prevMonth = format(subMonths(currentMonth, 1), 'yyyy-MM');
+    const { data: prevBudgets } = await supabase.from('budgets').select('*').eq('user_id', user.id).eq('month_year', prevMonth);
+    if (!prevBudgets?.length) { toast.error('Nenhum orçamento no mês anterior'); return; }
+    for (const b of prevBudgets) {
+      await supabase.from('budgets').insert({ user_id: user.id, category: b.category, month_year: monthYear, limit_amount: b.limit_amount });
+    }
+    toast.success('Orçamento copiado do mês anterior!');
+    fetchData();
+  };
+
+  const handleUseAverage = async () => {
+    if (!user) return;
+    const threeMonthsAgo = format(subMonths(currentMonth, 3), 'yyyy-MM-dd');
+    const oneMonthAgo = format(subMonths(currentMonth, 1), 'yyyy-MM-dd');
+    const { data: recentTx } = await supabase.from('transactions').select('*').eq('user_id', user.id).eq('type', 'expense').gte('date', threeMonthsAgo).lte('date', oneMonthAgo);
+    if (!recentTx?.length) { toast.error('Sem dados dos últimos 3 meses'); return; }
+    const catTotals: Record<string, number> = {};
+    recentTx.forEach(t => { catTotals[t.category] = (catTotals[t.category] || 0) + Number(t.amount); });
+    for (const [cat, total] of Object.entries(catTotals)) {
+      const avg = total / 3;
+      const limit = Math.ceil(avg * 1.1);
+      await supabase.from('budgets').insert({ user_id: user.id, category: cat, month_year: monthYear, limit_amount: limit });
+    }
+    toast.success('Orçamento baseado na média criado!');
+    fetchData();
+  };
+
   const getBarColor = (pct: number) => {
     if (pct >= 100) return '#dc2626';
     if (pct >= 80) return '#f97316';
@@ -197,9 +226,17 @@ export default function BudgetPage() {
             <PieChart className="w-12 h-12 mx-auto mb-3" style={{ color: '#86efac' }} />
             <p className="text-lg font-extrabold" style={{ color: 'var(--text-primary)' }}>Nenhum orçamento definido</p>
             <p className="text-sm mt-1 max-w-xs mx-auto" style={{ color: 'var(--text-secondary)' }}>Configure limites para cada categoria e controle seus gastos.</p>
-            <button onClick={openSetup} className="mt-4 px-5 py-2.5 rounded-lg text-sm font-bold text-white" style={{ background: '#16a34a' }}>
-              Configurar Orçamento
-            </button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mt-4">
+              <button onClick={handleCopyPrevMonth} className="px-4 py-2.5 rounded-lg text-sm font-bold" style={{ border: '1.5px solid var(--border-default)', color: 'var(--text-primary)', background: 'var(--bg-surface)' }}>
+                📋 Copiar do mês anterior
+              </button>
+              <button onClick={handleUseAverage} className="px-4 py-2.5 rounded-lg text-sm font-bold" style={{ border: '1.5px solid var(--border-default)', color: 'var(--text-primary)', background: 'var(--bg-surface)' }}>
+                📊 Usar média histórica
+              </button>
+              <button onClick={openSetup} className="px-5 py-2.5 rounded-lg text-sm font-bold text-white" style={{ background: '#16a34a' }}>
+                ✏️ Configurar manualmente
+              </button>
+            </div>
           </div>
         )}
 
