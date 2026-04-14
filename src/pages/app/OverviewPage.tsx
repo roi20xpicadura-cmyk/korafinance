@@ -235,15 +235,15 @@ export default function OverviewPage() {
           delay={1}
           single
           stats={profileType === 'business' ? [
-            { label: 'Receitas', val: stats.totalIncome, color: 'text-[#16a34a]' },
-            { label: 'Despesas', val: stats.totalExpense, color: 'text-[#dc2626]' },
-            { label: 'Receita Neg.', val: stats.bizIncome, color: 'text-[#16a34a]' },
-            { label: 'Gasto Neg.', val: stats.bizExpense, color: 'text-[#dc2626]' },
+            { label: 'Receitas', val: stats.totalIncome, color: 'var(--color-success-solid)' },
+            { label: 'Despesas', val: stats.totalExpense, color: 'var(--color-danger-solid)' },
+            { label: 'Receita Neg.', val: stats.bizIncome, color: 'var(--color-success-solid)' },
+            { label: 'Gasto Neg.', val: stats.bizExpense, color: 'var(--color-danger-solid)' },
           ] : [
-            { label: 'Receitas', val: stats.totalIncome, color: 'text-[#16a34a]' },
-            { label: 'Despesas', val: stats.totalExpense, color: 'text-[#dc2626]' },
-            { label: 'Patrimônio', val: stats.patrimonio, color: 'text-[#16a34a]' },
-            { label: 'Poupança', val: Math.max(0, stats.netBalance), color: 'text-[#16a34a]' },
+            { label: 'Receitas', val: stats.totalIncome, color: 'var(--color-success-solid)' },
+            { label: 'Despesas', val: stats.totalExpense, color: 'var(--color-danger-solid)' },
+            { label: 'Patrimônio', val: stats.patrimonio, color: 'var(--color-success-solid)' },
+            { label: 'Poupança', val: Math.max(0, stats.netBalance), color: 'var(--color-success-solid)' },
           ]}
         />
       )}
