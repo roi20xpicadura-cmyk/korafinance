@@ -12,6 +12,7 @@ const LIMITS = {
     budget: false,
     ai_chat: false,
     recurring: false,
+    bank_connection: false,
   },
   pro: {
     transactions_per_month: Infinity,
