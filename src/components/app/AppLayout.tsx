@@ -439,7 +439,7 @@ fontSize: 13,
         </header>
 
         {/* Mobile: page title below header */}
-        {isMobile && (
+        {isMobile && location.pathname !== '/app' && (
           <div style={{ padding: '12px 16px 4px' }}>
             <h1 style={{ fontSize: 20, fontWeight: 800, color: 'var(--color-text-strong)', letterSpacing: '-0.3px' }}>
               {PAGE_TITLES[location.pathname] || 'FinDash Pro'}
