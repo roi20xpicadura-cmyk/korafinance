@@ -3,10 +3,11 @@ import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
+import AIChatDrawer from '@/components/app/AIChatDrawer';
 import {
   LayoutDashboard, ArrowLeftRight, Target, TrendingUp, FileText,
   CreditCard, Briefcase, BarChart2, Download, Settings2, Crown,
-  LogOut, Menu, X, Bell, ChevronRight, BarChart3, Home, MoreHorizontal
+  LogOut, Menu, X, Bell, ChevronRight, BarChart3, Home, MoreHorizontal, Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -44,6 +45,7 @@ export default function AppLayout() {
   const [viewFilter, setViewFilter] = useState<'all' | 'business' | 'personal'>('all');
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMoreDrawer, setShowMoreDrawer] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
 
   const profileType = config?.profile_type || 'personal';
   const navItems = ALL_NAV_ITEMS.filter(item => item.profiles.includes(profileType));
@@ -323,6 +325,15 @@ export default function AppLayout() {
           </>
         )}
       </AnimatePresence>
+
+      {/* ═══ AI CHAT ═══ */}
+      <button onClick={() => setChatOpen(true)}
+        className={`fixed bottom-20 lg:bottom-6 right-5 z-[499] w-[52px] h-[52px] rounded-full bg-[#16a34a] shadow-lg flex items-center justify-center hover:bg-[#14532d] transition-all group ${chatOpen ? 'hidden' : ''}`}
+        title="Assistente IA — pergunte qualquer coisa">
+        <Sparkles className="w-[22px] h-[22px] text-white" />
+        <span className="absolute inset-0 rounded-full border-2 border-[#16a34a] animate-ping opacity-20 pointer-events-none" />
+      </button>
+      <AIChatDrawer open={chatOpen} onClose={() => setChatOpen(false)} />
     </div>
   );
 }
