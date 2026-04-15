@@ -542,7 +542,7 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
             </AnimatePresence>
 
             {/* ─── Messages / Welcome ─── */}
-            <div className="flex-1 overflow-y-auto" style={{
+            <div className="flex-1 overflow-y-auto ai-chat-messages" style={{
               background: 'var(--color-bg-base)',
               scrollbarWidth: 'thin',
               scrollbarColor: 'var(--color-border-base) transparent',
@@ -584,12 +584,11 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
             }}>
               <div className="flex items-end gap-2">
                 {/* Input wrapper */}
-                <div className="flex-1 flex items-end gap-2 rounded-2xl px-3.5 py-2.5 transition-all"
+                <div className="flex-1 flex items-end gap-2 rounded-2xl px-3.5 py-2.5 transition-all ai-chat-input-wrapper"
                   style={{
                     background: 'var(--color-bg-sunken)',
                     border: '1.5px solid var(--color-border-base)',
                   }}
-                  onFocus={() => {}}
                 >
                   <textarea
                     ref={textareaRef}
