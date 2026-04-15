@@ -471,6 +471,7 @@ export default function OverviewPage() {
           )}
         </div>
       </motion.div>
+      <AIChatDrawer open={aiChatOpen} onClose={() => setAiChatOpen(false)} />
     </div>
   );
 }
