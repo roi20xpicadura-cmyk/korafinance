@@ -80,6 +80,7 @@ export default function OverviewPage() {
   const { profile, config } = useProfile();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const [aiChatOpen, setAiChatOpen] = useState(false);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [investments, setInvestments] = useState<any[]>([]);
   const [goals, setGoals] = useState<any[]>([]);
