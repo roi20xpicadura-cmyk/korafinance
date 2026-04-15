@@ -127,7 +127,6 @@ const TOOLS = [
       },
     },
   },
-  // ===== NEW TOOLS =====
   {
     type: "function",
     function: {
@@ -136,9 +135,9 @@ const TOOLS = [
       parameters: {
         type: "object",
         properties: {
-          category: { type: "string", description: "Categoria do orçamento" },
-          limit_amount: { type: "number", description: "Valor limite do orçamento" },
-          month_year: { type: "string", description: "Mês no formato YYYY-MM (default: mês atual)" },
+          category: { type: "string" },
+          limit_amount: { type: "number" },
+          month_year: { type: "string", description: "YYYY-MM (default: mês atual)" },
         },
         required: ["category", "limit_amount"],
       },
@@ -156,7 +155,7 @@ const TOOLS = [
           amount: { type: "number" },
           category: { type: "string" },
           due_date: { type: "string", description: "YYYY-MM-DD" },
-          recurrent: { type: "boolean", description: "Se é recorrente" },
+          recurrent: { type: "boolean" },
           frequency: { type: "string", enum: ["weekly", "monthly", "yearly"] },
           origin: { type: "string", enum: ["personal", "business"] },
         },
@@ -185,12 +184,12 @@ const TOOLS = [
         type: "object",
         properties: {
           name: { type: "string" },
-          creditor: { type: "string", description: "Credor/instituição" },
+          creditor: { type: "string" },
           total_amount: { type: "number" },
           remaining_amount: { type: "number" },
           debt_type: { type: "string", enum: ["credit_card", "personal_loan", "bank_loan", "overdraft", "friend_family", "store_credit", "medical", "tax", "other"] },
-          interest_rate: { type: "number", description: "Taxa de juros mensal %" },
-          due_day: { type: "number", description: "Dia do vencimento 1-31" },
+          interest_rate: { type: "number" },
+          due_day: { type: "number" },
           min_payment: { type: "number" },
         },
         required: ["name", "creditor", "total_amount", "remaining_amount", "debt_type"],
@@ -207,7 +206,7 @@ const TOOLS = [
         properties: {
           debt_id: { type: "string" },
           amount: { type: "number" },
-          payment_date: { type: "string", description: "YYYY-MM-DD (default: hoje)" },
+          payment_date: { type: "string" },
           notes: { type: "string" },
         },
         required: ["debt_id", "amount"],
@@ -218,7 +217,7 @@ const TOOLS = [
     type: "function",
     function: {
       name: "add_recurring_transaction",
-      description: "Cria uma transação recorrente (receita ou despesa fixa mensal/semanal/anual).",
+      description: "Cria uma transação recorrente.",
       parameters: {
         type: "object",
         properties: {
@@ -228,8 +227,8 @@ const TOOLS = [
           category: { type: "string" },
           origin: { type: "string", enum: ["personal", "business"] },
           frequency: { type: "string", enum: ["weekly", "monthly", "yearly"] },
-          day_of_month: { type: "number", description: "Dia do mês 1-31" },
-          next_date: { type: "string", description: "YYYY-MM-DD próxima data" },
+          day_of_month: { type: "number" },
+          next_date: { type: "string" },
         },
         required: ["description", "amount", "type", "category", "origin", "frequency", "next_date"],
       },
@@ -245,10 +244,10 @@ const TOOLS = [
         properties: {
           name: { type: "string" },
           credit_limit: { type: "number" },
-          last_four: { type: "string", description: "Últimos 4 dígitos" },
+          last_four: { type: "string" },
           network: { type: "string", enum: ["visa", "mastercard", "elo", "amex", "hipercard", "other"] },
-          closing_day: { type: "number", description: "Dia de fechamento 1-31" },
-          due_day: { type: "number", description: "Dia de vencimento 1-31" },
+          closing_day: { type: "number" },
+          due_day: { type: "number" },
         },
         required: ["name", "credit_limit"],
       },
@@ -258,7 +257,7 @@ const TOOLS = [
     type: "function",
     function: {
       name: "get_financial_summary",
-      description: "Gera um resumo financeiro completo do usuário com análise de tendências, alertas e sugestões.",
+      description: "Gera um resumo financeiro completo do usuário.",
       parameters: { type: "object", properties: {}, required: [] },
     },
   },
@@ -312,8 +311,7 @@ async function executeTool(
       case "add_goal": {
         const { data, error } = await supabase.from("goals").insert({
           user_id: userId, name: args.name, target_amount: args.target_amount,
-          current_amount: args.current_amount || 0, deadline: args.deadline || null,
-          start_date: today,
+          current_amount: args.current_amount || 0, deadline: args.deadline || null, start_date: today,
         }).select().single();
         if (error) throw error;
         return { success: true, message: `Meta "${args.name}" criada (alvo: R$ ${args.target_amount.toFixed(2)}).`, data };
@@ -336,19 +334,17 @@ async function executeTool(
         if (error) throw error;
         return { success: true, message: `Investimento "${args.name}" adicionado.`, data };
       }
-      // ===== NEW TOOLS =====
       case "add_budget": {
         const monthYear = args.month_year || currentMonthYear;
-        // Upsert: check if exists
         const { data: existing } = await supabase.from("budgets").select("id").eq("user_id", userId).eq("category", args.category).eq("month_year", monthYear).maybeSingle();
         if (existing) {
           const { error } = await supabase.from("budgets").update({ limit_amount: args.limit_amount }).eq("id", existing.id);
           if (error) throw error;
-          return { success: true, message: `Orçamento de "${args.category}" atualizado para R$ ${args.limit_amount.toFixed(2)} em ${monthYear}.` };
+          return { success: true, message: `Orçamento de "${args.category}" atualizado para R$ ${args.limit_amount.toFixed(2)}.` };
         }
         const { error } = await supabase.from("budgets").insert({ user_id: userId, category: args.category, limit_amount: args.limit_amount, month_year: monthYear });
         if (error) throw error;
-        return { success: true, message: `Orçamento de R$ ${args.limit_amount.toFixed(2)} criado para "${args.category}" em ${monthYear}.` };
+        return { success: true, message: `Orçamento de R$ ${args.limit_amount.toFixed(2)} criado para "${args.category}".` };
       }
       case "add_scheduled_bill": {
         const { data, error } = await supabase.from("scheduled_bills").insert({
@@ -374,7 +370,7 @@ async function executeTool(
           status: "active", strategy: "snowball",
         }).select().single();
         if (error) throw error;
-        return { success: true, message: `Dívida "${args.name}" de R$ ${args.total_amount.toFixed(2)} adicionada (credor: ${args.creditor}).`, data };
+        return { success: true, message: `Dívida "${args.name}" de R$ ${args.total_amount.toFixed(2)} adicionada.`, data };
       }
       case "add_debt_payment": {
         const { error: payError } = await supabase.from("debt_payments").insert({
@@ -382,16 +378,12 @@ async function executeTool(
           payment_date: args.payment_date || today, notes: args.notes || null,
         });
         if (payError) throw payError;
-        // Update remaining
         const { data: debt } = await supabase.from("debts").select("remaining_amount").eq("id", args.debt_id).single();
         if (debt) {
           const newRemaining = Math.max(0, debt.remaining_amount - args.amount);
-          await supabase.from("debts").update({
-            remaining_amount: newRemaining,
-            status: newRemaining <= 0 ? "paid" : "active",
-          }).eq("id", args.debt_id);
+          await supabase.from("debts").update({ remaining_amount: newRemaining, status: newRemaining <= 0 ? "paid" : "active" }).eq("id", args.debt_id);
         }
-        return { success: true, message: `Pagamento de R$ ${args.amount.toFixed(2)} registrado na dívida.` };
+        return { success: true, message: `Pagamento de R$ ${args.amount.toFixed(2)} registrado.` };
       }
       case "add_recurring_transaction": {
         const { error } = await supabase.from("recurring_transactions").insert({
@@ -401,7 +393,7 @@ async function executeTool(
           next_date: args.next_date, active: true,
         });
         if (error) throw error;
-        return { success: true, message: `Transação recorrente "${args.description}" de R$ ${args.amount.toFixed(2)} (${args.frequency}) criada.` };
+        return { success: true, message: `Recorrente "${args.description}" de R$ ${args.amount.toFixed(2)} criada.` };
       }
       case "add_credit_card": {
         const { data, error } = await supabase.from("credit_cards").insert({
@@ -410,10 +402,9 @@ async function executeTool(
           closing_day: args.closing_day || null, due_day: args.due_day || null,
         }).select().single();
         if (error) throw error;
-        return { success: true, message: `Cartão "${args.name}" adicionado (limite: R$ ${args.credit_limit.toFixed(2)}).`, data };
+        return { success: true, message: `Cartão "${args.name}" adicionado.`, data };
       }
       case "get_financial_summary": {
-        // Fetch comprehensive data
         const [txRes, goalsRes, debtsRes, budgetsRes, billsRes, cardsRes, investRes] = await Promise.all([
           supabase.from("transactions").select("amount, type, category, date").eq("user_id", userId).is("deleted_at", null).order("date", { ascending: false }).limit(200),
           supabase.from("goals").select("name, target_amount, current_amount, deadline").eq("user_id", userId).is("deleted_at", null),
@@ -423,45 +414,22 @@ async function executeTool(
           supabase.from("credit_cards").select("name, credit_limit, used_amount").eq("user_id", userId),
           supabase.from("investments").select("name, invested_amount, current_amount, asset_type").eq("user_id", userId),
         ]);
-
         const txs = txRes.data || [];
         const thisMonthTxs = txs.filter((t: any) => t.date?.startsWith(currentMonthYear));
         const income = thisMonthTxs.filter((t: any) => t.type === "income").reduce((s: number, t: any) => s + t.amount, 0);
         const expense = thisMonthTxs.filter((t: any) => t.type === "expense").reduce((s: number, t: any) => s + t.amount, 0);
         const totalDebt = (debtsRes.data || []).filter((d: any) => d.status === "active").reduce((s: number, d: any) => s + d.remaining_amount, 0);
-        const totalInvested = (investRes.data || []).reduce((s: number, i: any) => s + i.invested_amount, 0);
-        const totalInvestCurrent = (investRes.data || []).reduce((s: number, i: any) => s + i.current_amount, 0);
-
-        // Category breakdown
         const catExpenses: Record<string, number> = {};
-        thisMonthTxs.filter((t: any) => t.type === "expense").forEach((t: any) => {
-          catExpenses[t.category] = (catExpenses[t.category] || 0) + t.amount;
-        });
-
-        // Budget usage
-        const budgetUsage = (budgetsRes.data || []).map((b: any) => ({
-          category: b.category,
-          limit: b.limit_amount,
-          spent: catExpenses[b.category] || 0,
-          pct: Math.round(((catExpenses[b.category] || 0) / b.limit_amount) * 100),
-        }));
-
+        thisMonthTxs.filter((t: any) => t.type === "expense").forEach((t: any) => { catExpenses[t.category] = (catExpenses[t.category] || 0) + t.amount; });
         return {
-          success: true,
-          message: "Resumo financeiro completo gerado.",
+          success: true, message: "Resumo financeiro completo gerado.",
           data: {
-            month: currentMonthYear,
-            income, expense, balance: income - expense,
+            month: currentMonthYear, income, expense, balance: income - expense,
             savings_rate: income > 0 ? Math.round(((income - expense) / income) * 100) : 0,
             total_debt: totalDebt,
-            total_invested: totalInvested,
-            investment_return: totalInvestCurrent - totalInvested,
-            goals: goalsRes.data || [],
-            pending_bills: billsRes.data || [],
-            budget_usage: budgetUsage,
+            goals: goalsRes.data || [], pending_bills: billsRes.data || [],
             top_expenses: Object.entries(catExpenses).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([cat, val]) => ({ category: cat, amount: val })),
-            cards: cardsRes.data || [],
-            active_debts: (debtsRes.data || []).filter((d: any) => d.status === "active"),
+            cards: cardsRes.data || [], active_debts: (debtsRes.data || []).filter((d: any) => d.status === "active"),
           },
         };
       }
@@ -472,6 +440,95 @@ async function executeTool(
     console.error(`Tool ${name} error:`, e);
     return { success: false, message: `Erro ao executar ${name}: ${e.message}` };
   }
+}
+
+function buildFinancialContext(
+  userName: string,
+  config: any,
+  transactions: any[],
+  goals: any[],
+  investments: any[],
+  debts: any[],
+  budgets: any[],
+  bills: any[],
+  cards: any[],
+  recurring: any[]
+): string {
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const thisMonthTx = transactions.filter((t: any) => t.date?.startsWith(currentMonth));
+  const totalIncome = thisMonthTx.filter((t: any) => t.type === "income").reduce((s: number, t: any) => s + t.amount, 0);
+  const totalExpense = thisMonthTx.filter((t: any) => t.type === "expense").reduce((s: number, t: any) => s + t.amount, 0);
+  const totalDebt = debts.filter((d: any) => d.status === "active").reduce((s: number, d: any) => s + d.remaining_amount, 0);
+  const balance = totalIncome - totalExpense;
+  const savingsRate = totalIncome > 0 ? Math.round((balance / totalIncome) * 100) : 0;
+
+  const catExpenses: Record<string, number> = {};
+  thisMonthTx.filter((t: any) => t.type === "expense").forEach((t: any) => {
+    catExpenses[t.category] = (catExpenses[t.category] || 0) + t.amount;
+  });
+
+  // Previous month comparison
+  const prevMonth = new Date();
+  prevMonth.setMonth(prevMonth.getMonth() - 1);
+  const prevMonthStr = prevMonth.toISOString().slice(0, 7);
+  const prevMonthTx = transactions.filter((t: any) => t.date?.startsWith(prevMonthStr));
+  const prevExpense = prevMonthTx.filter((t: any) => t.type === "expense").reduce((s: number, t: any) => s + t.amount, 0);
+  const prevIncome = prevMonthTx.filter((t: any) => t.type === "income").reduce((s: number, t: any) => s + t.amount, 0);
+
+  const expenseChange = prevExpense > 0 ? ((totalExpense / prevExpense - 1) * 100).toFixed(0) : "N/A";
+  const totalInvested = investments.reduce((s: number, i: any) => s + i.current_amount, 0);
+
+  return `
+━━━ DADOS FINANCEIROS REAIS DE ${userName.toUpperCase()} (${new Date().toLocaleDateString('pt-BR')}) ━━━
+
+📊 RESUMO DO MÊS ATUAL (${currentMonth}):
+- Receitas: R$ ${totalIncome.toFixed(2)}
+- Despesas: R$ ${totalExpense.toFixed(2)}
+- Saldo: R$ ${balance.toFixed(2)} ${balance >= 0 ? '✅' : '⚠️ NEGATIVO'}
+- Taxa de poupança: ${savingsRate}%
+- Comparação: despesas ${expenseChange}% vs mês anterior
+- Receita mês passado: R$ ${prevIncome.toFixed(2)} | Despesa: R$ ${prevExpense.toFixed(2)}
+
+💸 GASTOS POR CATEGORIA (mês atual):
+${Object.entries(catExpenses).sort((a, b) => (b[1] as number) - (a[1] as number)).map(([cat, val]) => `  • ${cat}: R$ ${(val as number).toFixed(2)}`).join("\n") || "  Nenhum gasto registrado"}
+
+📋 ORÇAMENTOS:
+${budgets.filter((b: any) => b.month_year === currentMonth).map((b: any) => {
+  const spent = catExpenses[b.category] || 0;
+  const pct = Math.round((spent / b.limit_amount) * 100);
+  return `  • ${b.category}: R$ ${spent.toFixed(2)} / R$ ${b.limit_amount.toFixed(2)} (${pct}%) ${pct > 100 ? '🔴 ESTOURADO' : pct > 80 ? '⚠️ PERTO DO LIMITE' : '✅'}`;
+}).join("\n") || "  Nenhum orçamento definido"}
+
+🎯 METAS:
+${goals.map((g: any) => {
+  const pct = Math.round(((g.current_amount || 0) / g.target_amount) * 100);
+  return `  [${g.id}] ${g.name}: R$ ${(g.current_amount || 0).toFixed(2)} / R$ ${g.target_amount.toFixed(2)} (${pct}%)${g.deadline ? ` prazo: ${g.deadline}` : ''}`;
+}).join("\n") || "  Nenhuma meta"}
+
+💰 INVESTIMENTOS (Total: R$ ${totalInvested.toFixed(2)}):
+${investments.map((i: any) => {
+  const ret = i.invested_amount > 0 ? ((i.current_amount - i.invested_amount) / i.invested_amount * 100).toFixed(1) : "0.0";
+  return `  [${i.id}] ${i.name} (${i.asset_type}): R$ ${i.current_amount.toFixed(2)} (retorno: ${ret}%)`;
+}).join("\n") || "  Nenhum"}
+
+💸 DÍVIDAS (Total: R$ ${totalDebt.toFixed(2)}):
+${debts.filter((d: any) => d.status === "active").map((d: any) => `  [${d.id}] ${d.name} (${d.creditor}): R$ ${d.remaining_amount.toFixed(2)} / R$ ${d.total_amount.toFixed(2)} | juros: ${d.interest_rate || 0}%/mês`).join("\n") || "  Nenhuma"}
+
+📅 CONTAS A PAGAR:
+${bills.filter((b: any) => b.status === "pending").slice(0, 10).map((b: any) => `  [${b.id}] ${b.due_date} | ${b.description}: R$ ${b.amount.toFixed(2)}`).join("\n") || "  Nenhuma pendente"}
+
+💳 CARTÕES:
+${cards.map((c: any) => `  [${c.id}] ${c.name}: R$ ${(c.used_amount || 0).toFixed(2)} / R$ ${c.credit_limit.toFixed(2)}${c.due_day ? ` | vence dia ${c.due_day}` : ''}`).join("\n") || "  Nenhum"}
+
+🔄 RECORRENTES:
+${recurring.map((r: any) => `  ${r.description}: R$ ${r.amount.toFixed(2)} (${r.type}, ${r.frequency}) próxima: ${r.next_date}`).join("\n") || "  Nenhuma"}
+
+📝 ÚLTIMOS 25 LANÇAMENTOS:
+${transactions.slice(0, 25).map((t: any) => `  [${t.id}] ${t.date} | ${t.description} | R$ ${t.amount.toFixed(2)} | ${t.type} | ${t.category}`).join("\n") || "  Nenhum"}
+
+🏆 Score: ${config?.financial_score || 0}/1000 | Streak: ${config?.streak_days || 0} dias | Nível: ${config?.level || "iniciante"}
+📊 Perfil: ${config?.profile_type || "personal"} | Plano: ${config?.plan || "free"}
+`;
 }
 
 serve(async (req) => {
@@ -489,20 +546,16 @@ serve(async (req) => {
     const supabaseAnon = Deno.env.get("SUPABASE_ANON_KEY")!;
 
     const authClient = createClient(supabaseUrl, supabaseAnon);
-
-    // Validate user
     const { data: userData, error: userError } = await authClient.auth.getUser(token);
     if (userError || !userData?.user) {
-      console.error("Auth validation failed:", userError);
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     const userId = userData.user.id;
-
     const serviceClient = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Fetch comprehensive financial context
+    // Fetch all financial data
     const [txRes, goalsRes, configRes, investRes, debtsRes, budgetsRes, billsRes, cardsRes, recurringRes, profileRes] = await Promise.all([
-      serviceClient.from("transactions").select("id, description, amount, type, category, origin, date").eq("user_id", userId).is("deleted_at", null).order("date", { ascending: false }).limit(50),
+      serviceClient.from("transactions").select("id, description, amount, type, category, origin, date").eq("user_id", userId).is("deleted_at", null).order("date", { ascending: false }).limit(200),
       serviceClient.from("goals").select("*").eq("user_id", userId).is("deleted_at", null),
       serviceClient.from("user_config").select("*").eq("user_id", userId).single(),
       serviceClient.from("investments").select("*").eq("user_id", userId),
@@ -525,107 +578,45 @@ serve(async (req) => {
     const recurring = recurringRes.data || [];
     const userName = profileRes.data?.full_name || "usuário";
 
-    const currentMonth = new Date().toISOString().slice(0, 7);
-    const thisMonthTx = transactions.filter((t: any) => t.date?.startsWith(currentMonth));
-    const totalIncome = thisMonthTx.filter((t: any) => t.type === "income").reduce((s: number, t: any) => s + t.amount, 0);
-    const totalExpense = thisMonthTx.filter((t: any) => t.type === "expense").reduce((s: number, t: any) => s + t.amount, 0);
-    const totalDebt = debts.filter((d: any) => d.status === "active").reduce((s: number, d: any) => s + d.remaining_amount, 0);
+    const financialContext = buildFinancialContext(userName, config, transactions, goals, investments, debts, budgets, bills, cards, recurring);
 
-    // Category spending
-    const catExpenses: Record<string, number> = {};
-    thisMonthTx.filter((t: any) => t.type === "expense").forEach((t: any) => {
-      catExpenses[t.category] = (catExpenses[t.category] || 0) + t.amount;
-    });
-
-    const financialContext = `
-Contexto financeiro de ${userName}:
-- Perfil: ${config?.profile_type || "personal"} | Moeda: ${config?.currency || "BRL"}
-- Score financeiro: ${config?.financial_score || 0}/1000 | Nível: ${config?.level || "iniciante"} | Streak: ${config?.streak_days || 0} dias
-
-📊 RESUMO DO MÊS (${currentMonth}):
-- Receita: R$ ${totalIncome.toFixed(2)} | Despesa: R$ ${totalExpense.toFixed(2)} | Saldo: R$ ${(totalIncome - totalExpense).toFixed(2)}
-- Taxa de poupança: ${totalIncome > 0 ? Math.round(((totalIncome - totalExpense) / totalIncome) * 100) : 0}%
-
-💳 LANÇAMENTOS RECENTES (com IDs para referência):
-${transactions.slice(0, 25).map((t: any) => `  [${t.id}] ${t.date} | ${t.description} | R$ ${t.amount.toFixed(2)} | ${t.type} | ${t.category}`).join("\n") || "  Nenhum"}
-
-📂 GASTOS POR CATEGORIA ESTE MÊS:
-${Object.entries(catExpenses).sort((a, b) => (b[1] as number) - (a[1] as number)).map(([cat, val]) => `  • ${cat}: R$ ${(val as number).toFixed(2)}`).join("\n") || "  Nenhum gasto"}
-
-📋 ORÇAMENTOS ATIVOS:
-${budgets.filter((b: any) => b.month_year === currentMonth).map((b: any) => {
-  const spent = catExpenses[b.category] || 0;
-  const pct = Math.round((spent / b.limit_amount) * 100);
-  return `  • ${b.category}: R$ ${spent.toFixed(2)} / R$ ${b.limit_amount.toFixed(2)} (${pct}%) ${pct > 90 ? '⚠️ QUASE NO LIMITE' : pct > 100 ? '🔴 ESTOURADO' : '✅'}`;
-}).join("\n") || "  Nenhum orçamento definido"}
-
-🎯 METAS:
-${goals.map((g: any) => `  [${g.id}] ${g.name}: R$ ${(g.current_amount || 0).toFixed(2)} / R$ ${g.target_amount.toFixed(2)} (${Math.round(((g.current_amount || 0) / g.target_amount) * 100)}%)${g.deadline ? ` prazo: ${g.deadline}` : ''}`).join("\n") || "  Nenhuma meta"}
-
-💰 INVESTIMENTOS:
-${investments.map((i: any) => {
-  const ret = ((i.current_amount - i.invested_amount) / i.invested_amount * 100).toFixed(1);
-  return `  [${i.id}] ${i.name} (${i.asset_type}): R$ ${i.current_amount.toFixed(2)} (retorno: ${ret}%)`;
-}).join("\n") || "  Nenhum investimento"}
-
-💸 DÍVIDAS ATIVAS:
-${debts.filter((d: any) => d.status === "active").map((d: any) => `  [${d.id}] ${d.name} (${d.creditor}): R$ ${d.remaining_amount.toFixed(2)} restante de R$ ${d.total_amount.toFixed(2)} | juros: ${d.interest_rate || 0}%/mês`).join("\n") || "  Nenhuma dívida"}
-- Total de dívidas ativas: R$ ${totalDebt.toFixed(2)}
-
-📅 CONTAS A PAGAR (próximas):
-${bills.filter((b: any) => b.status === "pending").slice(0, 10).map((b: any) => `  [${b.id}] ${b.due_date} | ${b.description}: R$ ${b.amount.toFixed(2)} ${b.recurrent ? '🔄' : ''}`).join("\n") || "  Nenhuma conta pendente"}
-
-💳 CARTÕES DE CRÉDITO:
-${cards.map((c: any) => `  [${c.id}] ${c.name} (${c.network || 'visa'}): R$ ${(c.used_amount || 0).toFixed(2)} / R$ ${c.credit_limit.toFixed(2)} usado${c.due_day ? ` | vence dia ${c.due_day}` : ''}`).join("\n") || "  Nenhum cartão"}
-
-🔄 TRANSAÇÕES RECORRENTES:
-${recurring.map((r: any) => `  [${r.id}] ${r.description}: R$ ${r.amount.toFixed(2)} (${r.type}, ${r.frequency}) próxima: ${r.next_date}`).join("\n") || "  Nenhuma recorrente"}
-`;
-
-    const { messages } = await req.json();
+    const { messages, stream: wantStream } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `Você é o Assistente Financeiro FinDash IA — um consultor financeiro pessoal inteligente, proativo e empático.
-Seu nome é **FinDash IA**. Trate o usuário pelo nome (${userName}).
+    const systemPrompt = `Você é a **FinDash IA** — assistente financeira pessoal de ${userName} no FinDash Pro.
 
 ## Personalidade
-- Profissional mas amigável. Use linguagem clara e acessível.
-- Seja proativo: ao analisar dados, ofereça insights e sugestões sem ser perguntado.
-- Use emojis com moderação para tornar a conversa agradável.
-- Formate com markdown: use **negrito**, listas e tabelas quando útil.
+- Amigável, direta e motivadora — como uma amiga especialista em finanças
+- Português brasileiro informal ("você", não "o senhor")
+- Use os dados reais SEMPRE — mencione valores específicos do contexto
+- Concisa: máximo 4 parágrafos por resposta
+- Use emojis com moderação. Formate com markdown: **negrito**, listas e tabelas.
+- Quando identificar um problema, ofereça uma solução prática
 
-## Capacidades
-Você pode EXECUTAR ações nos dados financeiros do usuário usando as ferramentas disponíveis:
-- ✅ Adicionar, atualizar e excluir lançamentos (receitas/despesas)
-- ✅ Criar e atualizar metas financeiras
-- ✅ Adicionar investimentos
-- ✅ Criar/atualizar orçamentos por categoria
-- ✅ Agendar contas a pagar e marcar como pagas
-- ✅ Registrar dívidas e pagamentos de dívidas
-- ✅ Criar transações recorrentes (salário, aluguel, etc.)
-- ✅ Adicionar cartões de crédito
-- ✅ Gerar resumo financeiro completo com análise
-
-## Regras
-1. NUNCA invente dados. Use APENAS o contexto fornecido.
-2. Quando o usuário pedir uma alteração, USE AS FERRAMENTAS para executar.
-3. Para atualizar/excluir algo, primeiro use search_transactions se precisar encontrar o ID.
-4. Sempre confirme as ações com detalhes específicos do que foi feito.
-5. Ao analisar finanças, identifique padrões, riscos e oportunidades.
-6. Se um orçamento estiver estourado ou quase, alerte proativamente.
-7. Se houver contas a pagar próximas, lembre o usuário.
-8. Sugira ações concretas baseadas na situação financeira.
+## Capacidades — USE AS FERRAMENTAS quando o usuário pedir:
+- ✅ Adicionar/atualizar/excluir lançamentos, metas, investimentos
+- ✅ Criar/atualizar orçamentos, contas a pagar, dívidas, cartões
+- ✅ Registrar pagamentos de dívidas, transações recorrentes
+- ✅ Gerar resumo financeiro completo com análise de tendências
 
 ## Análise Inteligente
-Quando o usuário perguntar sobre suas finanças:
+Ao analisar finanças:
 - Compare receita vs despesa e calcule taxa de poupança
-- Identifique as top 3 categorias de gasto
-- Verifique orçamentos estourados
-- Analise progresso das metas
-- Avalie risco das dívidas (juros altos)
-- Sugira onde economizar
-- Projete tendências se possível
+- Identifique top 3 categorias de gasto
+- Verifique orçamentos estourados/quase estourados
+- Analise progresso das metas vs deadline
+- Avalie custo real das dívidas (juros compostos)
+- Sugira cortes específicos baseados nos dados
+- Projete tendências e faça simulações
+
+## Regras
+1. NUNCA invente dados — use APENAS o contexto fornecido
+2. Quando pedirem alteração, USE AS FERRAMENTAS
+3. Para atualizar/excluir, use search_transactions se precisar do ID
+4. Confirme ações com detalhes específicos
+5. Alerte proativamente sobre orçamentos estourados e contas próximas
+6. Para investimentos, deixe claro que não é consultoria regulada
 
 ${financialContext}`;
 
@@ -634,70 +625,37 @@ ${financialContext}`;
       ...messages,
     ];
 
-    let finalResponse = "";
+    // Phase 1: Tool-calling loop (non-streaming)
     let actionsSummary: string[] = [];
     let maxIterations = 8;
 
     while (maxIterations > 0) {
       maxIterations--;
 
-      let response: Response;
-      try {
-        response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
-            messages: aiMessages,
-            tools: TOOLS,
-            stream: false,
-          }),
-        });
-      } catch (fetchErr) {
-        console.error("Fetch to AI gateway failed:", fetchErr);
-        return new Response(JSON.stringify({ error: "Falha ao conectar com o serviço de IA." }), {
-          status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+      const toolResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: aiMessages,
+          tools: TOOLS,
+          stream: false,
+        }),
+      });
+
+      if (!toolResponse.ok) {
+        const status = toolResponse.status;
+        if (status === 429) return new Response(JSON.stringify({ error: "Muitas requisições. Aguarde." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        if (status === 402) return new Response(JSON.stringify({ error: "Créditos de IA esgotados." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return new Response(JSON.stringify({ error: "Erro no serviço de IA" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
-      if (!response.ok) {
-        const errBody = await response.text().catch(() => "");
-        console.error("AI gateway error:", response.status, errBody);
-        if (response.status === 429) {
-          return new Response(JSON.stringify({ error: "Muitas requisições. Tente novamente em instantes." }), {
-            status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
-        if (response.status === 402) {
-          return new Response(JSON.stringify({ error: "Créditos de IA esgotados." }), {
-            status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
-        return new Response(JSON.stringify({ error: "Erro no serviço de IA" }), {
-          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      let result: any;
-      try {
-        result = await response.json();
-      } catch {
-        console.error("Failed to parse AI response");
-        return new Response(JSON.stringify({ error: "Resposta inválida da IA." }), {
-          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
+      const result = await toolResponse.json();
       const choice = result.choices?.[0];
-      if (!choice) {
-        console.error("No choices:", JSON.stringify(result).slice(0, 500));
-        return new Response(JSON.stringify({ error: "Resposta vazia da IA" }), {
-          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      if (!choice) return new Response(JSON.stringify({ error: "Resposta vazia da IA" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
       const msg = choice.message;
 
@@ -707,11 +665,8 @@ ${financialContext}`;
           const fnName = toolCall.function.name;
           let fnArgs: any;
           try {
-            fnArgs = typeof toolCall.function.arguments === "string"
-              ? JSON.parse(toolCall.function.arguments)
-              : toolCall.function.arguments || {};
+            fnArgs = typeof toolCall.function.arguments === "string" ? JSON.parse(toolCall.function.arguments) : toolCall.function.arguments || {};
           } catch { fnArgs = {}; }
-
           console.log(`Executing tool: ${fnName}`, JSON.stringify(fnArgs));
           const toolResult = await executeTool(serviceClient, userId, fnName, fnArgs);
           actionsSummary.push(toolResult.message);
@@ -720,18 +675,69 @@ ${financialContext}`;
         continue;
       }
 
-      finalResponse = msg.content || "";
-      break;
+      // No more tool calls — check if we want streaming final response
+      if (wantStream) {
+        // Phase 2: Stream the final response with gemini-2.5-pro for quality
+        const streamResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-pro",
+            messages: aiMessages,
+            stream: true,
+          }),
+        });
+
+        if (!streamResponse.ok || !streamResponse.body) {
+          const fallback = msg.content || "Desculpe, erro ao gerar resposta.";
+          return new Response(JSON.stringify({ reply: fallback, actions: actionsSummary.length > 0 ? actionsSummary : undefined }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        // Prepend actions as a special SSE event
+        const encoder = new TextEncoder();
+        const reader = streamResponse.body.getReader();
+
+        const readable = new ReadableStream({
+          async start(controller) {
+            // Send actions first
+            if (actionsSummary.length > 0) {
+              const actionsEvent = JSON.stringify({ type: "actions", actions: actionsSummary });
+              controller.enqueue(encoder.encode(`data: ${actionsEvent}\n\n`));
+            }
+
+            // Pipe through the SSE stream
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              controller.enqueue(value);
+            }
+            controller.close();
+          },
+        });
+
+        return new Response(readable, {
+          headers: { ...corsHeaders, "Content-Type": "text/event-stream", "Cache-Control": "no-cache", "Connection": "keep-alive" },
+        });
+      }
+
+      // Non-streaming fallback
+      const finalResponse = msg.content || (actionsSummary.length > 0 ? "✅ Ações executadas com sucesso!" : "Desculpe, não consegui processar.");
+      return new Response(JSON.stringify({
+        reply: finalResponse,
+        actions: actionsSummary.length > 0 ? actionsSummary : undefined,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    if (!finalResponse && actionsSummary.length > 0) {
-      finalResponse = "✅ Ações executadas com sucesso!";
-    } else if (!finalResponse) {
-      finalResponse = "Desculpe, não consegui processar sua solicitação. Tente novamente.";
-    }
-
+    // Exhausted iterations
     return new Response(JSON.stringify({
-      reply: finalResponse,
+      reply: actionsSummary.length > 0 ? "✅ Ações executadas!" : "Desculpe, não consegui processar.",
       actions: actionsSummary.length > 0 ? actionsSummary : undefined,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

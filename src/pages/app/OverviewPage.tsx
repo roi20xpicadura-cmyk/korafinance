@@ -15,7 +15,9 @@ import { format, parseISO, startOfMonth, endOfMonth, subDays, subMonths, differe
 import { ptBR } from 'date-fns/locale';
 import { Link, useNavigate } from 'react-router-dom';
 import PredictiveWidget from '@/components/dashboard/PredictiveWidget';
+import AIInsightsWidget from '@/components/dashboard/AIInsightsWidget';
 import WelcomeChecklist from '@/components/app/WelcomeChecklist';
+import AIChatDrawer from '@/components/app/AIChatDrawer';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const LazyChart = lazy(() => import('recharts').then(m => ({
@@ -78,6 +80,7 @@ export default function OverviewPage() {
   const { profile, config } = useProfile();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const [aiChatOpen, setAiChatOpen] = useState(false);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [investments, setInvestments] = useState<any[]>([]);
   const [goals, setGoals] = useState<any[]>([]);
@@ -314,7 +317,12 @@ export default function OverviewPage() {
         ))}
       </div>
 
-      {/* 4. PREDICTIVE AI (conditional) */}
+      {/* AI INSIGHTS */}
+      <motion.div {...stagger(6)}>
+        <AIInsightsWidget onOpenChat={() => setAiChatOpen(true)} />
+      </motion.div>
+
+      {/* 4. PREDICTIVE AI */}
       <PredictiveWidget />
 
       {/* 5. SCORE CARD — personal only, compact */}
@@ -463,6 +471,7 @@ export default function OverviewPage() {
           )}
         </div>
       </motion.div>
+      <AIChatDrawer open={aiChatOpen} onClose={() => setAiChatOpen(false)} />
     </div>
   );
 }
