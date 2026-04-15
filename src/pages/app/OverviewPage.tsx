@@ -317,7 +317,12 @@ export default function OverviewPage() {
         ))}
       </div>
 
-      {/* 4. PREDICTIVE AI (conditional) */}
+      {/* AI INSIGHTS */}
+      <motion.div {...stagger(6)}>
+        <AIInsightsWidget onOpenChat={() => setAiChatOpen(true)} />
+      </motion.div>
+
+      {/* 4. PREDICTIVE AI */}
       <PredictiveWidget />
 
       {/* 5. SCORE CARD — personal only, compact */}
