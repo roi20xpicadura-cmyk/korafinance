@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, X, ArrowUp, Loader2, CheckCircle2, Zap, MessageSquare, Plus, Trash2 } from 'lucide-react';
+import { Sparkles, X, ArrowUp, Loader2, CheckCircle2, Zap, MessageSquare, Plus, Trash2, Mic, MicOff } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -25,8 +25,10 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConvoId, setActiveConvoId] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -110,6 +112,61 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
     setMessages([]);
     setShowHistory(false);
   };
+
+  const toggleVoice = useCallback(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setMessages(prev => [...prev, { role: 'assistant', content: '⚠️ Seu navegador não suporta reconhecimento de voz. Tente o Chrome ou Edge.', ts: new Date() }]);
+      return;
+    }
+
+    if (isRecording && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.interimResults = true;
+    recognition.continuous = false;
+    recognitionRef.current = recognition;
+
+    let finalTranscript = '';
+
+    recognition.onresult = (event: any) => {
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interim = transcript;
+        }
+      }
+      setInput(finalTranscript || interim);
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+      recognitionRef.current = null;
+      if (finalTranscript.trim()) {
+        send(finalTranscript.trim());
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setIsRecording(false);
+      recognitionRef.current = null;
+      if (event.error === 'not-allowed') {
+        setMessages(prev => [...prev, { role: 'assistant', content: '⚠️ Permissão de microfone negada. Habilite nas configurações do navegador.', ts: new Date() }]);
+      }
+    };
+
+    recognition.start();
+    setIsRecording(true);
+  }, [isRecording, messages]);
 
   const send = async (text: string) => {
     if (!text.trim() || loading) return;
@@ -338,16 +395,30 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
 
             {/* Input */}
             <div className="border-t border-border/50 p-3">
-              <div className="relative">
-                <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && send(input)}
-                  placeholder="Pergunte ou peça uma ação..."
-                  className="w-full border-[1.5px] border-border rounded-[10px] py-2.5 pl-3.5 pr-11 text-[13px] focus:border-[#16a34a] focus:outline-none transition-colors"
-                />
-                <button onClick={() => send(input)} disabled={!input.trim() || loading}
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[#16a34a] flex items-center justify-center disabled:opacity-40 transition-opacity">
-                  {loading ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <ArrowUp className="w-4 h-4 text-white" />}
+              <div className="relative flex items-center gap-2">
+                <button onClick={toggleVoice}
+                  className={`w-9 h-9 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
+                    isRecording
+                      ? 'bg-red-500 animate-pulse shadow-lg shadow-red-500/30'
+                      : 'bg-muted hover:bg-muted/80'
+                  }`}
+                  title={isRecording ? 'Parar gravação' : 'Enviar áudio'}
+                >
+                  {isRecording ? <MicOff className="w-4 h-4 text-white" /> : <Mic className="w-4 h-4 text-muted-foreground" />}
                 </button>
+                <div className="relative flex-1">
+                  <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && send(input)}
+                    placeholder={isRecording ? 'Ouvindo...' : 'Pergunte ou peça uma ação...'}
+                    className={`w-full border-[1.5px] rounded-[10px] py-2.5 pl-3.5 pr-11 text-[13px] focus:outline-none transition-colors ${
+                      isRecording ? 'border-red-400 bg-red-50/50 dark:bg-red-900/10' : 'border-border focus:border-[#16a34a]'
+                    }`}
+                  />
+                  <button onClick={() => send(input)} disabled={!input.trim() || loading}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[#16a34a] flex items-center justify-center disabled:opacity-40 transition-opacity">
+                    {loading ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <ArrowUp className="w-4 h-4 text-white" />}
+                  </button>
+                </div>
               </div>
             </div>
           </motion.div>
