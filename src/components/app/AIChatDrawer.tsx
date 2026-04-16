@@ -481,59 +481,50 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
               boxShadow: isMobile ? 'none' : '-12px 0 40px rgba(0,0,0,0.12)',
             }}
           >
-            {/* ─── Header (compact 56px) ─── */}
+            {/* ─── Header (compact 56px, dark) ─── */}
             <div className="flex items-center gap-2.5 px-4 shrink-0"
               style={{
                 height: 56,
-                background: 'var(--color-bg-surface)',
-                borderBottom: '0.5px solid var(--color-border-ghost)',
+                background: '#08080F',
+                borderBottom: '0.5px solid rgba(167,139,250,0.08)',
                 paddingTop: isMobile ? 'env(safe-area-inset-top)' : 0,
                 minHeight: isMobile ? 'calc(56px + env(safe-area-inset-top))' : 56,
               }}>
-              {/* Avatar with online dot */}
               <div className="relative flex-shrink-0">
-                <div className="w-[38px] h-[38px] rounded-[11px] flex items-center justify-center"
-                  style={{
-                    background: 'linear-gradient(135deg, var(--color-green-600), #0d9488)',
-                    boxShadow: '0 2px 8px rgba(124, 58, 237,0.2)',
-                  }}>
-                  <Sparkles className="w-[17px] h-[17px] text-white" />
+                <div className="w-9 h-9 rounded-[10px] flex items-center justify-center"
+                  style={{ background: '#7C3AED' }}>
+                  <Sparkles className="w-4 h-4 text-white" />
                 </div>
-                <div className="absolute -bottom-[1px] -right-[1px] w-[10px] h-[10px] rounded-full"
-                  style={{ background: '#22c55e', border: '2px solid var(--color-bg-surface)' }} />
+                <div className="absolute -bottom-[1px] -right-[1px] w-[9px] h-[9px] rounded-full"
+                  style={{ background: '#22C55E', border: '2px solid #08080F' }} />
               </div>
 
-              {/* Name */}
               <div className="flex-1 min-w-0">
-                <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--color-text-strong)', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
                   Kora IA
                 </div>
-                <p className="text-[11px] truncate mt-px" style={{ color: 'var(--color-text-subtle)' }}>
-                  Assistente financeira pessoal
-                </p>
               </div>
 
-              {/* Compact buttons */}
               <div className="flex items-center gap-1.5">
                 <motion.button whileTap={{ scale: 0.88 }} onClick={startNewChat}
-                  className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center"
+                  className="w-8 h-8 rounded-[9px] flex items-center justify-center"
                   title="Nova conversa"
-                  style={{ background: 'var(--color-bg-sunken)', border: 'none', cursor: 'pointer' }}>
-                  <RotateCcw className="w-[15px] h-[15px]" style={{ color: 'var(--color-text-muted)' }} />
+                  style={{ background: '#110820', border: 'none', cursor: 'pointer' }}>
+                  <RotateCcw className="w-[14px] h-[14px]" style={{ color: 'rgba(255,255,255,0.4)' }} />
                 </motion.button>
                 <motion.button whileTap={{ scale: 0.88 }} onClick={onClose}
-                  className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center"
-                  style={{ background: 'var(--color-bg-sunken)', border: 'none', cursor: 'pointer' }}>
+                  className="w-8 h-8 rounded-[9px] flex items-center justify-center"
+                  style={{ background: '#110820', border: 'none', cursor: 'pointer' }}>
                   {isMobile
-                    ? <ChevronLeft className="w-[17px] h-[17px]" style={{ color: 'var(--color-text-muted)' }} />
-                    : <X className="w-[15px] h-[15px]" style={{ color: 'var(--color-text-muted)' }} />}
+                    ? <ChevronLeft className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.4)' }} />
+                    : <X className="w-[14px] h-[14px]" style={{ color: 'rgba(255,255,255,0.4)' }} />}
                 </motion.button>
               </div>
             </div>
 
             {/* ─── Messages / Welcome ─── */}
             <div className="flex-1 overflow-y-auto" style={{
-              background: 'var(--color-bg-base)',
+              background: '#08080F',
               scrollbarWidth: 'thin',
               scrollbarColor: 'var(--color-border-weak) transparent',
             }}>
