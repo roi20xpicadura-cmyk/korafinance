@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useIsMobile } from '@/hooks/use-mobile';
-import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
+import OnboardingChat from '@/components/onboarding/OnboardingChat';
 import AIChatDrawer from '@/components/app/AIChatDrawer';
 import OfflineBanner from '@/components/app/OfflineBanner';
 import QuickAddFAB from '@/components/app/QuickAddFAB';
@@ -123,7 +123,7 @@ export default function AppLayout() {
   const initial = (profile?.full_name || user?.email || '?')[0].toUpperCase();
 
   if (showOnboarding) {
-    return <OnboardingFlow onComplete={() => { setShowOnboarding(false); refetch(); }} />;
+    return <OnboardingChat onComplete={() => { setShowOnboarding(false); refetch(); }} />;
   }
 
   return (
@@ -315,12 +315,10 @@ export default function AppLayout() {
       {/* ═══ MAIN CONTENT ═══ */}
       <div className="flex-1 min-w-0 flex flex-col" style={{ paddingBottom: isMobile ? 80 : 0 }}>
         {/* Header */}
-        <header className="sticky top-0 z-30 flex items-center" style={{
+        <header className="sticky top-0 z-30 flex items-center glass" style={{
           height: isMobile ? 56 : 58,
-          background: 'var(--color-bg-surface)',
           borderBottom: '1px solid var(--color-border-weak)',
           padding: isMobile ? '0 16px' : '0 28px',
-          backdropFilter: 'blur(12px)',
           gap: 16,
         }}>
           {/* Mobile: hamburger */}
@@ -450,11 +448,9 @@ export default function AppLayout() {
 
       {/* ═══ MOBILE BOTTOM NAV ═══ */}
       {isMobile && (
-        <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center pb-safe" style={{
-          height: 64,
-          background: 'var(--color-bg-surface)',
+        <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center pb-safe glass" style={{
+          height: 68,
           borderTop: '1px solid var(--color-border-weak)',
-          boxShadow: '0 -4px 20px rgba(0,0,0,0.06)',
         }}>
           {MOBILE_NAV.map((item, i) => {
             if (item.path === 'fab') {
@@ -579,13 +575,14 @@ export default function AppLayout() {
       <button onClick={() => setChatOpen(true)}
         className={`fixed z-[499] flex items-center justify-center transition-all ${chatOpen ? 'hidden' : ''}`}
         style={{
-          bottom: isMobile ? 80 : 24, right: isMobile ? 16 : 20,
-          width: 52, height: 52, borderRadius: '50%',
-          background: 'var(--color-green-600)',
-          boxShadow: 'var(--shadow-lg)', color: 'white',
+          bottom: isMobile ? 84 : 24, right: isMobile ? 16 : 20,
+          width: 56, height: 56, borderRadius: 18,
+          background: 'linear-gradient(145deg, var(--color-green-500), var(--color-green-700))',
+          boxShadow: '0 8px 24px rgba(22,163,74,0.3), 0 0 0 1px rgba(22,163,74,0.1)', color: 'white',
+          border: '1px solid rgba(255,255,255,0.15)',
         }}
         aria-label="Assistente IA">
-        <Sparkles style={{ width: 22, height: 22 }} />
+        <Sparkles style={{ width: 24, height: 24 }} />
       </button>
       <AIChatDrawer open={chatOpen} onClose={() => setChatOpen(false)} />
     </div>

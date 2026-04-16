@@ -235,11 +235,13 @@ export default function OverviewPage() {
 
       {/* 2. HERO BALANCE CARD */}
       <motion.div {...stagger(1)} className="p-5 md:p-6" style={{
-        background: 'linear-gradient(135deg, #16a34a 0%, #14532d 100%)',
-        borderRadius: 20, position: 'relative', overflow: 'hidden',
+        background: 'linear-gradient(145deg, #0f2b1a 0%, #0a1f12 40%, #071a0d 100%)',
+        borderRadius: 22, position: 'relative', overflow: 'hidden',
+        border: '1px solid rgba(34,197,94,0.12)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.18), 0 0 0 1px rgba(34,197,94,0.06), inset 0 1px 0 rgba(255,255,255,0.04)',
       }}>
-        <div style={{ position: 'absolute', top: -40, right: -40, width: 160, height: 160, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
-        <div style={{ position: 'absolute', bottom: -20, left: '30%', width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+        <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,197,94,0.08) 0%, transparent 70%)' }} />
+        <div style={{ position: 'absolute', bottom: -30, left: '20%', width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,197,94,0.05) 0%, transparent 70%)' }} />
 
         <div className="flex items-center justify-between" style={{ marginBottom: 16, position: 'relative' }}>
           <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
@@ -310,10 +312,11 @@ export default function OverviewPage() {
       <SmartAlertsWidget />
 
       {/* 3. QUICK STATS — 2x2 */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2.5">
         {statCards.map((s, i) => (
           <motion.div key={s.label} {...stagger(i + 2)}
-            style={{ background: 'var(--color-bg-surface)', border: '0.5px solid var(--color-border-weak)', borderRadius: 14, padding: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            className="card-glow"
+            style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={{ width: 32, height: 32, borderRadius: 9, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <s.icon size={16} color={s.color} />
             </div>
@@ -341,7 +344,7 @@ export default function OverviewPage() {
 
       {/* 5. SCORE CARD — personal only, compact */}
       {showPersonal && (
-        <motion.div {...stagger(7)} style={{ background: 'var(--color-bg-surface)', border: '0.5px solid var(--color-border-weak)', borderRadius: 16, padding: '16px 20px' }}>
+        <motion.div {...stagger(7)} className="card-glow" style={{ padding: '16px 20px' }}>
           <div className="flex items-center justify-between" style={{ marginBottom: 14 }}>
             <div className="flex items-center gap-1.5" style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               <Shield size={14} color="var(--color-green-600)" /> Score Financeiro
@@ -383,7 +386,7 @@ export default function OverviewPage() {
       )}
 
       {/* 6. CHART */}
-      <motion.div {...stagger(8)} style={{ background: 'var(--color-bg-surface)', border: '0.5px solid var(--color-border-weak)', borderRadius: 16, padding: '16px 20px' }}>
+      <motion.div {...stagger(8)} className="card-glow" style={{ padding: '16px 20px' }}>
         <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
           <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--color-text-base)' }}>Evolução do saldo</span>
           <span style={{ fontSize: 11, color: 'var(--color-text-subtle)' }}>Últimos 6 meses</span>
@@ -451,7 +454,7 @@ export default function OverviewPage() {
             Ver todos →
           </button>
         </div>
-        <div style={{ background: 'var(--color-bg-surface)', border: '0.5px solid var(--color-border-weak)', borderRadius: 16, overflow: 'hidden' }}>
+        <div className="card-glow" style={{ overflow: 'hidden' }}>
           {recent.length === 0 ? (
             <div style={{ padding: '32px 16px', textAlign: 'center', fontSize: 13, color: 'var(--color-text-subtle)' }}>
               Nenhum lançamento ainda.
