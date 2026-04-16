@@ -344,7 +344,7 @@ export default function OverviewPage() {
 
       {/* 5. SCORE CARD — personal only, compact */}
       {showPersonal && (
-        <motion.div {...stagger(7)} style={{ background: 'var(--color-bg-surface)', border: '0.5px solid var(--color-border-weak)', borderRadius: 16, padding: '16px 20px' }}>
+        <motion.div {...stagger(7)} className="card-glow" style={{ padding: '16px 20px' }}>
           <div className="flex items-center justify-between" style={{ marginBottom: 14 }}>
             <div className="flex items-center gap-1.5" style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               <Shield size={14} color="var(--color-green-600)" /> Score Financeiro
@@ -386,7 +386,7 @@ export default function OverviewPage() {
       )}
 
       {/* 6. CHART */}
-      <motion.div {...stagger(8)} style={{ background: 'var(--color-bg-surface)', border: '0.5px solid var(--color-border-weak)', borderRadius: 16, padding: '16px 20px' }}>
+      <motion.div {...stagger(8)} className="card-glow" style={{ padding: '16px 20px' }}>
         <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
           <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--color-text-base)' }}>Evolução do saldo</span>
           <span style={{ fontSize: 11, color: 'var(--color-text-subtle)' }}>Últimos 6 meses</span>
@@ -454,7 +454,7 @@ export default function OverviewPage() {
             Ver todos →
           </button>
         </div>
-        <div style={{ background: 'var(--color-bg-surface)', border: '0.5px solid var(--color-border-weak)', borderRadius: 16, overflow: 'hidden' }}>
+        <div className="card-glow" style={{ overflow: 'hidden' }}>
           {recent.length === 0 ? (
             <div style={{ padding: '32px 16px', textAlign: 'center', fontSize: 13, color: 'var(--color-text-subtle)' }}>
               Nenhum lançamento ainda.
