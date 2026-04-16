@@ -235,11 +235,13 @@ export default function OverviewPage() {
 
       {/* 2. HERO BALANCE CARD */}
       <motion.div {...stagger(1)} className="p-5 md:p-6" style={{
-        background: 'linear-gradient(135deg, #16a34a 0%, #14532d 100%)',
-        borderRadius: 20, position: 'relative', overflow: 'hidden',
+        background: 'linear-gradient(145deg, #0f2b1a 0%, #0a1f12 40%, #071a0d 100%)',
+        borderRadius: 22, position: 'relative', overflow: 'hidden',
+        border: '1px solid rgba(34,197,94,0.12)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.18), 0 0 0 1px rgba(34,197,94,0.06), inset 0 1px 0 rgba(255,255,255,0.04)',
       }}>
-        <div style={{ position: 'absolute', top: -40, right: -40, width: 160, height: 160, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
-        <div style={{ position: 'absolute', bottom: -20, left: '30%', width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+        <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,197,94,0.08) 0%, transparent 70%)' }} />
+        <div style={{ position: 'absolute', bottom: -30, left: '20%', width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,197,94,0.05) 0%, transparent 70%)' }} />
 
         <div className="flex items-center justify-between" style={{ marginBottom: 16, position: 'relative' }}>
           <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
