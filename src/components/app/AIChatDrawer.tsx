@@ -48,7 +48,7 @@ function TypingIndicator() {
 
 /* ─── Markdown Components ─── */
 const markdownComponents = {
-  strong: ({ children }: any) => <strong style={{ fontWeight: 800, color: 'var(--color-text-strong)' }}>{children}</strong>,
+  strong: ({ children }: any) => <strong style={{ fontWeight: 800, color: '#ecf5ec' }}>{children}</strong>,
   p: ({ children }: any) => <p style={{ margin: 0, marginBottom: 6 }}>{children}</p>,
   ul: ({ children }: any) => <ul style={{ margin: '6px 0', paddingLeft: 0, listStyle: 'none' }}>{children}</ul>,
   li: ({ children }: any) => (
@@ -59,11 +59,11 @@ const markdownComponents = {
   ),
   code: ({ children }: any) => (
     <code style={{
-      background: 'var(--color-bg-sunken)', borderRadius: 6,
+      background: 'rgba(255,255,255,0.06)', borderRadius: 6,
       padding: '2px 6px', fontFamily: 'var(--font-mono)', fontSize: 13,
     }}>{children}</code>
   ),
-  h3: ({ children }: any) => <h3 style={{ fontSize: 14, fontWeight: 800, margin: '8px 0 4px', color: 'var(--color-text-strong)' }}>{children}</h3>,
+  h3: ({ children }: any) => <h3 style={{ fontSize: 14, fontWeight: 800, margin: '8px 0 4px', color: '#ecf5ec' }}>{children}</h3>,
 };
 
 /* ─── Message Bubble ─── */
