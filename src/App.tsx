@@ -133,7 +133,9 @@ const App = () => {
                   {/* Protected app routes */}
                   <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                     <Route index element={<OverviewPage />} />
-                    <Route path="transactions" element={<TransactionsPage />} />
+                    <Route path="transactions" element={<TransactionsRouter />} />
+                    <Route path="transactions/personal" element={<TransactionsPage profile="personal" />} />
+                    <Route path="transactions/business" element={<TransactionsPage profile="business" />} />
                     <Route path="goals" element={<GoalsPage />} />
                     <Route path="debts" element={<DebtsPage />} />
                     <Route path="budget" element={<BudgetPage />} />
