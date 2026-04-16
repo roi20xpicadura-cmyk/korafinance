@@ -11,10 +11,12 @@ const isPreviewHost =
   window.location.hostname.includes("lovableproject.com");
 
 if (isPreviewHost || isInIframe) {
+  // Never register SW in preview/iframe — causes stale content
   navigator.serviceWorker?.getRegistrations().then(regs =>
     regs.forEach(r => r.unregister())
   );
 } else if ('serviceWorker' in navigator) {
+  // Production: register SW for static asset caching (instant repeat visits)
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
