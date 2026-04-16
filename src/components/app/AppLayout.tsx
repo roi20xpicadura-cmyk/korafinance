@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useIsMobile } from '@/hooks/use-mobile';
-import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
+import OnboardingChat from '@/components/onboarding/OnboardingChat';
 import AIChatDrawer from '@/components/app/AIChatDrawer';
 import OfflineBanner from '@/components/app/OfflineBanner';
 import QuickAddFAB from '@/components/app/QuickAddFAB';
@@ -123,7 +123,7 @@ export default function AppLayout() {
   const initial = (profile?.full_name || user?.email || '?')[0].toUpperCase();
 
   if (showOnboarding) {
-    return <OnboardingFlow onComplete={() => { setShowOnboarding(false); refetch(); }} />;
+    return <OnboardingChat onComplete={() => { setShowOnboarding(false); refetch(); }} />;
   }
 
   return (
