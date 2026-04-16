@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomSheet from '@/components/app/BottomSheet';
 import { useAuth } from '@/contexts/AuthContext';
@@ -673,6 +673,20 @@ function DebtCard({ debt, isPriority, rank, onPay, onEdit, onDelete, onStatusCha
   const [expanded, setExpanded] = useState(isPriority);
   const [showMenu, setShowMenu] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!showMenu) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [showMenu]);
 
   const totalAmt = Number(debt.total_amount);
   const remAmt = Number(debt.remaining_amount);
@@ -778,24 +792,21 @@ function DebtCard({ debt, isPriority, rank, onPay, onEdit, onDelete, onStatusCha
                   style={{ width: 42, height: 42, background: 'var(--color-bg-sunken)', border: '1px solid var(--color-border-base)', borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Pencil size={14} color="var(--color-text-muted)" />
                 </motion.button>
-                <div style={{ position: 'relative' }}>
-                  <motion.button whileTap={{ scale: 0.97 }} onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
+                <div ref={menuRef} style={{ position: 'relative' }}>
+                  <motion.button whileTap={{ scale: 0.97 }} onClick={(e) => { e.stopPropagation(); setShowMenu(prev => !prev); }}
                     style={{ width: 42, height: 42, background: 'var(--color-bg-sunken)', border: '1px solid var(--color-border-base)', borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <MoreVertical size={14} color="var(--color-text-muted)" />
                   </motion.button>
                   {showMenu && (
-                    <>
-                      <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
-                      <div style={{ position: 'absolute', right: 0, top: 46, zIndex: 50, width: 180, background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border-base)', borderRadius: 12, boxShadow: 'var(--shadow-lg)', padding: 4 }}>
-                        {debt.status === 'active' ? (
-                          <MenuBtn icon={<Pause size={13} />} label="Pausar" onClick={() => { onStatusChange('paused'); setShowMenu(false); }} />
-                        ) : (
-                          <MenuBtn icon={<Play size={13} />} label="Reativar" onClick={() => { onStatusChange('active'); setShowMenu(false); }} />
-                        )}
-                        <MenuBtn icon={<Check size={13} />} label="Marcar quitada" color="var(--success-text)" onClick={() => { onStatusChange('paid'); setShowMenu(false); }} />
-                        <MenuBtn icon={<Trash2 size={13} />} label="Excluir" color="#dc2626" onClick={() => { setConfirmDelete(true); setShowMenu(false); }} />
-                      </div>
-                    </>
+                    <div style={{ position: 'absolute', right: 0, top: 46, zIndex: 50, width: 180, background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border-base)', borderRadius: 12, boxShadow: 'var(--shadow-lg)', padding: 4 }}>
+                      {debt.status === 'active' ? (
+                        <MenuBtn icon={<Pause size={13} />} label="Pausar" onClick={() => { onStatusChange('paused'); setShowMenu(false); }} />
+                      ) : (
+                        <MenuBtn icon={<Play size={13} />} label="Reativar" onClick={() => { onStatusChange('active'); setShowMenu(false); }} />
+                      )}
+                      <MenuBtn icon={<Check size={13} />} label="Marcar quitada" color="var(--success-text)" onClick={() => { onStatusChange('paid'); setShowMenu(false); }} />
+                      <MenuBtn icon={<Trash2 size={13} />} label="Excluir" color="#dc2626" onClick={() => { setConfirmDelete(true); setShowMenu(false); }} />
+                    </div>
                   )}
                 </div>
               </div>
