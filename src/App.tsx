@@ -45,6 +45,8 @@ const ExportPage = lazy(() => import("./pages/app/ExportPage").then(m => ({ defa
 const ChartsPage = lazy(() => import("./pages/app/ChartsPage"));
 const InvestmentsPage = lazy(() => import("./pages/app/InvestmentsPage"));
 const DREPage = lazy(() => import("./pages/app/DREPage"));
+const SecuritySettingsPage = lazy(() => import("./pages/app/SecuritySettingsPage"));
+const PrivacidadePage = lazy(() => import("./pages/PrivacidadePage"));
 
 // Optimized QueryClient with stale time and dedup
 const queryClient = new QueryClient({
@@ -126,6 +128,7 @@ const App = () => {
                   <Route path="/lgpd" element={<LGPDPage />} />
                   <Route path="/seguranca" element={<SegurancaPage />} />
                   <Route path="/sobre" element={<SobrePage />} />
+                  <Route path="/privacidade" element={<PrivacidadePage />} />
 
                   {/* Protected app routes */}
                   <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
@@ -137,6 +140,7 @@ const App = () => {
                     <Route path="cards" element={<CardsPage />} />
                     <Route path="export" element={<Suspense fallback={<PageSkeleton />}><ExportPage /></Suspense>} />
                     <Route path="settings" element={<SettingsPage />} />
+                    <Route path="settings/security" element={<SecuritySettingsPage />} />
                     <Route path="billing" element={<BillingPage />} />
                     <Route path="integrations" element={<IntegrationsPage />} />
                     <Route path="achievements" element={<AchievementsPage />} />
