@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Transaction } from "@/types/findash";
 import { format, parseISO, eachDayOfInterval } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { motion } from "framer-motion";
 
 interface Props {
@@ -15,6 +15,28 @@ interface Props {
 function fmt(v: number, c: string) {
   return `${c} ${v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
+
+const tooltipStyle = {
+  contentStyle: {
+    background: 'var(--color-bg-elevated)',
+    border: '1px solid var(--color-border-base)',
+    borderRadius: '10px',
+    boxShadow: 'var(--shadow-md)',
+    padding: '10px 14px',
+    fontSize: '13px',
+  },
+  labelStyle: {
+    color: 'var(--color-text-subtle)',
+    fontWeight: '500',
+    marginBottom: '4px',
+  },
+};
+
+const axisStyle = {
+  axisLine: false,
+  tickLine: false,
+  tick: { fontSize: 11, fill: 'var(--color-text-subtle)' },
+};
 
 export default function CashFlowTab({ filteredTx, currency, rangeStart, rangeEnd }: Props) {
   const chartData = useMemo(() => {
@@ -30,47 +52,45 @@ export default function CashFlowTab({ filteredTx, currency, rangeStart, rangeEnd
     });
   }, [filteredTx, rangeStart, rangeEnd]);
 
-  const tableData = useMemo(() => {
-    let cum = 0;
-    return chartData.map(d => {
-      return { ...d, acumulado: d.saldo };
-    });
-  }, [chartData]);
-
   return (
     <div className="space-y-4">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card-surface p-4">
-        <h3 className="text-[13px] font-extrabold text-fin-green-dark mb-3">Fluxo de Caixa Acumulado</h3>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card-surface p-5">
+        <h3 className="section-title mb-4">Fluxo de Caixa Acumulado</h3>
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(215 25% 89%)" />
-              <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748b' }} />
-              <YAxis tick={{ fontSize: 10, fill: '#64748b' }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-              <Tooltip formatter={(v: number) => fmt(v, currency)} labelStyle={{ fontWeight: 700 }} />
-              <ReferenceLine y={0} stroke="#94a3b8" strokeDasharray="4 4" />
-              <Area type="monotone" dataKey="saldo" stroke="hsl(142 71% 45%)" fill="hsl(142 71% 45% / 0.15)" strokeWidth={2} />
+              <defs>
+                <linearGradient id="cashGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="hsl(142 71% 37%)" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="hsl(142 71% 37%)" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <XAxis dataKey="date" {...axisStyle} tickMargin={8} />
+              <YAxis {...axisStyle} tickFormatter={v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : `${v}`} width={40} />
+              <Tooltip formatter={(v: number) => fmt(v, currency)} {...tooltipStyle} />
+              <ReferenceLine y={0} stroke="var(--color-border-base)" strokeDasharray="4 4" />
+              <Area type="monotone" dataKey="saldo" stroke="hsl(142 71% 37%)" fill="url(#cashGrad)" strokeWidth={2} dot={false} activeDot={{ r: 4, strokeWidth: 2, fill: 'var(--color-bg-surface)' }} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
       </motion.div>
 
       <div className="card-surface overflow-x-auto">
-        <table className="w-full text-xs">
+        <table className="w-full text-[13px]">
           <thead>
-            <tr className="border-b border-border">
+            <tr className="border-b border-border/40">
               {['Data', 'Receitas', 'Despesas', 'Saldo Acumulado'].map(h => (
-                <th key={h} className={`px-4 py-2.5 label-upper text-muted ${h !== 'Data' ? 'text-right' : 'text-left'}`}>{h}</th>
+                <th key={h} className={`px-5 py-3 label-upper ${h !== 'Data' ? 'text-right' : 'text-left'}`}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {tableData.filter(d => d.receitas > 0 || d.despesas > 0).map(d => (
-              <tr key={d.date} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
-                <td className="px-4 py-2 font-medium">{d.date}</td>
-                <td className="px-4 py-2 text-right text-fin-green metric-value">{fmt(d.receitas, currency)}</td>
-                <td className="px-4 py-2 text-right text-fin-red metric-value">{fmt(d.despesas, currency)}</td>
-                <td className={`px-4 py-2 text-right metric-value ${d.acumulado >= 0 ? 'text-fin-green' : 'text-fin-red'}`}>{fmt(d.acumulado, currency)}</td>
+            {chartData.filter(d => d.receitas > 0 || d.despesas > 0).map(d => (
+              <tr key={d.date} className="border-b border-border/20 hover:bg-secondary/30 transition-colors">
+                <td className="px-5 py-3 font-medium text-muted-foreground">{d.date}</td>
+                <td className="px-5 py-3 text-right text-fin-green metric-value">{fmt(d.receitas, currency)}</td>
+                <td className="px-5 py-3 text-right text-fin-red metric-value">{fmt(d.despesas, currency)}</td>
+                <td className={`px-5 py-3 text-right metric-value ${d.saldo >= 0 ? 'text-fin-green' : 'text-fin-red'}`}>{fmt(d.saldo, currency)}</td>
               </tr>
             ))}
           </tbody>

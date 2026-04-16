@@ -14,7 +14,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["Geist", "Inter", "system-ui", "-apple-system", "sans-serif"],
+        mono: ["Geist Mono", "SF Mono", "ui-monospace", "monospace"],
+      },
+      fontSize: {
+        "2xs": "11px",
       },
       colors: {
         border: "hsl(var(--border))",
@@ -90,6 +94,12 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        "premium-sm": "0 2px 6px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+        "premium-md": "0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05)",
+        "premium-lg": "0 8px 32px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06)",
+        "green-glow": "0 4px 14px rgba(22,163,74,0.25)",
       },
       keyframes: {
         "accordion-down": {

@@ -1,8 +1,9 @@
 import { Transaction } from "@/types/findash";
 import { motion } from "framer-motion";
-import { TrendingUp, Landmark, Percent, BarChart3, Receipt, CalendarDays, ArrowRight } from "lucide-react";
+import { TrendingUp, Landmark, Percent, BarChart3, Receipt, CalendarDays, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useState } from "react";
 
 interface Props {
   filteredTx: Transaction[];
@@ -22,41 +23,65 @@ function fmt(val: number, currency: string) {
 
 export default function OverviewTab({ filteredTx, stats, currency, onGoToTransactions }: Props) {
   const recent = [...filteredTx].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 8);
+  const [visible, setVisible] = useState(true);
 
   const kpis = [
-    { label: "Lucro Negócio", value: fmt(stats.bizProfit, currency), icon: TrendingUp, color: "text-fin-green", bg: "bg-fin-green-pale" },
-    { label: "Patrimônio Total", value: fmt(stats.patrimonio, currency), icon: Landmark, color: "text-fin-blue", bg: "bg-fin-blue-pale" },
-    { label: "Taxa de Poupança", value: `${stats.savingsRate.toFixed(1)}%`, icon: Percent, color: "text-fin-green", bg: "bg-fin-green-pale", bar: Math.min(stats.savingsRate, 100) },
-    { label: "ROI Negócio", value: `${stats.roiBiz.toFixed(1)}%`, icon: BarChart3, color: "text-fin-purple", bg: "bg-fin-purple-pale" },
-    { label: "Lançamentos", value: stats.txCount.toString(), icon: Receipt, color: "text-muted", bg: "bg-secondary" },
-    { label: "Média/dia", value: fmt(stats.avgPerDay, currency), icon: CalendarDays, color: "text-fin-amber", bg: "bg-fin-amber-pale" },
+    { label: "Lucro Negócio", value: fmt(stats.bizProfit, currency), icon: TrendingUp, positive: stats.bizProfit >= 0 },
+    { label: "Patrimônio Total", value: fmt(stats.patrimonio, currency), icon: Landmark, positive: true },
+    { label: "Taxa de Poupança", value: `${stats.savingsRate.toFixed(1)}%`, icon: Percent, positive: stats.savingsRate > 0, bar: Math.min(stats.savingsRate, 100) },
+    { label: "ROI Negócio", value: `${stats.roiBiz.toFixed(1)}%`, icon: BarChart3, positive: stats.roiBiz >= 0 },
+    { label: "Lançamentos", value: stats.txCount.toString(), icon: Receipt, positive: true },
+    { label: "Média/dia", value: fmt(stats.avgPerDay, currency), icon: CalendarDays, positive: stats.avgPerDay >= 0 },
   ];
 
   return (
-    <div className="space-y-4">
-      {/* Hero Card */}
+    <div className="space-y-5">
+      {/* Hero Balance Card — dark premium */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="card-surface p-6 bg-fin-green-pale relative overflow-hidden"
+        className="relative overflow-hidden rounded-2xl p-6 md:p-8"
+        style={{
+          background: 'linear-gradient(135deg, #0D1412 0%, #14322A 50%, #0D1412 100%)',
+        }}
       >
-        <div className="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-fin-green-border opacity-40" />
-        <p className="label-upper text-muted mb-1">Saldo Líquido do Período</p>
-        <p className={`text-4xl metric-value ${stats.netBalance >= 0 ? 'text-fin-green' : 'text-fin-red'}`}>
-          {fmt(stats.netBalance, currency)}
-        </p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
-          {[
-            { label: "Total Receitas", val: stats.totalIncome, cls: "text-fin-green" },
-            { label: "Total Despesas", val: stats.totalExpense, cls: "text-fin-red" },
-            { label: "Receita Negócio", val: stats.bizIncome, cls: "text-fin-green" },
-            { label: "Gasto Pessoal", val: stats.personalExpense, cls: "text-fin-red" },
-          ].map(s => (
-            <div key={s.label}>
-              <p className="label-upper text-muted">{s.label}</p>
-              <p className={`text-lg metric-value ${s.cls}`}>{fmt(s.val, currency)}</p>
-            </div>
-          ))}
+        {/* Subtle green glow */}
+        <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full opacity-20"
+          style={{ background: 'radial-gradient(circle, rgba(74,222,128,0.5) 0%, transparent 70%)' }} />
+        {/* Noise texture */}
+        <div className="absolute inset-0 opacity-[0.03]"
+          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")' }} />
+
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-white/50">
+              Saldo do Período
+            </span>
+            <button onClick={() => setVisible(!visible)}
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-white/40 hover:text-white/70 hover:bg-white/5 transition-all">
+              {visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+            </button>
+          </div>
+
+          <p className={`font-mono text-[42px] font-extrabold tracking-[-0.04em] leading-none mb-6 ${stats.netBalance >= 0 ? 'text-white' : 'text-red-400'}`}>
+            {visible ? fmt(stats.netBalance, currency) : '••••••'}
+          </p>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { label: "Receitas", val: stats.totalIncome, color: "text-emerald-400" },
+              { label: "Despesas", val: stats.totalExpense, color: "text-red-400" },
+              { label: "Receita Negócio", val: stats.bizIncome, color: "text-emerald-400" },
+              { label: "Gasto Pessoal", val: stats.personalExpense, color: "text-red-400" },
+            ].map(s => (
+              <div key={s.label}>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-white/40 mb-1">{s.label}</p>
+                <p className={`font-mono text-lg font-bold tracking-tight ${s.color}`}>
+                  {visible ? fmt(s.val, currency) : '••••'}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </motion.div>
 
@@ -67,17 +92,17 @@ export default function OverviewTab({ filteredTx, stats, currency, onGoToTransac
             key={k.label}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className="card-surface p-4"
+            transition={{ delay: i * 0.04 }}
+            className="card-surface p-5"
           >
-            <div className={`w-7 h-7 rounded-lg ${k.bg} flex items-center justify-center mb-2`}>
-              <k.icon className={`w-4 h-4 ${k.color}`} />
+            <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center mb-3">
+              <k.icon className="w-4 h-4 text-muted-foreground" />
             </div>
-            <p className="label-upper text-muted">{k.label}</p>
-            <p className={`text-lg metric-value ${k.color}`}>{k.value}</p>
+            <p className="label-upper mb-1">{k.label}</p>
+            <p className="metric-value text-lg text-foreground">{visible ? k.value : '••••'}</p>
             {k.bar !== undefined && (
-              <div className="mt-1.5 h-1.5 bg-fin-green-border rounded-full overflow-hidden">
-                <div className="h-full bg-fin-green rounded-full transition-all duration-500" style={{ width: `${k.bar}%` }} />
+              <div className="mt-2 h-1.5 bg-secondary rounded-full overflow-hidden">
+                <div className="h-full bg-primary rounded-full transition-all duration-700" style={{ width: `${k.bar}%` }} />
               </div>
             )}
           </motion.div>
@@ -86,39 +111,39 @@ export default function OverviewTab({ filteredTx, stats, currency, onGoToTransac
 
       {/* Recent Transactions */}
       <div className="card-surface">
-        <div className="flex items-center justify-between p-4 pb-2">
-          <h3 className="text-[13px] font-extrabold text-fin-green-dark">Lançamentos Recentes</h3>
-          <button onClick={onGoToTransactions} className="flex items-center gap-1 text-xs font-semibold text-fin-green hover:underline">
-            Ver todos <ArrowRight className="w-3 h-3" />
+        <div className="flex items-center justify-between px-5 py-4">
+          <h3 className="section-title">Lançamentos Recentes</h3>
+          <button onClick={onGoToTransactions} className="btn-ghost flex items-center gap-1.5 text-primary">
+            Ver todos <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="w-full text-[13px]">
             <thead>
-              <tr className="border-b border-border">
-                <th className="text-left px-4 py-2 label-upper text-muted">Data</th>
-                <th className="text-left px-4 py-2 label-upper text-muted">Descrição</th>
-                <th className="text-left px-4 py-2 label-upper text-muted">Categoria</th>
-                <th className="text-left px-4 py-2 label-upper text-muted">Tipo</th>
-                <th className="text-right px-4 py-2 label-upper text-muted">Valor</th>
+              <tr className="border-t border-border/40">
+                <th className="text-left px-5 py-3 label-upper">Data</th>
+                <th className="text-left px-5 py-3 label-upper">Descrição</th>
+                <th className="text-left px-5 py-3 label-upper">Categoria</th>
+                <th className="text-left px-5 py-3 label-upper">Tipo</th>
+                <th className="text-right px-5 py-3 label-upper">Valor</th>
               </tr>
             </thead>
             <tbody>
               {recent.length === 0 ? (
-                <tr><td colSpan={5} className="text-center py-8 text-muted text-sm">Nenhum lançamento no período</td></tr>
+                <tr><td colSpan={5} className="text-center py-12 text-muted-foreground text-sm">Nenhum lançamento no período</td></tr>
               ) : recent.map(tx => (
-                <tr key={tx.id} className={`border-b border-border/50 hover:bg-secondary/50 transition-colors border-l-2 ${tx.type === 'income' ? 'border-l-fin-green' : 'border-l-fin-red'}`}>
-                  <td className="px-4 py-2.5 font-medium">{format(parseISO(tx.date), "dd/MM", { locale: ptBR })}</td>
-                  <td className="px-4 py-2.5">{tx.desc}</td>
-                  <td className="px-4 py-2.5">
-                    <span className="px-2 py-0.5 rounded-full bg-secondary text-[10px] font-semibold">{tx.cat}</span>
+                <tr key={tx.id} className="border-t border-border/30 hover:bg-secondary/30 transition-colors">
+                  <td className="px-5 py-3 font-medium text-muted-foreground">{format(parseISO(tx.date), "dd/MM", { locale: ptBR })}</td>
+                  <td className="px-5 py-3 font-medium text-foreground">{tx.desc}</td>
+                  <td className="px-5 py-3">
+                    <span className="px-2.5 py-1 rounded-md bg-secondary text-[11px] font-semibold text-secondary-foreground">{tx.cat}</span>
                   </td>
-                  <td className="px-4 py-2.5">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${tx.type === 'income' ? 'bg-fin-green-pale text-fin-green' : 'bg-fin-red-pale text-fin-red'}`}>
+                  <td className="px-5 py-3">
+                    <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold ${tx.type === 'income' ? 'bg-fin-green-pale text-fin-green' : 'bg-fin-red-pale text-fin-red'}`}>
                       {tx.type === 'income' ? 'Receita' : 'Despesa'}
                     </span>
                   </td>
-                  <td className={`px-4 py-2.5 text-right metric-value ${tx.type === 'income' ? 'text-fin-green' : 'text-fin-red'}`}>
+                  <td className={`px-5 py-3 text-right metric-value ${tx.type === 'income' ? 'text-fin-green' : 'text-fin-red'}`}>
                     {tx.type === 'expense' ? '−' : '+'}{fmt(tx.val, currency)}
                   </td>
                 </tr>
