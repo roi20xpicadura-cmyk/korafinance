@@ -750,7 +750,7 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
               <div className="flex items-center justify-center gap-1.5 mt-[6px]">
                 <Lock className="w-[10px] h-[10px]" style={{ color: 'var(--color-text-disabled)' }} />
                 <p style={{ fontSize: 10, color: 'var(--color-text-disabled)', letterSpacing: '0.2px' }}>
-                  🔒 Dados criptografados · Privacidade garantida
+                  🔒 Dados criptografados · 🚫 Sem anúncios · 🛡️ LGPD
                 </p>
               </div>
             </div>
