@@ -411,8 +411,8 @@ export default function DebtsPage() {
       {/* ── Header ── */}
       <div style={{ padding: '16px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--color-text-strong)', letterSpacing: '-0.03em' }}>Sair das Dívidas</h1>
-          <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 2 }}>Seu plano personalizado de quitação</p>
+          <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--color-text-strong)', letterSpacing: '-0.03em' }}>Minhas Dívidas</h1>
+          <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 2 }}>{activeDebts.length} dívida{activeDebts.length !== 1 ? 's' : ''} ativa{activeDebts.length !== 1 ? 's' : ''}</p>
         </div>
         <motion.button whileTap={{ scale: 0.95 }} onClick={() => { resetForm(); setEditingDebt(null); setAddingDebt(true); }}
           style={{ height: 36, padding: '0 14px', background: 'var(--color-green-600)', border: 'none', borderRadius: 10, color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -422,8 +422,9 @@ export default function DebtsPage() {
 
       {/* ── 1. Hero Status Card ── */}
       <div style={{
-        margin: '12px 16px 0', background: hc.bg, border: `1.5px solid ${hc.border}`,
+        margin: '12px 16px 0', background: 'linear-gradient(135deg, #0a1f10, #061409)', border: '1.5px solid rgba(22,163,74,0.25)',
         borderRadius: 20, padding: 20, position: 'relative', overflow: 'hidden',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
       }}>
         <div style={{ position: 'absolute', top: -30, right: -30, width: 100, height: 100, borderRadius: '50%', background: hc.accent, opacity: 0.08, filter: 'blur(30px)', pointerEvents: 'none' }} />
         <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Total em dívidas</div>
@@ -470,7 +471,7 @@ export default function DebtsPage() {
               </div>
             )}
             <motion.button whileTap={{ scale: 0.97 }} onClick={nextAction.action}
-              style={{ width: '100%', height: 44, background: actionColor[nextAction.severity], border: 'none', borderRadius: 11, color: '#0a0a0a', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
+              style={{ width: '100%', height: 44, background: '#22c55e', border: 'none', borderRadius: 11, color: '#000000', fontSize: 14, fontWeight: 800, cursor: 'pointer', boxShadow: '0 3px 12px rgba(34,197,94,0.4)' }}>
               {nextAction.cta}
             </motion.button>
           </div>
@@ -487,14 +488,14 @@ export default function DebtsPage() {
           ]).map(s => (
             <motion.button key={s.id} whileTap={{ scale: 0.96 }} onClick={() => handleStrategyChange(s.id)}
               style={{
-                flex: 1, padding: '11px 14px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left',
+                flex: 1, padding: '11px 12px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, textAlign: 'left', minHeight: 52,
                 background: strategy === s.id ? 'var(--success-bg)' : 'var(--color-bg-surface)',
                 outline: `1.5px solid ${strategy === s.id ? 'var(--color-green-500)' : 'var(--color-border-base)'}`,
                 borderRadius: 12,
               }}>
-              <span style={{ fontSize: 18 }}>{s.emoji}</span>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: strategy === s.id ? 'var(--success-text)' : 'var(--color-text-strong)' }}>{s.label}</div>
+              <span style={{ fontSize: 16, flexShrink: 0 }}>{s.emoji}</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: strategy === s.id ? 'var(--success-text)' : 'var(--color-text-strong)' }}>{s.label}</div>
                 <div style={{ fontSize: 10, color: 'var(--color-text-muted)', marginTop: 1 }}>{s.sub}</div>
               </div>
               {strategy === s.id && <Check size={14} color="var(--success-text)" />}
@@ -573,7 +574,7 @@ export default function DebtsPage() {
               </div>
               <div>
                 <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginBottom: 4 }}>Total em juros</div>
-                <div style={{ fontSize: 24, fontWeight: 900, color: '#f87171', letterSpacing: '-0.03em' }}>
+                <div style={{ fontSize: 24, fontWeight: 900, color: payoffInfo.totalInterest > 1000 ? '#f87171' : 'rgba(255,255,255,0.7)', letterSpacing: '-0.03em' }}>
                   R$ {fmtCompact(payoffInfo.totalInterest)}
                 </div>
                 <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 2 }}>pagando mínimo</div>
@@ -592,6 +593,8 @@ export default function DebtsPage() {
           </div>
         )}
       </div>
+
+      <div style={{ height: 24 }} />
 
       {/* ── Sheets ── */}
       <AddDebtSheet open={addingDebt} onClose={() => { setAddingDebt(false); resetForm(); setEditingDebt(null); }}
@@ -708,7 +711,7 @@ function DebtCard({ debt, isPriority, rank, onPay, onEdit, onDelete, onStatusCha
           {rank}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-strong)', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{debt.name}</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-strong)', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textTransform: 'capitalize' }}>{debt.name}</div>
           <div style={{ display: 'flex', gap: 8, fontSize: 11, color: 'var(--color-text-muted)' }}>
             {rate > 0 ? (
               <span style={{ color: rate > 10 ? '#dc2626' : 'var(--color-text-muted)' }}>{rate}%/mês</span>
