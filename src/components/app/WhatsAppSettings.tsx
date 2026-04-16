@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { MessageCircle, Phone, Check, X, Loader2 } from 'lucide-react';
+import { MessageCircle, Phone, Loader2 } from 'lucide-react';
 
 interface WhatsAppConnection {
   id: string;
@@ -12,6 +12,13 @@ interface WhatsAppConnection {
   connected_at: string;
   last_message_at: string | null;
   total_messages: number;
+}
+
+function normalizePhonePreview(value: string) {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 7) return `${digits.slice(0, 2)} ${digits.slice(2)}`;
+  return `${digits.slice(0, 2)} ${digits.slice(2, 7)}-${digits.slice(7)}`;
 }
 
 export default function WhatsAppSettings() {
@@ -41,26 +48,31 @@ export default function WhatsAppSettings() {
   }
 
   async function sendCode() {
-    if (!phoneInput || phoneInput.replace(/\D/g, '').length < 10) {
-      toast.error('Digite um número válido');
+    const digits = phoneInput.replace(/\D/g, '');
+    if (!digits || digits.length < 10) {
+      toast.error('Digite um número válido com DDD');
       return;
     }
+
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('whatsapp-verify', {
         body: {
           userId: user!.id,
-          phoneNumber: phoneInput.replace(/\D/g, ''),
+          phoneNumber: digits,
           action: 'send_code',
         },
       });
+
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
       if (data?.sent) {
         setStep('verifying');
         toast.success('Código enviado para o WhatsApp!');
       }
-    } catch {
-      toast.error('Erro ao enviar código. Verifique o número.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao enviar código.');
     }
     setLoading(false);
   }
@@ -81,14 +93,19 @@ export default function WhatsAppSettings() {
         },
       });
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
       if (data?.verified) {
         toast.success('WhatsApp conectado com sucesso! 🎉');
+        if (data?.warning) {
+          toast.warning(data.warning);
+        }
         await loadConnection();
       } else {
         toast.error(data?.error || 'Código incorreto');
       }
-    } catch {
-      toast.error('Erro ao verificar código');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao verificar código');
     }
     setLoading(false);
   }
@@ -128,10 +145,9 @@ export default function WhatsAppSettings() {
 
   return (
     <div className="card-surface p-6">
-      {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#25D366' }}>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'hsl(var(--primary))' }}>
             <MessageCircle size={20} color="white" />
           </div>
           <div>
@@ -151,14 +167,13 @@ export default function WhatsAppSettings() {
       </div>
 
       <div style={{ borderTop: '1px solid var(--color-border-base)', paddingTop: 16 }}>
-        {/* CONNECTED */}
         {step === 'connected' && connection && (
           <div className="space-y-4">
             <div className="p-4 rounded-xl" style={{ background: 'var(--color-bg-sunken)' }}>
               <div className="flex items-center gap-2 mb-1">
                 <Phone size={14} style={{ color: 'var(--color-green-600)' }} />
                 <span className="text-[13px] font-bold" style={{ color: 'var(--color-text-strong)' }}>
-                  +55 {connection.phone_number.replace(/(\d{2})(\d{5})(\d{4})/, '$1 $2-$3')}
+                  +{connection.phone_number.replace(/(\d{2})(\d{2})(\d{5})(\d{4})/, '$1 $2 $3-$4')}
                 </span>
               </div>
               <p className="text-[11px]" style={{ color: 'var(--color-text-muted)' }}>
@@ -192,7 +207,6 @@ export default function WhatsAppSettings() {
           </div>
         )}
 
-        {/* IDLE */}
         {step === 'idle' && (
           <div className="space-y-4">
             <p className="text-[13px] leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
@@ -200,14 +214,13 @@ export default function WhatsAppSettings() {
             </p>
             <button onClick={() => setStep('entering')}
               className="w-full py-3 rounded-xl text-[13px] font-extrabold flex items-center justify-center gap-2 transition-all hover:brightness-110"
-              style={{ background: '#25D366', color: 'white', border: 'none' }}>
+              style={{ background: 'hsl(var(--primary))', color: 'white', border: 'none' }}>
               <MessageCircle size={16} />
               Conectar WhatsApp
             </button>
           </div>
         )}
 
-        {/* ENTERING PHONE */}
         {step === 'entering' && (
           <div className="space-y-4">
             <div>
@@ -220,7 +233,7 @@ export default function WhatsAppSettings() {
                 </div>
                 <input
                   value={phoneInput}
-                  onChange={e => setPhoneInput(e.target.value)}
+                  onChange={e => setPhoneInput(normalizePhonePreview(e.target.value))}
                   placeholder="11 99999-9999"
                   className="flex-1 px-3 py-2.5 rounded-lg text-[14px] outline-none"
                   style={{ background: 'var(--color-bg-sunken)', border: '1.5px solid var(--color-border-base)', color: 'var(--color-text-base)' }}
@@ -229,12 +242,12 @@ export default function WhatsAppSettings() {
                 />
               </div>
               <p className="text-[11px] mt-2" style={{ color: 'var(--color-text-subtle)' }}>
-                Enviaremos um código de verificação pelo WhatsApp.
+                Digite só DDD + número. O país (+55) já é adicionado automaticamente.
               </p>
             </div>
             <button onClick={sendCode} disabled={loading || phoneInput.replace(/\D/g, '').length < 10}
               className="w-full py-3 rounded-xl text-[13px] font-extrabold transition-all disabled:opacity-40"
-              style={{ background: '#25D366', color: 'white', border: 'none' }}>
+              style={{ background: 'hsl(var(--primary))', color: 'white', border: 'none' }}>
               {loading ? <Loader2 size={16} className="animate-spin mx-auto" /> : 'Enviar código de verificação'}
             </button>
             <button onClick={() => setStep('idle')}
@@ -244,7 +257,6 @@ export default function WhatsAppSettings() {
           </div>
         )}
 
-        {/* VERIFYING CODE */}
         {step === 'verifying' && (
           <div className="space-y-4">
             <div className="text-center p-4 rounded-xl" style={{ background: 'var(--color-bg-sunken)' }}>
@@ -275,7 +287,7 @@ export default function WhatsAppSettings() {
             </div>
             <button onClick={verifyCode} disabled={loading || codeInput.length !== 6}
               className="w-full py-3 rounded-xl text-[13px] font-extrabold transition-all disabled:opacity-40"
-              style={{ background: '#25D366', color: 'white', border: 'none' }}>
+              style={{ background: 'hsl(var(--primary))', color: 'white', border: 'none' }}>
               {loading ? <Loader2 size={16} className="animate-spin mx-auto" /> : 'Verificar e conectar'}
             </button>
             <button onClick={() => { setStep('entering'); setCodeInput(''); }}
