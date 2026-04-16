@@ -547,23 +547,22 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
                   whileTap={hasText && !loading ? { scale: 0.85 } : undefined}
                   onClick={() => send(input)}
                   disabled={!hasText || loading}
-                  className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
+                  className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
                   style={{
-                    background: loading ? 'var(--color-border-weak)' : hasText ? 'linear-gradient(135deg, #16a34a, #15803d)' : 'transparent',
-                    boxShadow: hasText && !loading ? '0 2px 10px rgba(22,163,74,0.3)' : 'none',
+                    background: loading ? 'rgba(255,255,255,0.08)' : hasText ? '#ecf5ec' : 'rgba(255,255,255,0.06)',
                     cursor: hasText && !loading ? 'pointer' : 'default',
                   }}
                 >
                   {loading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'var(--color-green-600)' }} />
+                    <Loader2 className="w-4 h-4 animate-spin" style={{ color: '#4ade80' }} />
                   ) : (
-                    <ArrowUp className="w-4 h-4" style={{ color: hasText ? 'white' : 'var(--color-text-subtle)' }} />
+                    <ArrowUp className="w-4 h-4" style={{ color: hasText ? '#0a0d0a' : 'rgba(255,255,255,0.3)' }} />
                   )}
                 </motion.button>
               </div>
               <div className="flex items-center justify-center gap-1.5 mt-2">
-                <Lock className="w-[9px] h-[9px]" style={{ color: 'var(--color-text-subtle)', opacity: 0.5 }} />
-                <p style={{ fontSize: 10, color: 'var(--color-text-subtle)', opacity: 0.5 }}>
+                <Lock className="w-[9px] h-[9px]" style={{ color: 'rgba(255,255,255,0.2)' }} />
+                <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>
                   Dados criptografados · Privacidade garantida
                 </p>
               </div>
