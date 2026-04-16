@@ -311,20 +311,20 @@ export default function AppLayout() {
       <div className="flex-1 min-w-0 flex flex-col" style={{ paddingBottom: isMobile ? 80 : 0 }}>
         {/* Header */}
         <header className="sticky top-0 z-30 flex items-center glass" style={{
-          height: isMobile ? 56 : 58,
+          height: isMobile ? 72 : 58,
           borderBottom: '1px solid var(--color-border-weak)',
           padding: isMobile ? '0 16px' : '0 28px',
           gap: 16,
         }}>
           {/* Mobile: hamburger */}
           <button className="md:hidden" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="Menu" style={{ color: 'var(--color-text-muted)' }}>
-            {sidebarOpen ? <X style={{ width: 20, height: 20 }} /> : <Menu style={{ width: 20, height: 20 }} />}
+            {sidebarOpen ? <X style={{ width: 22, height: 22 }} /> : <Menu style={{ width: 22, height: 22 }} />}
           </button>
 
           {/* Mobile: logo */}
           {isMobile && (
             <div className="flex items-center">
-              <img src={logo} alt="KoraFinance" style={{ height: 22, width: 'auto', objectFit: 'contain' }} />
+              <img src={logo} alt="KoraFinance" style={{ height: 48, width: 'auto', objectFit: 'contain' }} />
             </div>
           )}
 
