@@ -315,12 +315,10 @@ export default function AppLayout() {
       {/* ═══ MAIN CONTENT ═══ */}
       <div className="flex-1 min-w-0 flex flex-col" style={{ paddingBottom: isMobile ? 80 : 0 }}>
         {/* Header */}
-        <header className="sticky top-0 z-30 flex items-center" style={{
+        <header className="sticky top-0 z-30 flex items-center glass" style={{
           height: isMobile ? 56 : 58,
-          background: 'var(--color-bg-surface)',
           borderBottom: '1px solid var(--color-border-weak)',
           padding: isMobile ? '0 16px' : '0 28px',
-          backdropFilter: 'blur(12px)',
           gap: 16,
         }}>
           {/* Mobile: hamburger */}
@@ -450,11 +448,9 @@ export default function AppLayout() {
 
       {/* ═══ MOBILE BOTTOM NAV ═══ */}
       {isMobile && (
-        <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center pb-safe" style={{
-          height: 64,
-          background: 'var(--color-bg-surface)',
+        <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center pb-safe glass" style={{
+          height: 68,
           borderTop: '1px solid var(--color-border-weak)',
-          boxShadow: '0 -4px 20px rgba(0,0,0,0.06)',
         }}>
           {MOBILE_NAV.map((item, i) => {
             if (item.path === 'fab') {
