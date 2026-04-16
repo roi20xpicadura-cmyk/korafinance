@@ -329,7 +329,7 @@ export default function AppLayout() {
               <div className="flex items-center justify-center" style={{ width: 28, height: 28, borderRadius: 'var(--radius-sm)', background: 'var(--color-green-600)' }}>
                 <BarChart3 className="text-white" style={{ width: 15, height: 15 }} />
               </div>
-              <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--color-text-strong)' }}>FinDash Pro</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--color-text-strong)' }}>KoraFinance</span>
             </div>
           )}
 
