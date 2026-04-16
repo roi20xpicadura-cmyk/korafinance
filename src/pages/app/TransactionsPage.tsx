@@ -212,7 +212,7 @@ export default function TransactionsPage({ profile }: TransactionsPageProps = {}
           <motion.button whileTap={{ scale: 0.95 }} onClick={() => setShowSheet(true)}
             style={{
               display: 'flex', alignItems: 'center', gap: 6, height: 36, padding: '0 14px',
-              background: 'var(--color-green-600)', border: 'none', borderRadius: 10,
+              background: '#7C3AED', border: 'none', borderRadius: 10,
               color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer',
               boxShadow: '0 2px 8px rgba(124, 58, 237,0.3)',
             }}>
