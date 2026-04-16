@@ -31,12 +31,14 @@ export default function SecuritySettingsPage() {
     if (!user) return;
     setExporting(true);
     try {
-      const tables = ['transactions', 'goals', 'debts', 'credit_cards', 'investments', 'budgets', 'user_config', 'profiles'] as const;
+      const tables = ['transactions', 'goals', 'debts', 'credit_cards', 'investments', 'budgets', 'user_config'] as const;
       const data: Record<string, any> = {};
       for (const t of tables) {
-        const { data: rows } = await supabase.from(t).select('*').eq(t === 'profiles' ? 'id' : 'user_id', user.id);
+        const { data: rows } = await supabase.from(t).select('*').eq('user_id', user.id);
         data[t] = rows || [];
       }
+      const { data: profileRow } = await supabase.from('profiles').select('*').eq('id', user.id);
+      data['profiles'] = profileRow || [];
       const blob = new Blob([JSON.stringify({ exported_at: new Date().toISOString(), user_id: user.id, data }, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
