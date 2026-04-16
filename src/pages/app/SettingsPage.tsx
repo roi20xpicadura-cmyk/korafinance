@@ -4,7 +4,8 @@ import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { OBJECTIVES } from '@/lib/objectives';
 import { PROFILE_TYPES } from '@/components/onboarding/OnboardingFlow';
-import { Check, Download, Trash2, FileText, Camera, Bell, BellOff } from 'lucide-react';
+import { Check, Download, Trash2, FileText, Camera, Bell, BellOff, Shield, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { requestPushPermission, checkNotificationSupport, sendLocalNotification } from '@/lib/pushNotifications';
 import WhatsAppSettings from '@/components/app/WhatsAppSettings';
@@ -368,6 +369,20 @@ export default function SettingsPage() {
           </p>
         </div>
       </div>
+
+      {/* Security & Privacy link */}
+      <Link to="/app/settings/security" className="card-surface p-4 flex items-center gap-3 hover:brightness-95 transition-all">
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--color-green-100, #dcfce7)' }}>
+          <Shield size={18} style={{ color: 'var(--color-green-600)' }} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="text-[14px] font-extrabold flex items-center gap-1.5" style={{ color: 'var(--color-text-base)' }}>
+            Segurança e Privacidade <span>🛡️</span>
+          </div>
+          <div className="text-[12px]" style={{ color: 'var(--color-text-muted)' }}>Seus dados, seus direitos</div>
+        </div>
+        <ChevronRight size={16} style={{ color: 'var(--color-text-muted)' }} />
+      </Link>
 
       {/* Danger Zone */}
       <div className="card-surface p-6 border-destructive">
