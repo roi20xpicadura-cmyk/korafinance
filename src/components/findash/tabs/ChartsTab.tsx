@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { Transaction, Investment } from "@/types/findash";
-import { format, parseISO, eachDayOfInterval, eachWeekOfInterval, eachMonthOfInterval, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
+import { format, eachDayOfInterval } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Legend, AreaChart, Area } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { motion } from "framer-motion";
 
 interface Props {
@@ -17,10 +17,31 @@ function fmt(v: number, c: string) {
   return `${c} ${v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-const COLORS = ['#16a34a', '#2563eb', '#7c3aed', '#d97706', '#0891b2', '#dc2626', '#e11d48', '#059669', '#6366f1'];
+const COLORS = ['#16A34A', '#2563EB', '#7C3AED', '#D97706', '#0891B2', '#DC2626', '#E11D48', '#059669', '#6366F1'];
+
+const axisStyle = {
+  axisLine: false,
+  tickLine: false,
+  tick: { fontSize: 11, fill: 'var(--color-text-subtle)' },
+};
+
+const tooltipStyle = {
+  contentStyle: {
+    background: 'var(--color-bg-elevated)',
+    border: '1px solid var(--color-border-base)',
+    borderRadius: '10px',
+    boxShadow: 'var(--shadow-md)',
+    padding: '10px 14px',
+    fontSize: '13px',
+  },
+  labelStyle: {
+    color: 'var(--color-text-subtle)',
+    fontWeight: '500' as const,
+    marginBottom: '4px',
+  },
+};
 
 export default function ChartsTab({ filteredTx, investments, currency, rangeStart, rangeEnd }: Props) {
-  // Income vs Expense by day
   const dailyData = useMemo(() => {
     const days = eachDayOfInterval({ start: rangeStart, end: rangeEnd });
     return days.map(d => {
@@ -34,85 +55,88 @@ export default function ChartsTab({ filteredTx, investments, currency, rangeStar
     }).filter(d => d.receitas > 0 || d.despesas > 0);
   }, [filteredTx, rangeStart, rangeEnd]);
 
-  // Expenses by category
   const catData = useMemo(() => {
     const cats: Record<string, number> = {};
     filteredTx.filter(t => t.type === 'expense').forEach(t => { cats[t.cat] = (cats[t.cat] || 0) + t.val; });
     return Object.entries(cats).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
   }, [filteredTx]);
 
-  // Income by category
   const incCatData = useMemo(() => {
     const cats: Record<string, number> = {};
     filteredTx.filter(t => t.type === 'income').forEach(t => { cats[t.cat] = (cats[t.cat] || 0) + t.val; });
     return Object.entries(cats).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
   }, [filteredTx]);
 
-  // Business vs Personal
   const originData = useMemo(() => {
     const biz = filteredTx.filter(t => t.origin === 'business').reduce((s, t) => s + (t.type === 'income' ? t.val : -t.val), 0);
     const personal = filteredTx.filter(t => t.origin === 'personal').reduce((s, t) => s + (t.type === 'income' ? t.val : -t.val), 0);
     return [{ name: 'Negócio', value: Math.abs(biz) }, { name: 'Pessoal', value: Math.abs(personal) }];
   }, [filteredTx]);
 
+  const chartCard = "card-surface p-5";
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card-surface p-4">
-          <h3 className="text-[13px] font-extrabold text-fin-green-dark mb-3">Receitas vs Despesas</h3>
-          <div className="h-[250px]">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={chartCard}>
+          <h3 className="section-title mb-4">Receitas vs Despesas</h3>
+          <div className="h-[260px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={dailyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(215 25% 89%)" />
-                <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#64748b' }} />
-                <YAxis tick={{ fontSize: 10, fill: '#64748b' }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-                <Tooltip formatter={(v: number) => fmt(v, currency)} />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Bar dataKey="receitas" name="Receitas" fill="#16a34a" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="despesas" name="Despesas" fill="#dc2626" radius={[4, 4, 0, 0]} />
+              <BarChart data={dailyData} barGap={2}>
+                <XAxis dataKey="date" {...axisStyle} tickMargin={8} />
+                <YAxis {...axisStyle} tickFormatter={v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : `${v}`} width={40} />
+                <Tooltip formatter={(v: number) => fmt(v, currency)} {...tooltipStyle} />
+                <Bar dataKey="receitas" name="Receitas" fill="#16A34A" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="despesas" name="Despesas" fill="#E11D48" radius={[6, 6, 0, 0]} opacity={0.8} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="card-surface p-4">
-          <h3 className="text-[13px] font-extrabold text-fin-green-dark mb-3">Despesas por Categoria</h3>
-          <div className="h-[250px]">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className={chartCard}>
+          <h3 className="section-title mb-4">Despesas por Categoria</h3>
+          <div className="h-[260px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={catData} cx="50%" cy="50%" outerRadius={90} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                <Pie data={catData} cx="50%" cy="50%" outerRadius={95} innerRadius={50} dataKey="value" paddingAngle={2}
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  labelLine={{ stroke: 'var(--color-text-subtle)', strokeWidth: 1 }}>
                   {catData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
-                <Tooltip formatter={(v: number) => fmt(v, currency)} />
+                <Tooltip formatter={(v: number) => fmt(v, currency)} {...tooltipStyle} />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="card-surface p-4">
-          <h3 className="text-[13px] font-extrabold text-fin-green-dark mb-3">Receitas por Categoria</h3>
-          <div className="h-[250px]">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className={chartCard}>
+          <h3 className="section-title mb-4">Receitas por Categoria</h3>
+          <div className="h-[260px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={incCatData} cx="50%" cy="50%" outerRadius={90} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                <Pie data={incCatData} cx="50%" cy="50%" outerRadius={95} innerRadius={50} dataKey="value" paddingAngle={2}
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  labelLine={{ stroke: 'var(--color-text-subtle)', strokeWidth: 1 }}>
                   {incCatData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
-                <Tooltip formatter={(v: number) => fmt(v, currency)} />
+                <Tooltip formatter={(v: number) => fmt(v, currency)} {...tooltipStyle} />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="card-surface p-4">
-          <h3 className="text-[13px] font-extrabold text-fin-green-dark mb-3">Negócio vs Pessoal</h3>
-          <div className="h-[250px]">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className={chartCard}>
+          <h3 className="section-title mb-4">Negócio vs Pessoal</h3>
+          <div className="h-[260px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={originData} cx="50%" cy="50%" innerRadius={50} outerRadius={90} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
-                  <Cell fill="#16a34a" />
-                  <Cell fill="#d97706" />
+                <Pie data={originData} cx="50%" cy="50%" innerRadius={55} outerRadius={95} dataKey="value" paddingAngle={3}
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  labelLine={{ stroke: 'var(--color-text-subtle)', strokeWidth: 1 }}>
+                  <Cell fill="#16A34A" />
+                  <Cell fill="#D97706" />
                 </Pie>
-                <Tooltip formatter={(v: number) => fmt(v, currency)} />
+                <Tooltip formatter={(v: number) => fmt(v, currency)} {...tooltipStyle} />
               </PieChart>
             </ResponsiveContainer>
           </div>
