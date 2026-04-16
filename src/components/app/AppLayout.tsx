@@ -575,13 +575,14 @@ export default function AppLayout() {
       <button onClick={() => setChatOpen(true)}
         className={`fixed z-[499] flex items-center justify-center transition-all ${chatOpen ? 'hidden' : ''}`}
         style={{
-          bottom: isMobile ? 80 : 24, right: isMobile ? 16 : 20,
-          width: 52, height: 52, borderRadius: '50%',
-          background: 'var(--color-green-600)',
-          boxShadow: 'var(--shadow-lg)', color: 'white',
+          bottom: isMobile ? 84 : 24, right: isMobile ? 16 : 20,
+          width: 56, height: 56, borderRadius: 18,
+          background: 'linear-gradient(145deg, var(--color-green-500), var(--color-green-700))',
+          boxShadow: '0 8px 24px rgba(22,163,74,0.3), 0 0 0 1px rgba(22,163,74,0.1)', color: 'white',
+          border: '1px solid rgba(255,255,255,0.15)',
         }}
         aria-label="Assistente IA">
-        <Sparkles style={{ width: 22, height: 22 }} />
+        <Sparkles style={{ width: 24, height: 24 }} />
       </button>
       <AIChatDrawer open={chatOpen} onClose={() => setChatOpen(false)} />
     </div>
