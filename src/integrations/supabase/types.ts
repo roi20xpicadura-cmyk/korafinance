@@ -1230,6 +1230,117 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_connections: {
+        Row: {
+          active: boolean | null
+          connected_at: string | null
+          created_at: string | null
+          id: string
+          last_message_at: string | null
+          phone_number: string
+          total_messages: number | null
+          user_id: string
+          verification_code: string | null
+          verification_expires_at: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          active?: boolean | null
+          connected_at?: string | null
+          created_at?: string | null
+          id?: string
+          last_message_at?: string | null
+          phone_number: string
+          total_messages?: number | null
+          user_id: string
+          verification_code?: string | null
+          verification_expires_at?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          active?: boolean | null
+          connected_at?: string | null
+          created_at?: string | null
+          id?: string
+          last_message_at?: string | null
+          phone_number?: string
+          total_messages?: number | null
+          user_id?: string
+          verification_code?: string | null
+          verification_expires_at?: string | null
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
+      whatsapp_context: {
+        Row: {
+          id: string
+          last_intent: string | null
+          messages: Json | null
+          pending_confirmation: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          last_intent?: string | null
+          messages?: Json | null
+          pending_confirmation?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          last_intent?: string | null
+          messages?: Json | null
+          pending_confirmation?: Json | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      whatsapp_messages: {
+        Row: {
+          action_taken: string | null
+          created_at: string | null
+          direction: string
+          error: string | null
+          id: string
+          intent: string | null
+          message: string
+          phone_number: string
+          processed: boolean | null
+          transaction_created_id: string | null
+          user_id: string
+        }
+        Insert: {
+          action_taken?: string | null
+          created_at?: string | null
+          direction: string
+          error?: string | null
+          id?: string
+          intent?: string | null
+          message: string
+          phone_number: string
+          processed?: boolean | null
+          transaction_created_id?: string | null
+          user_id: string
+        }
+        Update: {
+          action_taken?: string | null
+          created_at?: string | null
+          direction?: string
+          error?: string | null
+          id?: string
+          intent?: string | null
+          message?: string
+          phone_number?: string
+          processed?: boolean | null
+          transaction_created_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

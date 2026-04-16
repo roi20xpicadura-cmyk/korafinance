@@ -18,6 +18,7 @@ import PredictiveWidget from '@/components/dashboard/PredictiveWidget';
 import AIInsightsWidget from '@/components/dashboard/AIInsightsWidget';
 import WelcomeChecklist from '@/components/app/WelcomeChecklist';
 import AIChatDrawer from '@/components/app/AIChatDrawer';
+import WhatsAppPromoWidget from '@/components/app/WhatsAppPromoWidget';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const LazyChart = lazy(() => import('recharts').then(m => ({
@@ -225,6 +226,9 @@ export default function OverviewPage() {
 
       {/* WELCOME CHECKLIST */}
       <WelcomeChecklist />
+
+      {/* WHATSAPP PROMO */}
+      <WhatsAppPromoWidget />
 
       {/* 2. HERO BALANCE CARD */}
       <motion.div {...stagger(1)} className="p-5 md:p-6" style={{
