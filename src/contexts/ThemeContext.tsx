@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -45,9 +45,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     root.classList.toggle('dark', resolved === 'dark');
   }, [resolved]);
 
-  // Sync from Supabase on load
+  // Sync from Supabase only once per user, and only if user hasn't picked locally
+  const syncedUserId = useRef<string | null>(null);
   useEffect(() => {
     if (!user) return;
+    if (syncedUserId.current === user.id) return;
+    syncedUserId.current = user.id;
+
+    // If user has already explicitly set a theme locally, don't overwrite from DB
+    const localPicked = localStorage.getItem('kora-theme-user-picked') === '1';
+    if (localPicked) return;
+
     supabase.from('user_config').select('theme').eq('user_id', user.id).single()
       .then(({ data }) => {
         if (data?.theme && ['light', 'dark', 'system'].includes(data.theme)) {
@@ -85,6 +93,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const setTheme = useCallback((t: Theme) => {
     setThemeState(t);
     localStorage.setItem('kora-theme', t);
+    localStorage.setItem('kora-theme-user-picked', '1');
     if (user) {
       supabase.from('user_config').update({ theme: t } as any).eq('user_id', user.id);
     }
