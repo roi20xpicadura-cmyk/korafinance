@@ -10,6 +10,7 @@ import {
   Search, Upload, Copy, Check, CheckCircle2, Clock, Plug, Plus,
   ChevronRight, RefreshCw, ArrowLeft, Bell, Zap, MessageSquarePlus, Settings2,
 } from 'lucide-react';
+import OpenFinanceSection from '@/components/app/OpenFinanceSection';
 import {
   INTEGRATIONS, CATEGORY_LABELS, CATEGORY_EMOJI, CATEGORY_COLORS, CATEGORY_COUNTS,
   getLogoUrl, type IntegrationDef, type IntegrationCategory,
