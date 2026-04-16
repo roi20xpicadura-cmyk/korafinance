@@ -553,17 +553,17 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
               )}
             </div>
 
-            {/* ─── Input Bar ─── */}
+            {/* ─── Input Bar (dark) ─── */}
             <div className="shrink-0" style={{
-              background: 'var(--color-bg-surface)',
-              borderTop: '0.5px solid var(--color-border-ghost)',
-              padding: '10px 16px',
-              paddingBottom: isMobile ? 'calc(10px + env(safe-area-inset-bottom))' : '10px',
+              background: '#08080F',
+              borderTop: '0.5px solid rgba(167,139,250,0.08)',
+              padding: '12px 16px',
+              paddingBottom: isMobile ? 'calc(12px + env(safe-area-inset-bottom))' : '12px',
             }}>
-              <div className="flex items-end gap-2 rounded-2xl px-3.5 py-2.5 transition-all ai-chat-input-wrapper"
+              <div className="flex items-end gap-2 rounded-[14px] px-3 py-2.5 transition-all ai-chat-input-wrapper"
                 style={{
-                  background: 'var(--color-bg-sunken)',
-                  border: '1.5px solid var(--color-border-base)',
+                  background: '#110820',
+                  border: '1px solid rgba(167,139,250,0.15)',
                 }}>
                 <textarea
                   ref={textareaRef}
@@ -578,7 +578,7 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
                   className="flex-1 bg-transparent border-none outline-none resize-none leading-[1.5]"
                   style={{
                     fontSize: isMobile ? '16px' : '15px',
-                    color: 'var(--color-text-base)',
+                    color: '#FFFFFF',
                     maxHeight: 100,
                     fontFamily: 'inherit',
                   }}
@@ -587,30 +587,27 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
                   whileTap={hasText && !loading ? { scale: 0.85 } : undefined}
                   onClick={() => send(input)}
                   disabled={!hasText || loading}
-                  className="w-8 h-8 rounded-[9px] flex items-center justify-center flex-shrink-0 transition-all"
+                  className="w-[30px] h-[30px] rounded-[8px] flex items-center justify-center flex-shrink-0 transition-all"
                   style={{
-                    background: loading
-                      ? 'var(--color-bg-sunken)'
-                      : hasText
-                        ? 'var(--color-green-600)'
-                        : 'transparent',
+                    background: loading ? 'transparent' : hasText ? '#7C3AED' : 'transparent',
                     cursor: hasText && !loading ? 'pointer' : 'default',
-                    boxShadow: hasText && !loading ? '0 2px 8px rgba(124, 58, 237,0.3)' : 'none',
                     border: 'none',
                   }}
                 >
                   {loading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'var(--color-green-500)' }} />
+                    <Loader2 className="w-4 h-4 animate-spin" style={{ color: '#A78BFA' }} />
                   ) : (
-                    <ArrowUp className="w-4 h-4" style={{ color: hasText ? 'white' : 'var(--color-text-disabled)' }} />
+                    <ArrowUp size={15} style={{ color: hasText ? '#FFFFFF' : 'rgba(255,255,255,0.2)' }} />
                   )}
                 </motion.button>
               </div>
-              <div className="flex items-center justify-center gap-1.5 mt-[6px]">
-                <Lock className="w-[10px] h-[10px]" style={{ color: 'var(--color-text-disabled)' }} />
-                <p style={{ fontSize: 10, color: 'var(--color-text-disabled)', letterSpacing: '0.2px' }}>
-                  🔒 Dados criptografados · 🚫 Sem anúncios · 🛡️ LGPD
-                </p>
+              <div style={{
+                textAlign: 'center',
+                marginTop: 6,
+                fontSize: 10,
+                color: 'rgba(255,255,255,0.15)',
+              }}>
+                🔒 Dados criptografados · Sem anúncios · LGPD
               </div>
             </div>
           </motion.div>
