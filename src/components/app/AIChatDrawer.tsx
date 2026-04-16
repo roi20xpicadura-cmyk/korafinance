@@ -533,12 +533,12 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
                   onKeyDown={e => {
                     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input); }
                   }}
-                  placeholder="Pergunte sobre suas finanças..."
+                  placeholder="Converse com a FinDash IA..."
                   rows={1}
                   className="flex-1 bg-transparent border-none outline-none resize-none leading-[1.5]"
                   style={{
                     fontSize: isMobile ? '16px' : '15px',
-                    color: 'var(--color-text-base)',
+                    color: '#ecf5ec',
                     maxHeight: 100,
                     fontFamily: 'inherit',
                   }}
