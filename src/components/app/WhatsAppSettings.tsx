@@ -152,7 +152,7 @@ export default function WhatsAppSettings() {
           </div>
           <div>
             <h2 className="text-[14px] font-extrabold" style={{ color: 'var(--color-text-strong)' }}>
-              KoraFinance IA no WhatsApp
+              FinDash Pro IA no WhatsApp
             </h2>
             <p className="text-[11px]" style={{ color: 'var(--color-text-muted)' }}>
               Registre gastos e consulte finanças pelo WhatsApp
