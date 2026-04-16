@@ -52,6 +52,14 @@ const MOBILE_NAV_PERSONAL = [
   { label: 'Mais', path: 'more', icon: MoreHorizontal, activeColor: '#64748b' },
 ];
 
+const MOBILE_NAV_BOTH = [
+  { label: 'Início', path: '/app', icon: Home, activeColor: '#7C3AED' },
+  { label: 'Pessoal', path: '/app/transactions/personal', icon: Home, activeColor: '#7C3AED' },
+  { label: '', path: 'fab', icon: Plus, activeColor: '#7C3AED' },
+  { label: 'Negócio', path: '/app/transactions/business', icon: Briefcase, activeColor: '#2563eb' },
+  { label: 'Mais', path: 'more', icon: MoreHorizontal, activeColor: '#64748b' },
+];
+
 const MOBILE_NAV_BUSINESS = [
   { label: 'Início', path: '/app', icon: Home, activeColor: '#7C3AED' },
   { label: 'Lançar', path: '/app/transactions', icon: ArrowLeftRight, activeColor: '#2563eb' },
@@ -63,6 +71,8 @@ const MOBILE_NAV_BUSINESS = [
 const PAGE_TITLES: Record<string, string> = {
   '/app': 'Visão Geral',
   '/app/transactions': 'Lançamentos',
+  '/app/transactions/personal': 'Lançamentos Pessoais',
+  '/app/transactions/business': 'Lançamentos Negócio',
   '/app/budget': 'Orçamento',
   '/app/goals': 'Metas',
   '/app/debts': 'Sair das Dívidas',
@@ -102,7 +112,10 @@ export default function AppLayout() {
 
   const profileType = config?.profile_type || 'personal';
   const navItems = ALL_NAV_ITEMS.filter(item => item.profiles.includes(profileType));
-  const MOBILE_NAV = profileType === 'business' ? MOBILE_NAV_BUSINESS : MOBILE_NAV_PERSONAL;
+  const MOBILE_NAV =
+    profileType === 'both' ? MOBILE_NAV_BOTH :
+    profileType === 'business' ? MOBILE_NAV_BUSINESS :
+    MOBILE_NAV_PERSONAL;
   const accountItems = ACCOUNT_ITEMS.filter(item => !(item as any).profiles || (item as any).profiles.includes(profileType));
   const plan = profile?.plan || 'free';
 
