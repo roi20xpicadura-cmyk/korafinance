@@ -284,7 +284,7 @@ export default function ImportModal({ open, onClose, onSuccess, profileType }: P
 
                   <button onClick={handleImport} disabled={importing}
                     className="w-full py-3 rounded-lg font-extrabold text-[13px] transition-colors disabled:opacity-50"
-                    style={{ background: 'var(--color-green-600)', color: 'white' }}>
+                    style={{ background: '#7C3AED', color: 'white' }}>
                     {importing ? 'Importando...' : `Importar ${parsed.length} lançamentos`}
                   </button>
                 </div>
