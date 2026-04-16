@@ -93,6 +93,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const setTheme = useCallback((t: Theme) => {
     setThemeState(t);
     localStorage.setItem('kora-theme', t);
+    localStorage.setItem('kora-theme-user-picked', '1');
     if (user) {
       supabase.from('user_config').update({ theme: t } as any).eq('user_id', user.id);
     }
