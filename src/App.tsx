@@ -72,6 +72,20 @@ const PageSkeleton = memo(function PageSkeleton() {
   );
 });
 
+/**
+ * Routes /app/transactions to the right page based on user's profile_type.
+ *  - 'business' → /app/transactions/business
+ *  - 'both' or 'personal' (default) → /app/transactions/personal
+ *  Renders the personal page directly while config loads to avoid a flash.
+ */
+function TransactionsRouter() {
+  const { config, loading } = useProfile();
+  if (loading) return <PageSkeleton />;
+  const profileType = config?.profile_type || 'personal';
+  if (profileType === 'business') return <Navigate to="/app/transactions/business" replace />;
+  return <Navigate to="/app/transactions/personal" replace />;
+}
+
 // Prefetch common app routes after initial load
 function usePrefetchAppRoutes() {
   useEffect(() => {
