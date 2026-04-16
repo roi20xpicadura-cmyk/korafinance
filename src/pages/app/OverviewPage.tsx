@@ -312,10 +312,11 @@ export default function OverviewPage() {
       <SmartAlertsWidget />
 
       {/* 3. QUICK STATS — 2x2 */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2.5">
         {statCards.map((s, i) => (
           <motion.div key={s.label} {...stagger(i + 2)}
-            style={{ background: 'var(--color-bg-surface)', border: '0.5px solid var(--color-border-weak)', borderRadius: 14, padding: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            className="card-glow"
+            style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={{ width: 32, height: 32, borderRadius: 9, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <s.icon size={16} color={s.color} />
             </div>
