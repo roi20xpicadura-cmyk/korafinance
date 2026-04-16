@@ -19,7 +19,6 @@ import AIInsightsWidget from '@/components/dashboard/AIInsightsWidget';
 import WelcomeChecklist from '@/components/app/WelcomeChecklist';
 import AIChatDrawer from '@/components/app/AIChatDrawer';
 import WhatsAppPromoWidget from '@/components/app/WhatsAppPromoWidget';
-import AIAgentsWidget from '@/components/dashboard/AIAgentsWidget';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const LazyChart = lazy(() => import('recharts').then(m => ({
@@ -228,8 +227,7 @@ export default function OverviewPage() {
       {/* WELCOME CHECKLIST */}
       <WelcomeChecklist />
 
-      {/* AI AGENTS */}
-      <AIAgentsWidget />
+      {/* WHATSAPP PROMO */}
 
       {/* WHATSAPP PROMO */}
       <WhatsAppPromoWidget />
