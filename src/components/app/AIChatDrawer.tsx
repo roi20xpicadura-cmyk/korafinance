@@ -145,8 +145,8 @@ function StreamingBubble({ content }: { content: string }) {
   );
 }
 
-/* ─── Welcome Screen (redesigned) ─── */
-function WelcomeScreen({ onSend, firstName, financialData }: {
+/* ─── Welcome Screen — minimal dark ─── */
+function WelcomeScreen({ onSend, firstName }: {
   onSend: (text: string) => void;
   firstName: string;
   financialData: { balance: number; score: number; totalDebt: number; topCategory: string | null };
@@ -154,221 +154,89 @@ function WelcomeScreen({ onSend, firstName, financialData }: {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
 
-  const smartQuestions = useMemo(() => {
-    const qs: { emoji: string; text: string; sub: string }[] = [];
-    qs.push({ emoji: '📊', text: 'Como estão minhas finanças?', sub: 'Resumo completo do mês' });
-    if (financialData.totalDebt > 0) {
-      qs.push({ emoji: '💳', text: 'Quando vou quitar minhas dívidas?', sub: `R$ ${formatCompact(financialData.totalDebt)} em aberto` });
-    } else {
-      qs.push({ emoji: '📈', text: 'Como posso investir melhor?', sub: 'Sugestões para seu perfil' });
-    }
-    if (financialData.topCategory) {
-      qs.push({ emoji: '💡', text: `Como reduzir gastos com ${financialData.topCategory}?`, sub: 'Sua maior categoria este mês' });
-    } else {
-      qs.push({ emoji: '💡', text: 'Onde posso economizar?', sub: 'Identificar gastos desnecessários' });
-    }
-    qs.push({ emoji: '🔮', text: 'Como estarão minhas finanças em 3 meses?', sub: 'Projeção com IA' });
-    return qs.slice(0, 4);
-  }, [financialData]);
-
-  const quickActions = [
-    { emoji: '💸', label: 'Lançar despesa', msg: 'Quero lançar uma despesa' },
-    { emoji: '💰', label: 'Lançar receita', msg: 'Quero lançar uma receita' },
-    { emoji: '📊', label: 'Resumo do mês', msg: 'Como estão minhas finanças esse mês?' },
-    { emoji: '🎯', label: 'Minha meta', msg: 'Como está o progresso das minhas metas?' },
+  const questions = [
+    { emoji: '📊', text: 'Como estão minhas finanças?' },
+    { emoji: '💳', text: 'Quando vou quitar minhas dívidas?' },
+    { emoji: '💡', text: 'Onde posso economizar?' },
+    { emoji: '🔮', text: 'Previsão dos próximos 3 meses' },
   ];
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto" style={{ padding: '20px 16px 12px', gap: 14 }}>
-      {/* Compact greeting */}
+    <div style={{
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      padding: '32px 20px 16px',
+      background: '#08080F',
+      gap: 32,
+    }}>
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="flex items-center gap-3"
+        transition={{ duration: 0.35 }}
+        style={{ textAlign: 'center' }}
       >
-        <div className="flex-shrink-0 w-11 h-11 rounded-[13px] flex items-center justify-center"
-          style={{
-            background: 'linear-gradient(135deg, var(--color-green-600), #0d9488)',
-            boxShadow: '0 3px 10px rgba(124, 58, 237,0.3)',
-          }}>
-          <Sparkles className="w-5 h-5 text-white" />
-        </div>
-        <div>
-          <div style={{
-            fontSize: 18, fontWeight: 900,
-            color: 'var(--color-text-strong)',
-            letterSpacing: '-0.02em',
-          }}>
-            {greeting}{firstName ? `, ${firstName}` : ''}! 👋
-          </div>
-          <div style={{ fontSize: 12, color: 'var(--color-text-subtle)', marginTop: 1 }}>
-            Kora IA • Assistente financeira pessoal
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Financial snapshot */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1, duration: 0.4 }}
-        style={{
-          background: 'var(--color-success-bg)',
-          border: '1px solid var(--color-success-border)',
+        <div style={{
+          width: 52, height: 52,
           borderRadius: 16,
-          padding: 16,
-        }}
-      >
-        <div style={{
-          fontSize: 11, fontWeight: 700,
-          color: 'var(--color-success-text)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          marginBottom: 10,
+          background: '#7C3AED',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          margin: '0 auto 16px',
+          boxShadow: '0 4px 20px rgba(124,58,237,0.4)',
         }}>
-          Seus dados de hoje
+          <Sparkles size={22} color="#FFFFFF" />
         </div>
-        <div className="grid grid-cols-3 gap-2.5">
-          {[
-            {
-              label: 'Saldo',
-              value: `R$ ${formatCompact(financialData.balance)}`,
-              color: financialData.balance >= 0 ? 'var(--color-green-600)' : 'var(--color-danger-solid)',
-            },
-            {
-              label: 'Score',
-              value: `${financialData.score}`,
-              color: 'var(--color-green-600)',
-            },
-            {
-              label: 'Dívidas',
-              value: financialData.totalDebt > 0
-                ? `R$ ${formatCompact(financialData.totalDebt)}`
-                : 'Nenhuma ✓',
-              color: financialData.totalDebt > 0 ? 'var(--color-danger-solid)' : 'var(--color-green-600)',
-            },
-          ].map((s, i) => (
-            <div key={i} className="text-center">
-              <div style={{
-                fontSize: 10, fontWeight: 600,
-                color: 'var(--color-text-subtle)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.04em',
-                marginBottom: 3,
-              }}>
-                {s.label}
-              </div>
-              <div style={{
-                fontSize: 15, fontWeight: 900,
-                color: s.color,
-                fontFamily: 'var(--font-mono)',
-                letterSpacing: '-0.02em',
-              }}>
-                {s.value}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div style={{
-          marginTop: 10,
-          paddingTop: 10,
-          borderTop: '1px solid var(--color-success-border)',
-          fontSize: 12,
-          color: 'var(--color-success-text)',
-          opacity: 0.8,
+        <h2 style={{
+          fontSize: 22, fontWeight: 900,
+          color: '#FFFFFF',
+          letterSpacing: '-0.02em',
+          marginBottom: 6,
         }}>
-          Tenho acesso a todos os seus dados financeiros. Pergunte qualquer coisa! 💬
-        </div>
+          {greeting}{firstName ? `, ${firstName}` : ''}! 👋
+        </h2>
+        <p style={{
+          fontSize: 13,
+          color: 'rgba(255,255,255,0.35)',
+          lineHeight: 1.5,
+          margin: 0,
+        }}>
+          Como posso te ajudar hoje?
+        </p>
       </motion.div>
 
-      {/* Smart questions */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.4 }}
-      >
-        <div style={{
-          fontSize: 11, fontWeight: 700,
-          color: 'var(--color-text-subtle)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          marginBottom: 8,
-        }}>
-          Perguntas rápidas
-        </div>
-        <div className="flex flex-col gap-[7px]">
-          {smartQuestions.map((q, i) => (
-            <motion.button
-              key={i}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 + i * 0.05 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => onSend(q.text)}
-              className="flex items-center gap-2.5 text-left transition-colors"
-              style={{
-                padding: '11px 14px',
-                background: 'var(--color-bg-surface)',
-                border: '1px solid var(--color-border-weak)',
-                borderRadius: 12,
-                cursor: 'pointer',
-              }}
-            >
-              <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1 }}>{q.emoji}</span>
-              <div className="flex-1 min-w-0">
-                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-base)', marginBottom: 1 }}>{q.text}</div>
-                <div style={{ fontSize: 11, color: 'var(--color-text-subtle)' }}>{q.sub}</div>
-              </div>
-              <ChevronRight size={14} style={{ color: 'var(--color-text-disabled)', flexShrink: 0 }} />
-            </motion.button>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Quick actions 2x2 */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35, duration: 0.4 }}
-      >
-        <div style={{
-          fontSize: 11, fontWeight: 700,
-          color: 'var(--color-text-subtle)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          marginBottom: 8,
-        }}>
-          Ações rápidas
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          {quickActions.map((a, i) => (
-            <motion.button
-              key={i}
-              whileTap={{ scale: 0.96 }}
-              onClick={() => onSend(a.msg)}
-              className="flex items-center gap-2.5"
-              style={{
-                padding: '13px 12px',
-                background: 'var(--color-bg-surface)',
-                border: '1px solid var(--color-border-weak)',
-                borderRadius: 12,
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-            >
-              <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1 }}>{a.emoji}</span>
-              <span style={{
-                fontSize: 12, fontWeight: 700,
-                color: 'var(--color-text-base)',
-                lineHeight: 1.3,
-              }}>
-                {a.label}
-              </span>
-            </motion.button>
-          ))}
-        </div>
-      </motion.div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {questions.map((q, i) => (
+          <motion.button
+            key={i}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 + i * 0.06 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => onSend(q.text)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '13px 16px',
+              background: '#110820',
+              border: '0.5px solid rgba(167,139,250,0.12)',
+              borderRadius: 12,
+              cursor: 'pointer',
+              textAlign: 'left',
+            }}
+          >
+            <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1 }}>{q.emoji}</span>
+            <span style={{
+              fontSize: 14, fontWeight: 600,
+              color: '#FFFFFF',
+              flex: 1,
+            }}>
+              {q.text}
+            </span>
+            <ChevronRight size={14} color="rgba(255,255,255,0.2)" />
+          </motion.button>
+        ))}
+      </div>
     </div>
   );
 }
