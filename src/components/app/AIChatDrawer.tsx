@@ -424,19 +424,20 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
               isMobile ? 'inset-0' : 'top-0 right-0 h-full w-[440px]'
             }`}
             style={{
-              background: 'var(--color-bg-base)',
-              borderLeft: isMobile ? 'none' : '1px solid var(--color-border-weak)',
-              boxShadow: isMobile ? 'none' : '-8px 0 30px rgba(0,0,0,0.08)',
+              background: '#0a0d0a',
+              borderLeft: isMobile ? 'none' : '1px solid rgba(255,255,255,0.06)',
+              boxShadow: isMobile ? 'none' : '-8px 0 30px rgba(0,0,0,0.3)',
             }}
           >
             {/* ─── Header ─── */}
             <div className="flex items-center gap-3 px-4 shrink-0"
               style={{
                 height: 64,
-                background: 'var(--color-bg-surface)',
-                borderBottom: '1px solid var(--color-border-weak)',
+                background: 'rgba(10,13,10,0.95)',
+                borderBottom: '1px solid rgba(255,255,255,0.06)',
                 paddingTop: isMobile ? 'env(safe-area-inset-top)' : 0,
                 minHeight: isMobile ? 'calc(64px + env(safe-area-inset-top))' : 64,
+                backdropFilter: 'blur(16px)',
               }}>
               {/* Avatar */}
               <div className="relative flex-shrink-0">
@@ -453,14 +454,14 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
               {/* Name */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-[16px] font-black" style={{ color: 'var(--color-text-strong)', letterSpacing: '-0.3px' }}>FinDash IA</span>
-                  <span style={{ fontSize: 11, color: 'var(--color-text-subtle)' }}>·</span>
+                  <span className="text-[16px] font-black" style={{ color: '#ecf5ec', letterSpacing: '-0.3px' }}>FinDash IA</span>
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>·</span>
                   <div className="flex items-center gap-1">
                     <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#22c55e', boxShadow: '0 0 6px #22c55e' }} />
-                    <span className="text-[12px] font-bold" style={{ color: '#16a34a' }}>Online</span>
+                    <span className="text-[12px] font-bold" style={{ color: '#4ade80' }}>Online</span>
                   </div>
                 </div>
-                <p className="text-[11px] truncate mt-0.5" style={{ color: 'var(--color-text-subtle)' }}>Assistente financeira pessoal</p>
+                <p className="text-[11px] truncate mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>Assistente financeira pessoal</p>
               </div>
 
               {/* Buttons */}
