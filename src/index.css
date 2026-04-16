@@ -324,13 +324,24 @@
     --purple-border: 263 50% 20%;
 
     --sidebar-background: 240 28% 5%;
-    --sidebar-foreground: 0 0% 60%;
-    --sidebar-primary: 258 90% 66%;
+    --sidebar-foreground: 0 0% 78%;
+    --sidebar-primary: 258 90% 70%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 263 60% 12%;
-    --sidebar-accent-foreground: 0 0% 85%;
-    --sidebar-border: 263 50% 20%;
-    --sidebar-ring: 258 90% 66%;
+    --sidebar-accent: 263 60% 18%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 263 50% 28%;
+    --sidebar-ring: 258 90% 70%;
+  }
+
+  /* Dark mode: stronger label contrast + crisper icons */
+  [data-theme="dark"] .label-upper,
+  .dark .label-upper {
+    color: rgba(255, 255, 255, 0.45);
+    font-weight: 800;
+  }
+  [data-theme="dark"] svg,
+  .dark svg {
+    stroke-width: 1.85;
   }
 }
 
