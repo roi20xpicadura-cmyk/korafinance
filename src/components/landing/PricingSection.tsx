@@ -45,7 +45,7 @@ export default function PricingSection() {
           {annual && <span className="text-[10px] md:text-[11px] font-bold text-[#854d0e] bg-[#fef9c3] px-2 py-0.5 rounded-full">-20%</span>}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 items-stretch">
           {plans.map((p, idx) => {
             const price = annual ? p.priceAnnual : p.price;
             return (
@@ -55,7 +55,7 @@ export default function PricingSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1, duration: 0.5, ease }}
-                className={`relative rounded-[16px] md:rounded-[20px] p-6 md:p-8 ${
+                className={`relative rounded-[16px] md:rounded-[20px] p-6 md:p-8 flex flex-col h-full ${
                   p.dark ? 'bg-[#0f172a] text-white'
                     : p.featured ? 'bg-white border-2 border-[#7C3AED] md:scale-[1.04]'
                     : 'bg-white border border-[#e2e8f0]'
@@ -87,7 +87,7 @@ export default function PricingSection() {
 
                 <div className={`border-t mb-5 md:mb-6 ${p.dark ? 'border-white/10' : 'border-[#f1f5f9]'}`} />
 
-                <ul className="space-y-2.5 md:space-y-3 mb-6 md:mb-8">
+                <ul className="space-y-2.5 md:space-y-3 mb-6 md:mb-8 flex-1">
                   {p.features.map(f => (
                     <li key={f.label} className="flex items-center gap-2 text-[12px] md:text-[13px]">
                       {f.included ? (
@@ -102,7 +102,7 @@ export default function PricingSection() {
                   ))}
                 </ul>
 
-                <Link to="/register" className={`block w-full py-3 md:py-3.5 rounded-[10px] md:rounded-[12px] text-[14px] md:text-[15px] font-[800] text-center transition-all duration-200 ${
+                <Link to="/register" className={`block w-full py-3 md:py-3.5 rounded-[10px] md:rounded-[12px] text-[14px] md:text-[15px] font-[800] text-center transition-all duration-200 mt-auto ${
                   p.dark ? 'bg-white text-[#0f172a] hover:bg-[#f1f5f9]'
                     : p.featured ? 'bg-[#7C3AED] text-white hover:bg-[#1A0D35]'
                     : 'bg-white border-[1.5px] border-[#e2e8f0] text-[#0f172a] hover:border-[#7C3AED] hover:text-[#7C3AED]'
