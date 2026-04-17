@@ -102,7 +102,7 @@ export default function PricingSection() {
                   ))}
                 </ul>
 
-                <Link to="/register" className={`block w-full py-3 md:py-3.5 rounded-[10px] md:rounded-[12px] text-[14px] md:text-[15px] font-[800] text-center transition-all duration-200 ${
+                <Link to="/register" className={`block w-full py-3 md:py-3.5 rounded-[10px] md:rounded-[12px] text-[14px] md:text-[15px] font-[800] text-center transition-all duration-200 mt-auto ${
                   p.dark ? 'bg-white text-[#0f172a] hover:bg-[#f1f5f9]'
                     : p.featured ? 'bg-[#7C3AED] text-white hover:bg-[#1A0D35]'
                     : 'bg-white border-[1.5px] border-[#e2e8f0] text-[#0f172a] hover:border-[#7C3AED] hover:text-[#7C3AED]'
