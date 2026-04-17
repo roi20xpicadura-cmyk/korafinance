@@ -7,6 +7,12 @@ import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { haptic } from '@/lib/haptics';
 
+const AppleIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="#0f172a">
+    <path d="M17.05 12.04c-.03-2.84 2.32-4.21 2.43-4.28-1.32-1.93-3.39-2.2-4.12-2.23-1.76-.18-3.43 1.03-4.32 1.03-.89 0-2.27-1-3.73-.98-1.92.03-3.69 1.12-4.68 2.83-1.99 3.46-.51 8.59 1.43 11.4.95 1.38 2.08 2.93 3.55 2.87 1.43-.06 1.97-.92 3.7-.92 1.72 0 2.21.92 3.72.89 1.54-.03 2.51-1.4 3.45-2.79 1.09-1.6 1.54-3.15 1.57-3.23-.03-.01-3.01-1.16-3.04-4.59zM14.27 3.61c.79-.96 1.32-2.29 1.17-3.61-1.13.05-2.5.75-3.31 1.7-.73.85-1.37 2.2-1.2 3.5 1.26.1 2.55-.64 3.34-1.59z"/>
+  </svg>
+);
+
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 48 48">
     <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -134,6 +140,25 @@ export default function RegisterPage() {
         style={{ marginTop: 20, height: 52, width: '100%', background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer', transition: 'all 150ms' }}>
         <GoogleIcon />
         <span style={{ fontSize: 15, fontWeight: 600, color: '#0f172a' }}>Cadastrar com Google</span>
+      </motion.button>
+
+      {/* Apple button */}
+      <motion.button
+        onClick={async () => {
+          haptic.light();
+          try {
+            const result = await lovable.auth.signInWithOAuth('apple', {
+              redirect_uri: window.location.origin,
+            });
+            if (result?.error) { toast.error('Não foi possível cadastrar com Apple.'); return; }
+            if (result?.redirected) return;
+          } catch { toast.error('Erro ao conectar com Apple.'); }
+        }}
+        whileTap={{ scale: 0.97 }}
+        className="hover:bg-[#f8fafc] hover:border-[#cbd5e1]"
+        style={{ marginTop: 10, height: 52, width: '100%', background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer', transition: 'all 150ms' }}>
+        <AppleIcon />
+        <span style={{ fontSize: 15, fontWeight: 600, color: '#0f172a' }}>Cadastrar com Apple</span>
       </motion.button>
 
       <div className="flex items-center gap-3" style={{ margin: '18px 0' }}>
