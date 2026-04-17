@@ -14,7 +14,7 @@ import {
   LayoutDashboard, ArrowLeftRight, Target, TrendingUp, FileText,
   CreditCard, Briefcase, BarChart2, Download, Settings2, Crown,
   LogOut, Menu, X, Bell, ChevronRight, BarChart3, Home, MoreHorizontal, Sparkles,
-  AlertCircle, CalendarDays, Trophy, Gift, Sun, Moon, Monitor, Plus, Building2, Plug, FlaskConical, Lock
+  AlertCircle, CalendarDays, Trophy, Gift, Sun, Moon, Monitor, Plus, Building2, Plug, FlaskConical, Lock, Repeat
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,6 +30,7 @@ const ALL_NAV_ITEMS = [
   { label: 'Metas', path: '/app/goals', icon: Target, profiles: ['personal', 'both'] },
   { label: 'Dívidas', path: '/app/debts', icon: AlertCircle, profiles: ['personal', 'both'] },
   { label: 'Cartões', path: '/app/cards', icon: CreditCard, profiles: ['personal', 'business', 'both'], comingSoon: true },
+  { label: 'Assinaturas', path: '/app/subscriptions', icon: Repeat, profiles: ['personal', 'business', 'both'], badge: 'NOVO' },
   { label: 'Investimentos', path: '/app/investments', icon: TrendingUp, profiles: ['personal', 'business', 'both'], comingSoon: true },
   { label: 'Gráficos', path: '/app/charts', icon: BarChart2, profiles: ['personal', 'business', 'both'] },
   { label: 'DRE', path: '/app/dre', icon: FileText, profiles: ['business', 'both'], comingSoon: true },
@@ -90,6 +91,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/app/billing': 'Planos e Assinatura',
   '/app/simulator': 'Simulador E Se...?',
   '/app/predictions': 'IA Preditiva',
+  '/app/subscriptions': 'Assinaturas',
 };
 
 export default function AppLayout() {
