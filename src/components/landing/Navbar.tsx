@@ -17,8 +17,7 @@ export default function Navbar() {
   const navLinks = [
     { label: 'Recursos', href: '#recursos' },
     { label: 'Preços', href: '#precos' },
-    { label: 'Blog', href: '#faq' },
-    { label: 'Integrações', href: '#integracoes' },
+    { label: 'FAQ', href: '#faq' },
   ];
 
   return (

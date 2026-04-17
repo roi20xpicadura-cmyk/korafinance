@@ -2,9 +2,32 @@ import { Link } from 'react-router-dom';
 import koraIcon from '@/assets/korafinance-icon.png';
 
 const columns = [
-  { title: 'Produto', links: [{ label: 'Recursos', href: '#recursos' }, { label: 'Preços', href: '#precos' }, { label: 'Integrações', href: '#integracoes' }, { label: 'Changelog', href: '#' }, { label: 'Roadmap', href: '#' }, { label: 'App Mobile', href: '#' }] },
-  { title: 'Legal', links: [{ label: 'Nossa Promessa', to: '/privacidade' }, { label: 'Termos de Uso', to: '/termos-de-uso' }, { label: 'Privacidade', to: '/politica-de-privacidade' }, { label: 'Cookies', to: '/politica-cookies' }, { label: 'LGPD', to: '/lgpd' }, { label: 'Segurança', to: '/seguranca' }, { label: 'Sobre', to: '/sobre' }] },
-  { title: 'Suporte', links: [{ label: 'Central de Ajuda', href: '#' }, { label: 'Contato: suporte@korafinance.app', href: 'mailto:suporte@korafinance.app' }, { label: 'Status', href: '#' }, { label: 'Comunidade', href: '#' }, { label: 'Blog', href: '#' }] },
+  {
+    title: 'Produto',
+    links: [
+      { label: 'Recursos', href: '#recursos' },
+      { label: 'Preços', href: '#precos' },
+      { label: 'Perguntas frequentes', href: '#faq' },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { label: 'Nossa Promessa', to: '/privacidade' },
+      { label: 'Termos de Uso', to: '/termos-de-uso' },
+      { label: 'Privacidade', to: '/politica-de-privacidade' },
+      { label: 'Cookies', to: '/politica-de-cookies' },
+      { label: 'LGPD', to: '/lgpd' },
+      { label: 'Segurança', to: '/seguranca' },
+      { label: 'Sobre', to: '/sobre' },
+    ],
+  },
+  {
+    title: 'Suporte',
+    links: [
+      { label: 'suporte@korafinance.app', href: 'mailto:suporte@korafinance.app' },
+    ],
+  },
 ];
 
 export default function Footer() {
@@ -17,12 +40,9 @@ export default function Footer() {
               <img src={koraIcon} alt="KoraFinance" className="w-7 h-7 rounded-lg object-cover" />
               <span className="text-[15px] font-[900] text-white">KoraFinance</span>
             </div>
-            <p className="text-[12px] text-white/40 leading-[1.8] max-w-[240px] mb-5">O painel financeiro mais completo do Brasil. Para quem quer organizar, crescer e realizar.</p>
-            <div className="flex gap-2">
-              {['I', 'L', 'X'].map(s => (
-                <a key={s} href="#" className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/50 hover:bg-white/20 hover:text-white/80 transition-all text-[11px] font-bold">{s}</a>
-              ))}
-            </div>
+            <p className="text-[12px] text-white/40 leading-[1.8] max-w-[240px] mb-5">
+              O painel financeiro mais completo do Brasil. Para quem quer organizar, crescer e realizar.
+            </p>
           </div>
           {columns.map(col => (
             <div key={col.title}>
@@ -31,9 +51,19 @@ export default function Footer() {
                 {col.links.map((link: any) => (
                   <li key={link.label}>
                     {link.to ? (
-                      <Link to={link.to} className="text-[13px] text-white/45 hover:text-white/80 transition-colors duration-150">{link.label}</Link>
+                      <Link
+                        to={link.to}
+                        className="text-[13px] text-white/45 hover:text-white/80 transition-colors duration-150"
+                      >
+                        {link.label}
+                      </Link>
                     ) : (
-                      <a href={link.href} className="text-[13px] text-white/45 hover:text-white/80 transition-colors duration-150">{link.label}</a>
+                      <a
+                        href={link.href}
+                        className="text-[13px] text-white/45 hover:text-white/80 transition-colors duration-150"
+                      >
+                        {link.label}
+                      </a>
                     )}
                   </li>
                 ))}
@@ -43,8 +73,7 @@ export default function Footer() {
         </div>
         <div className="border-t border-white/[0.06] pt-8 flex flex-col md:flex-row justify-between items-center gap-3">
           <div className="text-[11px] text-white/25 text-center md:text-left">
-            <div>© 2026 KoraFinance. Todos os direitos reservados.</div>
-            <div>CNPJ: XX.XXX.XXX/0001-XX</div>
+            © 2026 KoraFinance. Todos os direitos reservados.
           </div>
           <div className="text-[11px] text-white/25">Feito com 💚 no Brasil</div>
         </div>
