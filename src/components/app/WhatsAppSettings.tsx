@@ -110,6 +110,21 @@ export default function WhatsAppSettings() {
     setLoading(false);
   }
 
+  async function toggleActive(newVal: boolean) {
+    if (!connection) return;
+    setConnection({ ...connection, active: newVal });
+    const { error } = await supabase
+      .from('whatsapp_connections')
+      .update({ active: newVal })
+      .eq('user_id', user!.id);
+    if (error) {
+      setConnection({ ...connection, active: !newVal });
+      toast.error('Erro ao atualizar preferência');
+    } else {
+      toast.success(newVal ? 'Notificações ativadas 🔔' : 'Notificações pausadas 🔕');
+    }
+  }
+
   async function disconnect() {
     setLoading(true);
     await supabase.functions.invoke('whatsapp-verify', {
