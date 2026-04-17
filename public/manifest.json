@@ -11,6 +11,15 @@
   "orientation": "portrait",
   "lang": "pt-BR",
   "categories": ["finance", "productivity"],
+  "iarc_rating_id": "e58c174a-81d2-5c3c-32cc-34308dd5aae4",
+  "prefer_related_applications": false,
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.korafinance.app",
+      "id": "com.korafinance.app"
+    }
+  ],
   "icons": [
     { "src": "/icons/icon-72.png",  "sizes": "72x72",   "type": "image/png", "purpose": "any" },
     { "src": "/icons/icon-96.png",  "sizes": "96x96",   "type": "image/png", "purpose": "any" },
