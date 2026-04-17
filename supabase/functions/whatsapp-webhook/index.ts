@@ -400,10 +400,31 @@ serve(async (req) => {
     const phone = (body.phone || "")
       .replace("@s.whatsapp.net", "")
       .replace(/\D/g, "");
-    const text = body.text?.message?.trim();
+    let text = body.text?.message?.trim();
     const image = body.image || body.imageMessage;
+    const audio = body.audio || body.audioMessage;
 
     if (!phone) return new Response("OK", { status: 200 });
+
+    // ── AUDIO TRANSCRIPTION (Z-API) ──
+    if (audio && !text) {
+      const audioUrl = typeof audio === "string" ? audio : (audio.audioUrl || audio.url);
+      console.log("[AUDIO] received, url:", audioUrl);
+      try {
+        const transcribed = await transcribeAudioWithGemini(audioUrl);
+        if (transcribed) {
+          text = transcribed;
+          console.log("[AUDIO] transcribed:", text.slice(0, 200));
+        } else {
+          await sendWhatsApp(phone, `Não consegui ouvir seu áudio agora 🎤 Pode mandar em texto?`);
+          return new Response("OK", { status: 200 });
+        }
+      } catch (e) {
+        console.error("[AUDIO] error:", e);
+        await sendWhatsApp(phone, `Tive um problema pra entender seu áudio 🎤 Manda em texto, por favor!`);
+        return new Response("OK", { status: 200 });
+      }
+    }
 
     const { data: conn } = await supabase
       .from("whatsapp_connections")
