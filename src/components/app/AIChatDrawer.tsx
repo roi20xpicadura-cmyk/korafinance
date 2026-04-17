@@ -171,7 +171,7 @@ const WelcomeScreen = forwardRef<HTMLDivElement, {
       display: 'flex',
       flexDirection: 'column',
       padding: '32px 20px 16px',
-      background: '#08080F',
+      background: 'var(--color-bg-base)',
       gap: 32,
     }}>
       <motion.div
@@ -183,7 +183,7 @@ const WelcomeScreen = forwardRef<HTMLDivElement, {
         <div style={{
           width: 52, height: 52,
           borderRadius: 16,
-          background: '#7C3AED',
+          background: 'var(--color-green-600)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           margin: '0 auto 16px',
           boxShadow: '0 4px 20px rgba(124,58,237,0.4)',
@@ -192,7 +192,7 @@ const WelcomeScreen = forwardRef<HTMLDivElement, {
         </div>
         <h2 style={{
           fontSize: 22, fontWeight: 900,
-          color: '#FFFFFF',
+          color: 'var(--color-text-strong)',
           letterSpacing: '-0.02em',
           marginBottom: 6,
         }}>
@@ -200,7 +200,7 @@ const WelcomeScreen = forwardRef<HTMLDivElement, {
         </h2>
         <p style={{
           fontSize: 13,
-          color: 'rgba(255,255,255,0.35)',
+          color: 'var(--color-text-muted)',
           lineHeight: 1.5,
           margin: 0,
         }}>
@@ -222,8 +222,8 @@ const WelcomeScreen = forwardRef<HTMLDivElement, {
               alignItems: 'center',
               gap: 12,
               padding: '13px 16px',
-              background: '#110820',
-              border: '0.5px solid rgba(167,139,250,0.12)',
+              background: 'var(--color-bg-surface)',
+              border: '1px solid var(--color-border-weak)',
               borderRadius: 12,
               cursor: 'pointer',
               textAlign: 'left',
@@ -232,12 +232,12 @@ const WelcomeScreen = forwardRef<HTMLDivElement, {
             <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1 }}>{q.emoji}</span>
             <span style={{
               fontSize: 14, fontWeight: 600,
-              color: '#FFFFFF',
+              color: 'var(--color-text-strong)',
               flex: 1,
             }}>
               {q.text}
             </span>
-            <ChevronRight size={14} color="rgba(255,255,255,0.2)" />
+            <ChevronRight size={14} color="var(--color-text-muted)" />
           </motion.button>
         ))}
       </div>
