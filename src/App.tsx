@@ -49,6 +49,7 @@ const PredictionsPage = lazy(() => import("./pages/app/PredictionsPage"));
 const ExportPage = lazy(() => import("./pages/app/ExportPage").then(m => ({ default: m.ExportPage })));
 const ChartsPage = lazy(() => import("./pages/app/ChartsPage"));
 const InvestmentsPage = lazy(() => import("./pages/app/InvestmentsPage"));
+const SubscriptionsPage = lazy(() => import("./pages/app/SubscriptionsPage"));
 const DREPage = lazy(() => import("./pages/app/DREPage"));
 const SecuritySettingsPage = lazy(() => import("./pages/app/SecuritySettingsPage"));
 const PrivacidadePage = lazy(() => import("./pages/PrivacidadePage"));
@@ -199,6 +200,7 @@ const App = () => {
                       </Paywall>
                     } />
                     <Route path="investments" element={<InvestmentsPage />} />
+                    <Route path="subscriptions" element={<SubscriptionsPage />} />
                     <Route path="dre" element={
                       <Paywall feature="dre" requiredPlan="business" title="DRE Empresarial" description="Demonstrativo de Resultado completo para empresas e MEIs.">
                         <DREPage />
