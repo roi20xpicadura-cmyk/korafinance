@@ -67,6 +67,52 @@ export default function SettingsPage() {
     setSaving(false);
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Selecione uma imagem');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Imagem deve ter no máximo 2MB');
+      return;
+    }
+    setUploadingAvatar(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from('avatars')
+        .upload(path, file, { upsert: true, cacheControl: '3600' });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from('avatars').getPublicUrl(path);
+      const url = pub.publicUrl;
+      await updateProfile({ avatar_url: url });
+      setAvatarUrl(url);
+      toast.success('Foto de perfil atualizada!');
+    } catch (err: any) {
+      toast.error(err?.message || 'Erro ao enviar foto');
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    if (!user) return;
+    setUploadingAvatar(true);
+    try {
+      await updateProfile({ avatar_url: null as any });
+      setAvatarUrl('');
+      toast.success('Foto removida');
+    } catch {
+      toast.error('Erro ao remover foto');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   const handleSaveProfileType = async (val: string) => {
     setProfileType(val);
     await updateConfig({ profile_type: val } as any);
@@ -191,7 +237,60 @@ export default function SettingsPage() {
       {/* Profile */}
       <div className="card-surface p-6">
         <h2 className="text-[13px] font-extrabold text-fin-green-dark mb-4">Perfil</h2>
-        <div className="space-y-3">
+        <div className="space-y-4">
+          {/* Avatar */}
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Foto de perfil" className="w-20 h-20 rounded-full object-cover border-[1.5px] border-fin-green-border" />
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-fin-green-pale border-[1.5px] border-fin-green-border flex items-center justify-center text-2xl font-bold text-fin-green-dark">
+                  {(fullName || user?.email || '?').charAt(0).toUpperCase()}
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingAvatar}
+                aria-label="Alterar foto"
+                className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md hover:brightness-110 disabled:opacity-50"
+              >
+                <Camera size={14} />
+              </button>
+            </div>
+            <div className="flex-1">
+              <p className="text-[13px] font-semibold text-foreground">Foto de perfil</p>
+              <p className="text-[11px] text-muted mb-2">JPG ou PNG, até 2MB</p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingAvatar}
+                  className="px-3 py-1.5 rounded-[9px] bg-primary text-primary-foreground text-[11px] font-bold hover:brightness-110 transition-all disabled:opacity-50"
+                >
+                  {uploadingAvatar ? 'Enviando…' : 'Enviar foto'}
+                </button>
+                {avatarUrl && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveAvatar}
+                    disabled={uploadingAvatar}
+                    className="px-3 py-1.5 rounded-[9px] border-[1.5px] border-border text-[11px] font-bold text-muted hover:border-fin-green-border transition-all disabled:opacity-50"
+                  >
+                    Remover
+                  </button>
+                )}
+              </div>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarUpload}
+              className="hidden"
+            />
+          </div>
+
           <div>
             <label className="label-upper text-muted block mb-1.5">Nome completo</label>
             <input value={fullName} onChange={e => setFullName(e.target.value)}
