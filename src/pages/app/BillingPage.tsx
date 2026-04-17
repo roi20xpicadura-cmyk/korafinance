@@ -30,8 +30,20 @@ export default function BillingPage() {
     });
   }, [user]);
 
+  const HOTMART_LINKS: Record<string, string> = {
+    pro: 'https://pay.hotmart.com/S105430199N?off=p5itoui4&checkoutMode=6',
+    business: 'https://pay.hotmart.com/S105430199N?off=ir7ki0tu',
+  };
+
   const handleUpgrade = async (planName: string) => {
-    toast.info('Integração Stripe em configuração. Entre em contato para upgrade.');
+    const key = planName.toLowerCase();
+    const url = HOTMART_LINKS[key];
+    if (!url) {
+      toast.info('Plano indisponível no momento.');
+      return;
+    }
+    const emailParam = user?.email ? `&email=${encodeURIComponent(user.email)}` : '';
+    window.open(`${url}${emailParam}`, '_blank', 'noopener,noreferrer');
   };
 
   const limits = PLAN_LIMITS[plan];
