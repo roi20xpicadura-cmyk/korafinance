@@ -140,9 +140,20 @@ export default function RegisterPage() {
       <AnimatePresence>
         {error && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-            style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '12px 14px', marginTop: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <AlertCircle style={{ width: 14, height: 14, color: '#ef4444', flexShrink: 0 }} />
-            <span style={{ fontSize: 13, color: '#dc2626' }}>{error}</span>
+            style={{ background: existingOAuthEmail ? '#fffbeb' : '#fef2f2', border: existingOAuthEmail ? '1px solid #fde68a' : '1px solid #fecaca', borderRadius: 10, padding: '12px 14px', marginTop: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+              <AlertCircle style={{ width: 14, height: 14, color: existingOAuthEmail ? '#d97706' : '#ef4444', flexShrink: 0, marginTop: 2 }} />
+              <span style={{ fontSize: 13, color: existingOAuthEmail ? '#92400e' : '#dc2626' }}>{error}</span>
+            </div>
+            {existingOAuthEmail && (
+              <button
+                type="button"
+                onClick={handleGoogleAuth}
+                style={{ marginTop: 10, width: '100%', height: 42, background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', fontSize: 14, fontWeight: 600, color: '#0f172a' }}
+              >
+                <GoogleIcon /> Continuar com Google
+              </button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
