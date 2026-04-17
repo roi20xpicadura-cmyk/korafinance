@@ -124,8 +124,8 @@ export default function SecuritySettingsPage() {
         {/* Your rights */}
         <Card title="Seus direitos (LGPD)">
           <div className="p-4 space-y-2">
-            <ActionRow icon="📥" label="Exportar meus dados" desc="Baixe todos os seus dados em JSON" cta={exporting ? '...' : 'Exportar'} onClick={handleExport} color="#7C3AED" />
-            <ActionRow icon="🗑️" label="Excluir minha conta" desc="Apaga permanentemente todos os dados" cta="Excluir" onClick={() => setShowDelete(true)} color="#dc2626" />
+            <ActionRow icon="📥" label="Exportar meus dados" desc="Baixe todos os seus dados em JSON" cta={exporting ? '...' : 'Exportar'} onClick={handleExport} color="var(--color-green-600)" />
+            <ActionRow icon="🗑️" label="Excluir minha conta" desc="Apaga permanentemente todos os dados" cta="Excluir" onClick={() => setShowDelete(true)} color="var(--color-danger-solid)" />
           </div>
         </Card>
 
