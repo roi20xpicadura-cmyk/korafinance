@@ -54,12 +54,25 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [existingOAuthEmail, setExistingOAuthEmail] = useState(false);
 
   const strength = getStrength(password);
+
+  const handleGoogleAuth = async () => {
+    haptic.light();
+    try {
+      const result = await lovable.auth.signInWithOAuth('google', {
+        redirect_uri: window.location.origin,
+      });
+      if (result?.error) { toast.error('Não foi possível cadastrar com Google.'); return; }
+      if (result?.redirected) return;
+    } catch { toast.error('Erro ao conectar com Google.'); }
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setExistingOAuthEmail(false);
     if (password.length < 8) { setError('A senha deve ter pelo menos 8 caracteres'); haptic.error(); return; }
     if (!agreedTerms) { setError('Aceite os termos para continuar'); haptic.error(); return; }
 
@@ -79,10 +92,20 @@ export default function RegisterPage() {
       setLoading(false);
       const msg = err.message.includes('weak_password') || err.message.includes('weak')
         ? 'Essa senha é muito comum. Tente uma senha mais única.'
-        : err.message.includes('already registered')
+        : err.message.includes('already registered') || err.message.includes('already been registered')
         ? 'Este e-mail já está cadastrado. Tente fazer login.'
         : err.message;
       setError(msg);
+      haptic.error();
+      return;
+    }
+
+    // Supabase quirk: when email exists, signUp returns user with identities: []
+    // (no error, to prevent email enumeration). Detect and guide user.
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      setLoading(false);
+      setExistingOAuthEmail(true);
+      setError('Este e-mail já está cadastrado. Se você criou a conta com Google, use o botão abaixo.');
       haptic.error();
       return;
     }
@@ -117,9 +140,20 @@ export default function RegisterPage() {
       <AnimatePresence>
         {error && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-            style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '12px 14px', marginTop: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <AlertCircle style={{ width: 14, height: 14, color: '#ef4444', flexShrink: 0 }} />
-            <span style={{ fontSize: 13, color: '#dc2626' }}>{error}</span>
+            style={{ background: existingOAuthEmail ? '#fffbeb' : '#fef2f2', border: existingOAuthEmail ? '1px solid #fde68a' : '1px solid #fecaca', borderRadius: 10, padding: '12px 14px', marginTop: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+              <AlertCircle style={{ width: 14, height: 14, color: existingOAuthEmail ? '#d97706' : '#ef4444', flexShrink: 0, marginTop: 2 }} />
+              <span style={{ fontSize: 13, color: existingOAuthEmail ? '#92400e' : '#dc2626' }}>{error}</span>
+            </div>
+            {existingOAuthEmail && (
+              <button
+                type="button"
+                onClick={handleGoogleAuth}
+                style={{ marginTop: 10, width: '100%', height: 42, background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, cursor: 'pointer', fontSize: 14, fontWeight: 600, color: '#0f172a' }}
+              >
+                <GoogleIcon /> Continuar com Google
+              </button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
