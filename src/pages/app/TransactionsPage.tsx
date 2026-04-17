@@ -461,9 +461,8 @@ export default function TransactionsPage({ profile }: TransactionsPageProps = {}
                             </motion.button>
                           )}
                         </AnimatePresence>
-                      </motion.div>
+                      </div>
                     ))}
-                  </AnimatePresence>
                 </div>
               </div>
             );
