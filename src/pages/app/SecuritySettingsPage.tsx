@@ -156,10 +156,10 @@ export default function SecuritySettingsPage() {
           <div className="w-full max-w-md p-6 rounded-2xl" style={{ background: 'var(--color-bg-surface)' }}>
             <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--color-text-strong)' }}>Tem certeza?</h3>
             <p className="text-[13px] mb-4" style={{ color: 'var(--color-text-muted)' }}>Esta ação é irreversível. Todos os seus dados serão excluídos em até 30 dias.</p>
-            <input value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)} placeholder="Digite EXCLUIR" className="w-full px-3 py-2.5 rounded-lg border-[1.5px] mb-4 outline-none text-sm" style={{ borderColor: '#dc2626', background: 'var(--color-bg-sunken)', color: 'var(--color-text-base)' }} />
+            <input value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)} placeholder="Digite EXCLUIR" className="w-full px-3 py-2.5 rounded-lg border-[1.5px] mb-4 outline-none text-sm" style={{ borderColor: 'var(--color-danger-solid)', background: 'var(--color-bg-sunken)', color: 'var(--color-text-base)' }} />
             <div className="flex gap-3">
               <button onClick={() => { setShowDelete(false); setDeleteConfirm(''); }} className="flex-1 py-2.5 rounded-lg text-[13px] font-bold border" style={{ borderColor: 'var(--color-border-base)', color: 'var(--color-text-base)' }}>Cancelar</button>
-              <button onClick={handleDelete} disabled={deleteConfirm !== 'EXCLUIR'} className="flex-1 py-2.5 rounded-lg text-[13px] font-bold text-white bg-[#dc2626] disabled:opacity-50">Excluir</button>
+              <button onClick={handleDelete} disabled={deleteConfirm !== 'EXCLUIR'} className="flex-1 py-2.5 rounded-lg text-[13px] font-bold text-white disabled:opacity-50" style={{ background: 'var(--color-danger-solid)' }}>Excluir</button>
             </div>
           </div>
         </div>
