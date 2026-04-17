@@ -64,12 +64,12 @@ export function PricingCards({ currentPlan, onUpgrade, compact }: { currentPlan?
       cta: 'Começar grátis', href: '/register', featured: false, dark: false,
     },
     {
-      name: 'Pro', price: 29, priceAnnual: 23, sub: PLAN_BENEFITS.pro.tagline,
+      name: 'Pro', price: 19.90, priceAnnual: 15.90, sub: PLAN_BENEFITS.pro.tagline,
       features: PLAN_BENEFITS.pro.items,
       cta: 'Assinar Pro →', href: '/register', featured: true, dark: false,
     },
     {
-      name: 'Business', price: 79, priceAnnual: 63, sub: PLAN_BENEFITS.business.tagline,
+      name: 'Business', price: 59.90, priceAnnual: 47.90, sub: PLAN_BENEFITS.business.tagline,
       features: PLAN_BENEFITS.business.items,
       cta: 'Assinar Business', href: '/register', featured: false, dark: true,
     },
