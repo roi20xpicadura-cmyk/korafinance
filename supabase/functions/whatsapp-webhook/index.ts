@@ -1,9 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
-const AI_MODEL = "google/gemini-2.5-flash";
-const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
+const ANTHROPIC_MODEL = "claude-sonnet-4-5";
+const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 
 const ZAPI_INSTANCE_ID = Deno.env.get("ZAPI_INSTANCE_ID")!;
 const ZAPI_TOKEN = Deno.env.get("ZAPI_TOKEN")!;
@@ -258,18 +258,17 @@ async function processImage(imageUrl: string, userName: string): Promise<{
   try {
     const { base64, mimeType } = await downloadImageBase64(imageUrl);
 
-    const response = await fetch(AI_URL, {
+    const response = await fetch(ANTHROPIC_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: AI_MODEL,
-        messages: [
-          {
-            role: "system",
-            content: `Você é a Kora IA do KoraFinance.
+        model: ANTHROPIC_MODEL,
+        max_tokens: 2000,
+        system: `Você é a Kora IA do KoraFinance.
 Analise a imagem e extraia dados financeiros.
 A imagem pode ser: cupom fiscal, nota fiscal, comprovante, extrato ou print de app.
 
@@ -294,26 +293,24 @@ Categorias: Supermercado, Alimentação, Delivery, Farmácia, Combustível, Tran
 
 Se não encontrar dados:
 {"found": false, "summary": "Não consegui identificar dados financeiros"}`,
-          },
-          {
-            role: "user",
-            content: [
-              { type: "text", text: "Analise esta imagem e extraia os dados financeiros." },
-              { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64}` } },
-            ],
-          },
-        ],
+        messages: [{
+          role: "user",
+          content: [
+            { type: "image", source: { type: "base64", media_type: mimeType, data: base64 } },
+            { type: "text", text: "Analise esta imagem e extraia os dados financeiros." },
+          ],
+        }],
       }),
     });
 
     if (!response.ok) {
       const errBody = await response.text();
-      console.error("[AI Image] HTTP", response.status, errBody.slice(0, 500));
+      console.error("[Anthropic Image] HTTP", response.status, errBody.slice(0, 500));
       return { transactions: [], reply: `Não consegui ler essa imagem agora, ${userName}. Tenta de novo ou descreve em texto 📷` };
     }
 
     const data = await response.json();
-    const text = data.choices?.[0]?.message?.content || "{}";
+    const text = data.content?.[0]?.text || "{}";
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : "{}");
 
@@ -550,36 +547,34 @@ serve(async (req) => {
 
       messages.push({ role: "user", content: text });
 
-      const response = await fetch(AI_URL, {
+      const response = await fetch(ANTHROPIC_URL, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "x-api-key": ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: AI_MODEL,
-          messages: [
-            { role: "system", content: systemPrompt },
-            ...messages,
-          ],
+          model: ANTHROPIC_MODEL,
+          max_tokens: 600,
+          system: systemPrompt,
+          messages,
         }),
       });
 
       if (!response.ok) {
         const errBody = await response.text();
-        console.error("[AI] HTTP", response.status, errBody.slice(0, 500));
+        console.error("[Anthropic] HTTP", response.status, errBody.slice(0, 500));
         const fallback = response.status === 429
           ? `Tô recebendo muitas mensagens agora, ${ctx.name} 😅 Espera 1 minutinho e manda de novo!`
-          : response.status === 402
-          ? `Sem créditos de IA no momento, ${ctx.name}. Avisa o suporte! 🙏`
           : `Eita, ${ctx.name}! Tô com um probleminha pra pensar agora 🤯 Tenta de novo em alguns segundos.`;
         await sendWhatsApp(phone, fallback);
         return new Response("OK", { status: 200 });
       }
 
       const data = await response.json();
-      const aiText = (data.choices?.[0]?.message?.content || "").trim();
-      console.log("AI response:", aiText.slice(0, 300));
+      const aiText = (data.content?.[0]?.text || "").trim();
+      console.log("Claude response:", aiText.slice(0, 300));
 
       let finalReply = aiText;
 
