@@ -264,9 +264,10 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
 
   const firstName = profile?.full_name?.split(' ')[0] || '';
 
+  // Scroll only when a full message is added or loading toggles — not on every stream token (jank)
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading, streamingText]);
+  }, [messages.length, loading]);
 
   useEffect(() => {
     if (open) {
@@ -291,13 +292,13 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
     ]);
 
     const txs = txRes.data || [];
-    const income = txs.filter(t => t.type === 'receita').reduce((s, t) => s + Number(t.amount), 0);
-    const expenses = txs.filter(t => t.type === 'despesa').reduce((s, t) => s + Number(t.amount), 0);
+    const income = txs.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
+    const expenses = txs.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
     const totalDebt = (debtRes.data || []).reduce((s, d) => s + Number(d.remaining_amount), 0);
 
     // Find top expense category
     const catMap: Record<string, number> = {};
-    txs.filter(t => t.type === 'despesa').forEach(t => {
+    txs.filter(t => t.type === 'expense').forEach(t => {
       catMap[t.category] = (catMap[t.category] || 0) + Number(t.amount);
     });
     const topCategory = Object.entries(catMap).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
