@@ -54,8 +54,20 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [existingOAuthEmail, setExistingOAuthEmail] = useState(false);
 
   const strength = getStrength(password);
+
+  const handleGoogleAuth = async () => {
+    haptic.light();
+    try {
+      const result = await lovable.auth.signInWithOAuth('google', {
+        redirect_uri: window.location.origin,
+      });
+      if (result?.error) { toast.error('Não foi possível cadastrar com Google.'); return; }
+      if (result?.redirected) return;
+    } catch { toast.error('Erro ao conectar com Google.'); }
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
