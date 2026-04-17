@@ -239,15 +239,17 @@ export default function SimulatorPage() {
       background: C.white, border: `1px solid ${C.borderSoft}`,
       borderRadius: 16, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
     }}>
-      <div style={{ marginBottom: 18 }}>
-        <div style={{
-          color: C.textSubtle, fontSize: 10, fontWeight: 700,
-          textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10,
-        }}>
-          Cenários prontos
+      {!isMobile && (
+        <div style={{ marginBottom: 18 }}>
+          <div style={{
+            color: C.textSubtle, fontSize: 10, fontWeight: 700,
+            textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10,
+          }}>
+            Cenários prontos
+          </div>
+          {presetChips}
         </div>
-        {presetChips}
-      </div>
+      )}
 
       <div style={{
         color: C.textStrong, fontSize: 16, fontWeight: 800,
