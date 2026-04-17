@@ -87,7 +87,7 @@ export default function PricingSection() {
 
                 <div className={`border-t mb-5 md:mb-6 ${p.dark ? 'border-white/10' : 'border-[#f1f5f9]'}`} />
 
-                <ul className="space-y-2.5 md:space-y-3 mb-6 md:mb-8">
+                <ul className="space-y-2.5 md:space-y-3 mb-6 md:mb-8 flex-1">
                   {p.features.map(f => (
                     <li key={f.label} className="flex items-center gap-2 text-[12px] md:text-[13px]">
                       {f.included ? (
