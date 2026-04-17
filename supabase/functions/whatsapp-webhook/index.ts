@@ -292,19 +292,26 @@ PARA REGISTRAR RECEITA (recebi, entrou, ganhei, depositou):
 Responda APENAS com JSON:
 {"action":"income","amount":VALOR,"description":"descrição","category":"Categoria","confirm":false}
 
+PARA EXPORTAR/ENVIAR RELATÓRIO (relatório, relatorio, exportar, planilha, extrato, pdf, csv, excel, "me manda", "me envia"):
+Identifique formato e período. Responda APENAS com JSON:
+{"action":"export","format":"summary|pdf|csv","period":"this_month|last_month|last_7_days|last_30_days|year","period_label":"texto humano curto"}
+- format="summary" quando pedir apenas resumo/total
+- format="pdf" quando pedir relatório, PDF, comprovante, detalhado
+- format="csv" quando pedir planilha, excel, csv, tabela
+- Se não citar período → "this_month"
+- period_label ex: "este mês", "mês passado", "últimos 7 dias"
+
 PARA PERGUNTAS FINANCEIRAS: responda com dados REAIS do contexto acima.
 
 Exemplos:
-- "quanto gastei?" → use dados reais de expenses
-- "quando vou quitar X?" → calcule com os dados de dívidas
-- "quanto posso gastar por dia?" → use dailyBudget
-- "como estão minhas metas?" → use dados de goals
+- "quanto gastei?" → texto com dados reais
 - "estou indo bem?" → analise balance, score, budgets
+- "me manda o relatório do mês" → JSON action=export, format=pdf
+- "exporta a planilha de outubro" → JSON action=export, format=csv
 
 REGRAS:
 - NUNCA invente números — use SEMPRE os dados acima
-- Se não souber responder, diga que vai verificar no app
-- Para registros responda SOMENTE o JSON
+- Para registros e exports responda SOMENTE o JSON
 - Para perguntas responda em texto simples
 - Confirme gastos acima de R$500 antes de salvar`;
 }
@@ -727,6 +734,83 @@ serve(async (req) => {
         const jsonMatch = aiText.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           const action = JSON.parse(jsonMatch[0]);
+
+          if (action.action === "export") {
+            // Compute date range from period
+            const today = new Date();
+            const y = today.getFullYear();
+            const m = today.getMonth();
+            let startDate: string;
+            let endDate: string;
+            let periodLabel = action.period_label || "este mês";
+
+            switch (action.period) {
+              case "last_month": {
+                startDate = new Date(y, m - 1, 1).toISOString().slice(0, 10);
+                endDate = new Date(y, m, 0).toISOString().slice(0, 10);
+                if (!action.period_label) periodLabel = "mês passado";
+                break;
+              }
+              case "last_7_days": {
+                const s = new Date(); s.setDate(s.getDate() - 7);
+                startDate = s.toISOString().slice(0, 10);
+                endDate = today.toISOString().slice(0, 10);
+                if (!action.period_label) periodLabel = "últimos 7 dias";
+                break;
+              }
+              case "last_30_days": {
+                const s = new Date(); s.setDate(s.getDate() - 30);
+                startDate = s.toISOString().slice(0, 10);
+                endDate = today.toISOString().slice(0, 10);
+                if (!action.period_label) periodLabel = "últimos 30 dias";
+                break;
+              }
+              case "year": {
+                startDate = new Date(y, 0, 1).toISOString().slice(0, 10);
+                endDate = new Date(y, 11, 31).toISOString().slice(0, 10);
+                if (!action.period_label) periodLabel = `${y}`;
+                break;
+              }
+              default: {
+                startDate = new Date(y, m, 1).toISOString().slice(0, 10);
+                endDate = new Date(y, m + 1, 0).toISOString().slice(0, 10);
+                if (!action.period_label) periodLabel = "este mês";
+              }
+            }
+
+            const fmt = (action.format || "summary") as string;
+            const ack = fmt === "summary"
+              ? `📊 Gerando o resumo de *${periodLabel}*, ${ctx.name}...`
+              : fmt === "csv"
+              ? `📋 Preparando sua planilha de *${periodLabel}*, ${ctx.name}...`
+              : `📄 Gerando o PDF de *${periodLabel}*, ${ctx.name}...`;
+            await sendWhatsApp(phone, ack);
+
+            // Fire-and-forget: chama whatsapp-export sem aguardar
+            fetch(`${SUPABASE_URL}/functions/v1/whatsapp-export`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${SUPABASE_KEY}`,
+              },
+              body: JSON.stringify({
+                userId,
+                phone,
+                format: fmt,
+                startDate,
+                endDate,
+                periodLabel,
+              }),
+            }).catch((err) => console.error("[export invoke] error:", err));
+
+            await supabase.from("whatsapp_messages").insert({
+              user_id: userId, phone, phone_number: phone,
+              direction: "outbound", role: "assistant",
+              message: ack, content: ack,
+              created_at: new Date().toISOString(),
+            });
+            return new Response("OK", { status: 200 });
+          }
 
           if (action.action === "expense" || action.action === "income") {
             const amount = parseFloat(action.amount);
