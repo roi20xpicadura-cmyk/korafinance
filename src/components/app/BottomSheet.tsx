@@ -57,21 +57,30 @@ export default function BottomSheet({ open, onClose, title, children, maxHeight 
                 }}
               />
 
+              {/* Close button (always shown on mobile so user can dismiss) */}
+              <button
+                onClick={onClose}
+                aria-label="Fechar"
+                className="flex items-center justify-center"
+                style={{
+                  position: 'absolute',
+                  top: 14,
+                  right: 14,
+                  width: 36,
+                  height: 36,
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--color-bg-sunken)',
+                  color: 'var(--color-text-muted)',
+                  border: 'none',
+                  zIndex: 2,
+                }}
+              >
+                <X style={{ width: 18, height: 18 }} />
+              </button>
+
               {title && (
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center mb-4" style={{ paddingRight: 44 }}>
                   <h3 style={{ fontSize: 17, fontWeight: 800, color: 'var(--color-text-strong)' }}>{title}</h3>
-                  <button
-                    onClick={onClose}
-                    className="flex items-center justify-center"
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 'var(--radius-md)',
-                      color: 'var(--color-text-muted)',
-                    }}
-                  >
-                    <X style={{ width: 18, height: 18 }} />
-                  </button>
                 </div>
               )}
 
@@ -88,7 +97,7 @@ export default function BottomSheet({ open, onClose, title, children, maxHeight 
               onClick={(e) => e.target === e.currentTarget && onClose()}
             >
               <div
-                className="w-full overflow-y-auto"
+                className="w-full overflow-y-auto relative"
                 style={{
                   maxWidth: 480,
                   maxHeight,
@@ -100,6 +109,23 @@ export default function BottomSheet({ open, onClose, title, children, maxHeight 
                 }}
                 onClick={(e) => e.stopPropagation()}
               >
+                {!title && (
+                  <button
+                    onClick={onClose}
+                    aria-label="Fechar"
+                    className="flex items-center justify-center transition-colors"
+                    style={{
+                      position: 'absolute', top: 14, right: 14,
+                      width: 32, height: 32,
+                      borderRadius: 'var(--radius-md)',
+                      color: 'var(--color-text-muted)',
+                      background: 'var(--color-bg-sunken)',
+                      border: 'none', zIndex: 2,
+                    }}
+                  >
+                    <X style={{ width: 18, height: 18 }} />
+                  </button>
+                )}
                 {title && (
                   <div className="flex items-center justify-between mb-4">
                     <h3 style={{ fontSize: 17, fontWeight: 800, color: 'var(--color-text-strong)' }}>{title}</h3>
