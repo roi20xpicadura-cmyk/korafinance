@@ -45,7 +45,7 @@ export default function PricingSection() {
           {annual && <span className="text-[10px] md:text-[11px] font-bold text-[#854d0e] bg-[#fef9c3] px-2 py-0.5 rounded-full">-20%</span>}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 items-stretch">
           {plans.map((p, idx) => {
             const price = annual ? p.priceAnnual : p.price;
             return (
