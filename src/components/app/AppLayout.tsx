@@ -95,7 +95,7 @@ const PAGE_TITLES: Record<string, string> = {
 export default function AppLayout() {
   const { user, signOut } = useAuth();
   const { profile, config, loading, refetch } = useProfile();
-  const { theme, cycleTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme, cycleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
