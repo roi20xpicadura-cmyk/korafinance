@@ -1,19 +1,39 @@
 {
   "name": "KoraFinance",
   "short_name": "KoraFinance",
-  "description": "Controle total das suas finanças",
-  "start_url": "/app",
+  "description": "Seu assistente financeiro com IA. Controle gastos, metas e dívidas pelo WhatsApp.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#f8faf8",
-  "theme_color": "#16a34a",
-  "orientation": "portrait-primary",
+  "background_color": "#08080F",
+  "theme_color": "#7C3AED",
+  "orientation": "portrait",
+  "lang": "pt-BR",
+  "categories": ["finance", "productivity"],
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/icons/icon-72.png",  "sizes": "72x72",   "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-96.png",  "sizes": "96x96",   "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-128.png", "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-144.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-152.png", "sizes": "152x152", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-384.png", "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ],
   "shortcuts": [
-    { "name": "Novo Lançamento", "url": "/app/transactions?action=new" },
-    { "name": "Ver Dashboard", "url": "/app" }
-  ],
-  "categories": ["finance", "productivity"]
+    {
+      "name": "Lançar gasto",
+      "short_name": "Lançar",
+      "description": "Registre um gasto rapidamente",
+      "url": "/app/transactions?action=new",
+      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Ver saldo",
+      "short_name": "Saldo",
+      "description": "Veja seu saldo atual",
+      "url": "/app",
+      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+    }
+  ]
 }

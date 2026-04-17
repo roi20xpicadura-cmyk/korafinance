@@ -1,5 +1,5 @@
-const CACHE_NAME = 'kora-v3';
-const STATIC_ASSETS = ['/', '/app', '/login', '/manifest.json', '/icon-192.png', '/icon-512.png'];
+const CACHE_NAME = 'kora-v4';
+const STATIC_ASSETS = ['/', '/app', '/login', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
 const API_CACHE = 'kora-api-v1';
 
 // Install: pre-cache critical assets
@@ -85,8 +85,8 @@ self.addEventListener('push', e => {
   const title = data.title || 'KoraFinance';
   const options = {
     body: data.body || 'Você tem uma nova notificação',
-    icon: '/icon-192.png',
-    badge: '/icon-192.png',
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-badge-72.png',
     vibrate: [100, 50, 100],
     data: { url: data.url || '/app' },
     actions: data.actions || [],
