@@ -234,7 +234,7 @@ function buildPDF(name: string, periodLabel: string, txs: any[]): Uint8Array {
     doc.text(String(t.category || "").slice(0, 20), 56, y);
     doc.text(String(t.description || "").slice(0, 40), 96, y);
     doc.setTextColor(isIncome ? 22 : 220, isIncome ? 163 : 38, isIncome ? 74 : 38);
-    doc.text((isIncome ? "+" : "-") + fmt(Number(t.amount)), 178, y, { align: "right" });
+    doc.text((isIncome ? "+" : "-") + fmt(Number(t.amount)), 194, y, { align: "right" });
     y += 5;
   }
 
