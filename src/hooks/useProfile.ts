@@ -1,6 +1,7 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 interface Profile {
   id: string;
@@ -35,22 +36,52 @@ export function useProfile() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [config, setConfig] = useState<UserConfig | null>(null);
   const [loading, setLoading] = useState(true);
+  const previousPlanRef = useRef<string | null>(null);
 
   const fetchProfile = useCallback(async () => {
     if (!user) { setLoading(false); return; }
 
-    // Parallel fetch — both queries at the same time
     const [profileRes, configRes] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', user.id).single(),
       supabase.from('user_config').select('*').eq('user_id', user.id).single(),
     ]);
 
-    if (profileRes.data) setProfile(profileRes.data as Profile);
+    if (profileRes.data) {
+      setProfile(profileRes.data as Profile);
+      previousPlanRef.current = (profileRes.data as Profile).plan;
+    }
     if (configRes.data) setConfig(configRes.data as unknown as UserConfig);
     setLoading(false);
   }, [user]);
 
   useEffect(() => { fetchProfile(); }, [fetchProfile]);
+
+  // Realtime listener for plan changes (Hotmart webhook → instant unlock)
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel(`profile-${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` },
+        (payload) => {
+          const newProfile = payload.new as Profile;
+          const oldPlan = previousPlanRef.current;
+          const newPlan = newProfile.plan;
+          setProfile(newProfile);
+          if (newPlan !== oldPlan && newPlan !== 'free' && oldPlan === 'free') {
+            const planName = newPlan === 'pro' ? 'Pro' : newPlan === 'business' ? 'Business' : newPlan;
+            toast.success(`🎉 Bem-vindo ao plano ${planName}!`, {
+              description: 'Todos os benefícios já estão liberados para você!',
+              duration: 6000,
+            });
+          }
+          previousPlanRef.current = newPlan;
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user]);
 
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) return;
