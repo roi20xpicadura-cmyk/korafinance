@@ -130,8 +130,14 @@ export default function HeroSection() {
         {/* Screenshot */}
         <div className="relative mt-12 md:mt-20 max-w-[1100px] mx-auto">
           {/* Blur orbs - hidden on mobile for performance */}
-          <div className="hidden md:block absolute -left-20 top-1/4 w-[400px] h-[400px] rounded-full bg-[rgba(124, 58, 237,0.12)] blur-[80px] -z-10" />
-          <div className="hidden md:block absolute -right-20 top-1/3 w-[300px] h-[300px] rounded-full bg-[rgba(37,99,235,0.08)] blur-[60px] -z-10" />
+          <div
+            className="hidden md:block absolute -left-20 top-1/4 w-[400px] h-[400px] rounded-full blur-[80px] -z-10"
+            style={{ background: 'rgba(124,58,237,0.12)' }}
+          />
+          <div
+            className="hidden md:block absolute -right-20 top-1/3 w-[300px] h-[300px] rounded-full blur-[60px] -z-10"
+            style={{ background: 'rgba(37,99,235,0.08)' }}
+          />
 
           <motion.div
             initial={{ opacity: 0, y: 40 }}
