@@ -12,6 +12,7 @@ import { AppErrorBoundary } from "@/components/app/ErrorBoundary";
 import { AnimatePresence } from "framer-motion";
 import SplashScreen from "@/components/app/SplashScreen";
 import SWUpdateBanner from "@/components/app/SWUpdateBanner";
+import LogoLoader from "@/components/app/LogoLoader";
 import { useProfile } from "@/hooks/useProfile";
 
 // Lazy-loaded routes
@@ -63,14 +64,7 @@ const queryClient = new QueryClient({
 });
 
 const PageSkeleton = memo(function PageSkeleton() {
-  return (
-    <div className="min-h-[60vh] flex items-center justify-center" style={{ background: 'var(--color-bg-base)' }}>
-      <div className="flex flex-col items-center" style={{ gap: 12 }}>
-        <div className="skeleton-shimmer" style={{ width: 40, height: 40, borderRadius: 'var(--radius-lg)' }} />
-        <div className="skeleton-shimmer" style={{ width: 120, height: 12, borderRadius: 6 }} />
-      </div>
-    </div>
-  );
+  return <LogoLoader />;
 });
 
 /**
