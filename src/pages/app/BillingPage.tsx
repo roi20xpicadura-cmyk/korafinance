@@ -85,7 +85,7 @@ export default function BillingPage() {
       </div>
 
       {/* Plan Comparison */}
-      <PricingCards currentPlan={plan} onUpgrade={handleUpgrade} />
+      <PricingCards currentPlan={plan} onUpgrade={handleUpgrade} compact />
 
       {/* Invoice History Placeholder */}
       <div className="card-surface p-4 md:p-6">
