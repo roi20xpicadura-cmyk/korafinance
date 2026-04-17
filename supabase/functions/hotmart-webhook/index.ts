@@ -107,13 +107,14 @@ Deno.serve(async (req) => {
   }
   const authUser = usersList.users.find(u => (u.email || '').toLowerCase() === buyerEmail.toLowerCase());
   if (!authUser) {
-    console.warn('user not found for email', buyerEmail);
-    return new Response(JSON.stringify({ ok: true, skipped: 'user not found' }), {
+    console.warn('user not found for email', buyerEmail, 'total users:', usersList.users.length);
+    return new Response(JSON.stringify({ ok: true, skipped: 'user not found', email: buyerEmail }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 
   const userId = authUser.id;
+  console.log('user found', { userId, email: authUser.email });
   const isApproved = ['PURCHASE_APPROVED', 'PURCHASE_COMPLETE'].includes(event);
   const isCancelled = ['PURCHASE_REFUNDED', 'PURCHASE_CHARGEBACK', 'PURCHASE_CANCELED', 'SUBSCRIPTION_CANCELLATION'].includes(event);
 
@@ -121,18 +122,20 @@ Deno.serve(async (req) => {
     const newPlan = resolvePlan(offerCode, productName);
     if (!newPlan) {
       console.warn('could not resolve plan', { offerCode, productName });
-      return new Response(JSON.stringify({ ok: true, skipped: 'unknown plan' }), {
+      return new Response(JSON.stringify({ ok: true, skipped: 'unknown plan', offerCode, productName }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
     const expiresAt = new Date();
     expiresAt.setMonth(expiresAt.getMonth() + 1);
 
+    console.log('updating plan', { userId, newPlan, expiresAt: expiresAt.toISOString() });
     const { error: upErr } = await supabase
       .from('profiles')
       .update({ plan: newPlan, plan_expires_at: expiresAt.toISOString() } as any)
       .eq('id', userId);
     if (upErr) console.error('plan update error', upErr);
+    else console.log('✅ plan updated successfully', { userId, newPlan });
 
     // WhatsApp notification (optional)
     const { data: waConn } = await supabase
