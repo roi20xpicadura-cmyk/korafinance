@@ -202,7 +202,7 @@ async function callClaude(systemPrompt: string, history: any[], userMessage: str
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5",
       max_tokens: 800,
       system: systemPrompt,
       messages,
@@ -337,7 +337,7 @@ async function processImage(imageBase64: string, mimeType: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5",
       max_tokens: 1500,
       system: `Analise cupom/nota/comprovante e retorne APENAS JSON:
 {"is_transaction":true,"transactions":[{"type":"expense","amount":number,"description":"...","category":"..."}],"total":number,"establishment":"...","reply":"..."}
