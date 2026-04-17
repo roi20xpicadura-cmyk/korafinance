@@ -171,7 +171,7 @@ const WelcomeScreen = forwardRef<HTMLDivElement, {
       display: 'flex',
       flexDirection: 'column',
       padding: '32px 20px 16px',
-      background: '#08080F',
+      background: 'var(--color-bg-base)',
       gap: 32,
     }}>
       <motion.div
@@ -183,7 +183,7 @@ const WelcomeScreen = forwardRef<HTMLDivElement, {
         <div style={{
           width: 52, height: 52,
           borderRadius: 16,
-          background: '#7C3AED',
+          background: 'var(--color-green-600)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           margin: '0 auto 16px',
           boxShadow: '0 4px 20px rgba(124,58,237,0.4)',
@@ -192,7 +192,7 @@ const WelcomeScreen = forwardRef<HTMLDivElement, {
         </div>
         <h2 style={{
           fontSize: 22, fontWeight: 900,
-          color: '#FFFFFF',
+          color: 'var(--color-text-strong)',
           letterSpacing: '-0.02em',
           marginBottom: 6,
         }}>
@@ -200,7 +200,7 @@ const WelcomeScreen = forwardRef<HTMLDivElement, {
         </h2>
         <p style={{
           fontSize: 13,
-          color: 'rgba(255,255,255,0.35)',
+          color: 'var(--color-text-muted)',
           lineHeight: 1.5,
           margin: 0,
         }}>
@@ -222,8 +222,8 @@ const WelcomeScreen = forwardRef<HTMLDivElement, {
               alignItems: 'center',
               gap: 12,
               padding: '13px 16px',
-              background: '#110820',
-              border: '0.5px solid rgba(167,139,250,0.12)',
+              background: 'var(--color-bg-surface)',
+              border: '1px solid var(--color-border-weak)',
               borderRadius: 12,
               cursor: 'pointer',
               textAlign: 'left',
@@ -232,12 +232,12 @@ const WelcomeScreen = forwardRef<HTMLDivElement, {
             <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1 }}>{q.emoji}</span>
             <span style={{
               fontSize: 14, fontWeight: 600,
-              color: '#FFFFFF',
+              color: 'var(--color-text-strong)',
               flex: 1,
             }}>
               {q.text}
             </span>
-            <ChevronRight size={14} color="rgba(255,255,255,0.2)" />
+            <ChevronRight size={14} color="var(--color-text-muted)" />
           </motion.button>
         ))}
       </div>
@@ -486,12 +486,12 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
               boxShadow: isMobile ? 'none' : '-12px 0 40px rgba(0,0,0,0.12)',
             }}
           >
-            {/* ─── Header (compact 56px, dark) ─── */}
+            {/* ─── Header ─── */}
             <div className="flex items-center gap-2.5 px-4 shrink-0"
               style={{
                 height: 56,
-                background: '#08080F',
-                borderBottom: '0.5px solid rgba(167,139,250,0.08)',
+                background: 'var(--color-bg-surface)',
+                borderBottom: '1px solid var(--color-border-weak)',
                 paddingTop: isMobile ? 'env(safe-area-inset-top)' : 0,
                 minHeight: isMobile ? 'calc(56px + env(safe-area-inset-top))' : 56,
               }}>
@@ -505,7 +505,7 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
               </div>
 
               <div className="flex-1 min-w-0">
-                <div style={{ fontSize: 15, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--color-text-strong)', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
                   Kora IA
                 </div>
               </div>
@@ -514,22 +514,22 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
                 <motion.button whileTap={{ scale: 0.88 }} onClick={startNewChat}
                   className="w-8 h-8 rounded-[9px] flex items-center justify-center"
                   title="Nova conversa"
-                  style={{ background: '#110820', border: 'none', cursor: 'pointer' }}>
-                  <RotateCcw className="w-[14px] h-[14px]" style={{ color: 'rgba(255,255,255,0.4)' }} />
+                  style={{ background: 'var(--color-bg-sunken)', border: 'none', cursor: 'pointer' }}>
+                  <RotateCcw className="w-[14px] h-[14px]" style={{ color: 'var(--color-text-muted)' }} />
                 </motion.button>
                 <motion.button whileTap={{ scale: 0.88 }} onClick={onClose}
                   className="w-8 h-8 rounded-[9px] flex items-center justify-center"
-                  style={{ background: '#110820', border: 'none', cursor: 'pointer' }}>
+                  style={{ background: 'var(--color-bg-sunken)', border: 'none', cursor: 'pointer' }}>
                   {isMobile
-                    ? <ChevronLeft className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.4)' }} />
-                    : <X className="w-[14px] h-[14px]" style={{ color: 'rgba(255,255,255,0.4)' }} />}
+                    ? <ChevronLeft className="w-4 h-4" style={{ color: 'var(--color-text-muted)' }} />
+                    : <X className="w-[14px] h-[14px]" style={{ color: 'var(--color-text-muted)' }} />}
                 </motion.button>
               </div>
             </div>
 
             {/* ─── Messages / Welcome ─── */}
             <div className="flex-1 overflow-y-auto" style={{
-              background: '#08080F',
+              background: 'var(--color-bg-base)',
               scrollbarWidth: 'thin',
               scrollbarColor: 'var(--color-border-weak) transparent',
             }}>
@@ -558,17 +558,17 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
               )}
             </div>
 
-            {/* ─── Input Bar (dark) ─── */}
+            {/* ─── Input Bar ─── */}
             <div className="shrink-0" style={{
-              background: '#08080F',
-              borderTop: '0.5px solid rgba(167,139,250,0.08)',
+              background: 'var(--color-bg-surface)',
+              borderTop: '1px solid var(--color-border-weak)',
               padding: '12px 16px',
               paddingBottom: isMobile ? 'calc(12px + env(safe-area-inset-bottom))' : '12px',
             }}>
               <div className="flex items-end gap-2 rounded-[14px] px-3 py-2.5 transition-all ai-chat-input-wrapper"
                 style={{
-                  background: '#110820',
-                  border: '1px solid rgba(167,139,250,0.15)',
+                  background: 'var(--color-bg-sunken)',
+                  border: '1px solid var(--color-border-weak)',
                 }}>
                 <textarea
                   ref={textareaRef}
@@ -583,7 +583,7 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
                   className="flex-1 bg-transparent border-none outline-none resize-none leading-[1.5]"
                   style={{
                     fontSize: isMobile ? '16px' : '15px',
-                    color: '#FFFFFF',
+                    color: 'var(--color-text-strong)',
                     maxHeight: 100,
                     fontFamily: 'inherit',
                   }}
@@ -594,15 +594,15 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
                   disabled={!hasText || loading}
                   className="w-[30px] h-[30px] rounded-[8px] flex items-center justify-center flex-shrink-0 transition-all"
                   style={{
-                    background: loading ? 'transparent' : hasText ? '#7C3AED' : 'transparent',
+                    background: loading ? 'transparent' : hasText ? 'var(--color-green-600)' : 'transparent',
                     cursor: hasText && !loading ? 'pointer' : 'default',
                     border: 'none',
                   }}
                 >
                   {loading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" style={{ color: '#A78BFA' }} />
+                    <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'var(--color-green-500)' }} />
                   ) : (
-                    <ArrowUp size={15} style={{ color: hasText ? '#FFFFFF' : 'rgba(255,255,255,0.2)' }} />
+                    <ArrowUp size={15} style={{ color: hasText ? '#FFFFFF' : 'var(--color-text-muted)' }} />
                   )}
                 </motion.button>
               </div>
@@ -610,7 +610,7 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
                 textAlign: 'center',
                 marginTop: 6,
                 fontSize: 10,
-                color: 'rgba(255,255,255,0.15)',
+                color: 'var(--color-text-muted)',
               }}>
                 🔒 Dados criptografados · Sem anúncios · LGPD
               </div>
