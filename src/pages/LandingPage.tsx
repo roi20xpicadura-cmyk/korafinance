@@ -6,6 +6,7 @@ import SEO from '@/components/SEO';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, X } from 'lucide-react';
+import { PLAN_BENEFITS } from '@/lib/plans';
 
 // Lazy-load below-the-fold sections
 const MetricsSection = lazy(() => import('@/components/landing/MetricsSection'));
