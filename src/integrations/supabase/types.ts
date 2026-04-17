@@ -1419,6 +1419,7 @@ export type Database = {
           last_intent: string | null
           messages: Json | null
           pending_confirmation: Json | null
+          pending_transactions: Json | null
           updated_at: string | null
           user_id: string
         }
@@ -1427,6 +1428,7 @@ export type Database = {
           last_intent?: string | null
           messages?: Json | null
           pending_confirmation?: Json | null
+          pending_transactions?: Json | null
           updated_at?: string | null
           user_id: string
         }
@@ -1435,6 +1437,7 @@ export type Database = {
           last_intent?: string | null
           messages?: Json | null
           pending_confirmation?: Json | null
+          pending_transactions?: Json | null
           updated_at?: string | null
           user_id?: string
         }
