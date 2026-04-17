@@ -452,6 +452,63 @@ export type Database = {
         }
         Relationships: []
       }
+      detected_subscriptions: {
+        Row: {
+          category: string | null
+          created_at: string
+          estimated_amount: number
+          frequency: string
+          icon: string | null
+          id: string
+          last_charge_date: string | null
+          match_pattern: string
+          next_expected_date: string | null
+          notes: string | null
+          occurrences: number
+          service_name: string
+          status: string
+          updated_at: string
+          user_acknowledged: boolean
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          estimated_amount?: number
+          frequency?: string
+          icon?: string | null
+          id?: string
+          last_charge_date?: string | null
+          match_pattern: string
+          next_expected_date?: string | null
+          notes?: string | null
+          occurrences?: number
+          service_name: string
+          status?: string
+          updated_at?: string
+          user_acknowledged?: boolean
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          estimated_amount?: number
+          frequency?: string
+          icon?: string | null
+          id?: string
+          last_charge_date?: string | null
+          match_pattern?: string
+          next_expected_date?: string | null
+          notes?: string | null
+          occurrences?: number
+          service_name?: string
+          status?: string
+          updated_at?: string
+          user_acknowledged?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
