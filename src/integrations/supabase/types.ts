@@ -1378,6 +1378,8 @@ export type Database = {
           created_at: string | null
           id: string
           last_message_at: string | null
+          last_notification_at: string | null
+          last_notification_category: string | null
           phone_number: string
           total_messages: number | null
           user_id: string
@@ -1391,6 +1393,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           last_message_at?: string | null
+          last_notification_at?: string | null
+          last_notification_category?: string | null
           phone_number: string
           total_messages?: number | null
           user_id: string
@@ -1404,6 +1408,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           last_message_at?: string | null
+          last_notification_at?: string | null
+          last_notification_category?: string | null
           phone_number?: string
           total_messages?: number | null
           user_id?: string
