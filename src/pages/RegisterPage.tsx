@@ -142,6 +142,25 @@ export default function RegisterPage() {
         <span style={{ fontSize: 15, fontWeight: 600, color: '#0f172a' }}>Cadastrar com Google</span>
       </motion.button>
 
+      {/* Apple button */}
+      <motion.button
+        onClick={async () => {
+          haptic.light();
+          try {
+            const result = await lovable.auth.signInWithOAuth('apple', {
+              redirect_uri: window.location.origin,
+            });
+            if (result?.error) { toast.error('Não foi possível cadastrar com Apple.'); return; }
+            if (result?.redirected) return;
+          } catch { toast.error('Erro ao conectar com Apple.'); }
+        }}
+        whileTap={{ scale: 0.97 }}
+        className="hover:bg-[#f8fafc] hover:border-[#cbd5e1]"
+        style={{ marginTop: 10, height: 52, width: '100%', background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer', transition: 'all 150ms' }}>
+        <AppleIcon />
+        <span style={{ fontSize: 15, fontWeight: 600, color: '#0f172a' }}>Cadastrar com Apple</span>
+      </motion.button>
+
       <div className="flex items-center gap-3" style={{ margin: '18px 0' }}>
         <div className="flex-1" style={{ height: 1, background: '#f1f5f9' }} />
         <span style={{ fontSize: 12, color: '#94a3b8' }}>ou</span>
