@@ -695,7 +695,7 @@ serve(async (req) => {
 
     if (!conn?.user_id) {
       await sendWhatsApp(phone,
-        `👋 Olá! Sou a *Kora IA* do KoraFinance 🐨\n\nPara usar o assistente, conecte seu número:\n\n1️⃣ Acesse *korafinance.app*\n2️⃣ Configurações → WhatsApp\n3️⃣ Informe este número\n\nDepois é só mandar:\n💸 _"gastei 50 no mercado"_\n📷 _Foto do cupom fiscal_`
+        `👋 Olá! Sou a *Kora IA* do KoraFinance 🐨\n\nPara usar o assistente, conecte seu número:\n\n1️⃣ Acesse *korafinance.app*\n2️⃣ Configurações → WhatsApp\n3️⃣ Informe este número\n\nDepois é só mandar:\n💸 _"gastei 50 no mercado"_\n📷 _Foto do comprovante_\n📄 _PDF do extrato ou fatura_`
       );
       return new Response("OK", { status: 200 });
     }
