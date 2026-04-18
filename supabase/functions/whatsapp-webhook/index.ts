@@ -21,7 +21,7 @@ function fmt(v: number): string {
   });
 }
 
-async function sendWhatsApp(phone: string, text: string) {
+async function sendWhatsApp(phone: string, text: string): Promise<boolean> {
   const url = `https://api.z-api.io/instances/${ZAPI_INSTANCE_ID}/token/${ZAPI_TOKEN}/send-text`;
   console.log("[Z-API SEND] →", phone, "| len:", text.length);
   try {
@@ -35,8 +35,10 @@ async function sendWhatsApp(phone: string, text: string) {
     });
     const respText = await res.text();
     console.log("[Z-API SEND] status:", res.status, "| body:", respText.slice(0, 300));
+    return res.ok;
   } catch (e) {
     console.error("[Z-API SEND] EXCEPTION", e);
+    return false;
   }
 }
 
@@ -626,15 +628,47 @@ Fique de olho! 👀`;
 serve(async (req) => {
   if (req.method !== "POST") return new Response("OK", { status: 200 });
 
-  // Nota: Z-API não envia Client-Token de volta nos webhooks de entrada
-  // (esse header só é usado quando *nós* chamamos a API deles). A proteção
-  // contra chamadas externas vem de: (1) URL da função ser secreta/obscura
-  // e (2) dedup por messageId na tabela whatsapp_webhook_dedup. Se quiser
-  // endurecer, configure um WHATSAPP_WEBHOOK_SECRET e valide como query/path
-  // param no webhook cadastrado no painel da Z-API.
+  const sentToken =
+    req.headers.get("client-token") ||
+    req.headers.get("x-client-token") ||
+    req.headers.get("Client-Token");
+
+  let body: any;
+  try {
+    body = await req.json();
+  } catch {
+    return new Response(JSON.stringify({ error: "invalid json" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const looksLikeZapiWebhook = Boolean(
+    body &&
+    typeof body === "object" &&
+    typeof body.phone === "string" &&
+    (body.text || body.image || body.imageMessage || body.audio || body.audioMessage || body.document || body.documentMessage || body.documentWithCaption || body.documentWithCaptionMessage || body.messageId || body.id || body.key?.id)
+  );
+
+  if (ZAPI_CLIENT_TOKEN && sentToken && sentToken !== ZAPI_CLIENT_TOKEN) {
+    return new Response(JSON.stringify({ error: "unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  if (ZAPI_CLIENT_TOKEN && !sentToken && !looksLikeZapiWebhook) {
+    return new Response(JSON.stringify({ error: "unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  if (!sentToken) {
+    console.warn("[WEBHOOK AUTH] Missing client token header; accepting trusted Z-API-shaped payload for compatibility");
+  }
 
   try {
-    const body = await req.json();
     console.log("Z-API payload:", JSON.stringify(body).slice(0, 500));
 
     if (body.fromMe || body.isGroup) return new Response("OK", { status: 200 });
@@ -829,6 +863,19 @@ serve(async (req) => {
         await sendWhatsApp(phone, `Não consegui baixar o arquivo, ${ctx.name} 😕 Tenta enviar de novo!`);
         return new Response("OK", { status: 200 });
       }
+
+      // Feedback imediato — usuário sabe que recebemos enquanto a IA processa
+      const isPdfHint = document ? true : false;
+      const ackMsg = isPdfHint
+        ? `📄 Recebi seu documento, ${ctx.name}! Analisando as transações... ⏳`
+        : `📷 Recebi sua imagem, ${ctx.name}! Lendo o comprovante... ⏳`;
+      await sendWhatsApp(phone, ackMsg);
+      await supabase.from("whatsapp_messages").insert({
+        user_id: userId, phone, phone_number: phone,
+        direction: "outbound", role: "assistant",
+        message: ackMsg, content: ackMsg,
+        created_at: new Date().toISOString(),
+      });
 
       const { transactions, reply, importDirect } = await processAttachment(fileUrl, ctx.name, ctx.profile);
 
