@@ -714,14 +714,15 @@ serve(async (req) => {
     const userId = conn.user_id;
     const ctx = await loadUserContext(userId);
 
+    const inboundLabel = text || (document ? "[documento]" : image ? "[imagem]" : audio ? "[áudio]" : "[mídia]");
     await supabase.from("whatsapp_messages").insert({
       user_id: userId,
       phone,
       phone_number: phone,
       direction: "inbound",
       role: "user",
-      message: text || "[imagem]",
-      content: text || "[imagem]",
+      message: inboundLabel,
+      content: inboundLabel,
       created_at: new Date().toISOString(),
     });
 
