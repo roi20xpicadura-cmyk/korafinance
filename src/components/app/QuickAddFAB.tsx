@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
+import { useState, useRef, useMemo, useCallback, useEffect, forwardRef } from 'react';
 import { Plus, ArrowUp, ArrowDown, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,7 +13,7 @@ interface QuickAddFABProps {
   embedded?: boolean;
 }
 
-export default function QuickAddFAB({ embedded }: QuickAddFABProps = {}) {
+const QuickAddFAB = forwardRef<HTMLButtonElement, QuickAddFABProps>(function QuickAddFAB({ embedded } = {}, _ref) {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
   const { config } = useProfile();
@@ -257,4 +257,6 @@ export default function QuickAddFAB({ embedded }: QuickAddFABProps = {}) {
       </BottomSheet>
     </>
   );
-}
+});
+
+export default QuickAddFAB;
