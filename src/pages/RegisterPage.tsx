@@ -58,16 +58,19 @@ export default function RegisterPage() {
 
   const strength = getStrength(password);
 
-  const handleGoogleAuth = async () => {
+  const handleOAuth = async (provider: 'google' | 'apple') => {
     haptic.light();
+    const label = provider === 'google' ? 'Google' : 'Apple';
     try {
-      const result = await lovable.auth.signInWithOAuth('google', {
-        redirect_uri: window.location.origin,
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        redirect_uri: `${window.location.origin}/app`,
       });
-      if (result?.error) { toast.error('Não foi possível cadastrar com Google.'); return; }
+      if (result?.error) { toast.error(`Não foi possível cadastrar com ${label}.`); return; }
       if (result?.redirected) return;
-    } catch { toast.error('Erro ao conectar com Google.'); }
+    } catch { toast.error(`Erro ao conectar com ${label}.`); }
   };
+  const handleGoogleAuth = () => handleOAuth('google');
+  const handleAppleAuth = () => handleOAuth('apple');
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,10 +120,18 @@ export default function RegisterPage() {
         marketing_emails: false,
       }).eq('id', data.user.id);
 
-      // Fire-and-forget welcome email (non-blocking)
+      // Fire-and-forget welcome email (non-blocking, structured logging)
       supabase.functions.invoke('send-welcome-email', {
         body: { email, name: fullName },
-      }).catch(err => console.error('Welcome email failed:', err));
+      })
+        .then(({ error: fnErr }) => {
+          if (fnErr) {
+            console.error('[welcome-email] invoke returned error', { email, error: fnErr.message });
+          }
+        })
+        .catch((err) => {
+          console.error('[welcome-email] invoke threw', { email, error: err?.message ?? String(err) });
+        });
     }
 
     setLoading(false);
@@ -160,16 +171,7 @@ export default function RegisterPage() {
 
       {/* Google button */}
       <motion.button
-        onClick={async () => {
-          haptic.light();
-          try {
-            const result = await lovable.auth.signInWithOAuth('google', {
-              redirect_uri: window.location.origin,
-            });
-            if (result?.error) { toast.error('Não foi possível cadastrar com Google.'); return; }
-            if (result?.redirected) return;
-          } catch { toast.error('Erro ao conectar com Google.'); }
-        }}
+        onClick={handleGoogleAuth}
         whileTap={{ scale: 0.97 }}
         className="hover:bg-[#f8fafc] hover:border-[#cbd5e1]"
         style={{ marginTop: 20, height: 52, width: '100%', background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer', transition: 'all 150ms' }}>
@@ -179,16 +181,7 @@ export default function RegisterPage() {
 
       {/* Apple button */}
       <motion.button
-        onClick={async () => {
-          haptic.light();
-          try {
-            const result = await lovable.auth.signInWithOAuth('apple', {
-              redirect_uri: window.location.origin,
-            });
-            if (result?.error) { toast.error('Não foi possível cadastrar com Apple.'); return; }
-            if (result?.redirected) return;
-          } catch { toast.error('Erro ao conectar com Apple.'); }
-        }}
+        onClick={handleAppleAuth}
         whileTap={{ scale: 0.97 }}
         className="hover:bg-[#f8fafc] hover:border-[#cbd5e1]"
         style={{ marginTop: 10, height: 52, width: '100%', background: 'white', border: '1.5px solid #e2e8f0', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer', transition: 'all 150ms' }}>
