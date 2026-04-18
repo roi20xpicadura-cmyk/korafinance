@@ -407,6 +407,7 @@ export type Database = {
           notes: string | null
           priority: number | null
           remaining_amount: number
+          remaining_installments: number | null
           status: string | null
           strategy: string | null
           total_amount: number
@@ -426,6 +427,7 @@ export type Database = {
           notes?: string | null
           priority?: number | null
           remaining_amount: number
+          remaining_installments?: number | null
           status?: string | null
           strategy?: string | null
           total_amount: number
@@ -445,6 +447,7 @@ export type Database = {
           notes?: string | null
           priority?: number | null
           remaining_amount?: number
+          remaining_installments?: number | null
           status?: string | null
           strategy?: string | null
           total_amount?: number
@@ -853,6 +856,299 @@ export type Database = {
           id?: string
           invested_amount?: number
           name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      kora_actions: {
+        Row: {
+          action_type: string
+          confirmed_at: string | null
+          created_at: string
+          executed_at: string | null
+          id: string
+          interaction_id: string | null
+          payload: Json
+          reasoning: string | null
+          result: Json | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          confirmed_at?: string | null
+          created_at?: string
+          executed_at?: string | null
+          id?: string
+          interaction_id?: string | null
+          payload: Json
+          reasoning?: string | null
+          result?: Json | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          confirmed_at?: string | null
+          created_at?: string
+          executed_at?: string | null
+          id?: string
+          interaction_id?: string | null
+          payload?: Json
+          reasoning?: string | null
+          result?: Json | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kora_actions_interaction_id_fkey"
+            columns: ["interaction_id"]
+            isOneToOne: false
+            referencedRelation: "kora_interactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kora_coaching_plans: {
+        Row: {
+          checkin_frequency: string | null
+          completed_at: string | null
+          created_at: string
+          description: string
+          duration_days: number | null
+          id: string
+          last_checkin_at: string | null
+          next_checkin_at: string | null
+          plan_type: string
+          progress_percent: number | null
+          start_date: string
+          status: string
+          steps: Json
+          target_date: string | null
+          target_metrics: Json | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          checkin_frequency?: string | null
+          completed_at?: string | null
+          created_at?: string
+          description: string
+          duration_days?: number | null
+          id?: string
+          last_checkin_at?: string | null
+          next_checkin_at?: string | null
+          plan_type: string
+          progress_percent?: number | null
+          start_date?: string
+          status?: string
+          steps?: Json
+          target_date?: string | null
+          target_metrics?: Json | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          checkin_frequency?: string | null
+          completed_at?: string | null
+          created_at?: string
+          description?: string
+          duration_days?: number | null
+          id?: string
+          last_checkin_at?: string | null
+          next_checkin_at?: string | null
+          plan_type?: string
+          progress_percent?: number | null
+          start_date?: string
+          status?: string
+          steps?: Json
+          target_date?: string | null
+          target_metrics?: Json | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      kora_interactions: {
+        Row: {
+          channel: string
+          cost_usd: number | null
+          created_at: string
+          id: string
+          input_tokens: number | null
+          input_type: string
+          kora_response: string | null
+          metadata: Json | null
+          model_used: string | null
+          output_tokens: number | null
+          persona: string
+          triggered_action_ids: string[] | null
+          user_id: string
+          user_message: string | null
+          user_rating: number | null
+        }
+        Insert: {
+          channel: string
+          cost_usd?: number | null
+          created_at?: string
+          id?: string
+          input_tokens?: number | null
+          input_type: string
+          kora_response?: string | null
+          metadata?: Json | null
+          model_used?: string | null
+          output_tokens?: number | null
+          persona?: string
+          triggered_action_ids?: string[] | null
+          user_id: string
+          user_message?: string | null
+          user_rating?: number | null
+        }
+        Update: {
+          channel?: string
+          cost_usd?: number | null
+          created_at?: string
+          id?: string
+          input_tokens?: number | null
+          input_type?: string
+          kora_response?: string | null
+          metadata?: Json | null
+          model_used?: string | null
+          output_tokens?: number | null
+          persona?: string
+          triggered_action_ids?: string[] | null
+          user_id?: string
+          user_message?: string | null
+          user_rating?: number | null
+        }
+        Relationships: []
+      }
+      kora_memory: {
+        Row: {
+          confidence: number
+          content: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          importance: number
+          last_referenced_at: string | null
+          memory_type: string
+          metadata: Json | null
+          reference_count: number
+          user_id: string
+        }
+        Insert: {
+          confidence?: number
+          content: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          importance?: number
+          last_referenced_at?: string | null
+          memory_type: string
+          metadata?: Json | null
+          reference_count?: number
+          user_id: string
+        }
+        Update: {
+          confidence?: number
+          content?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          importance?: number
+          last_referenced_at?: string | null
+          memory_type?: string
+          metadata?: Json | null
+          reference_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      kora_usage_limits: {
+        Row: {
+          opus_daily_count: number
+          opus_daily_date: string
+          opus_monthly_count: number
+          opus_monthly_period: string
+          updated_at: string
+          user_id: string
+          vision_monthly_count: number
+          vision_monthly_period: string
+        }
+        Insert: {
+          opus_daily_count?: number
+          opus_daily_date?: string
+          opus_monthly_count?: number
+          opus_monthly_period?: string
+          updated_at?: string
+          user_id: string
+          vision_monthly_count?: number
+          vision_monthly_period?: string
+        }
+        Update: {
+          opus_daily_count?: number
+          opus_daily_date?: string
+          opus_monthly_count?: number
+          opus_monthly_period?: string
+          updated_at?: string
+          user_id?: string
+          vision_monthly_count?: number
+          vision_monthly_period?: string
+        }
+        Relationships: []
+      }
+      kora_user_profile: {
+        Row: {
+          interactions_analyzed: number
+          last_updated_at: string
+          life_context: Json | null
+          prefers_data_heavy: boolean | null
+          prefers_direct_tone: boolean | null
+          prefers_emotional_support: boolean | null
+          profile_confidence: number | null
+          spending_patterns: Json | null
+          trait_emotional_spender: number | null
+          trait_frugal: number | null
+          trait_planner: number | null
+          trait_risk_tolerant: number | null
+          trait_social_oriented: number | null
+          user_id: string
+        }
+        Insert: {
+          interactions_analyzed?: number
+          last_updated_at?: string
+          life_context?: Json | null
+          prefers_data_heavy?: boolean | null
+          prefers_direct_tone?: boolean | null
+          prefers_emotional_support?: boolean | null
+          profile_confidence?: number | null
+          spending_patterns?: Json | null
+          trait_emotional_spender?: number | null
+          trait_frugal?: number | null
+          trait_planner?: number | null
+          trait_risk_tolerant?: number | null
+          trait_social_oriented?: number | null
+          user_id: string
+        }
+        Update: {
+          interactions_analyzed?: number
+          last_updated_at?: string
+          life_context?: Json | null
+          prefers_data_heavy?: boolean | null
+          prefers_direct_tone?: boolean | null
+          prefers_emotional_support?: boolean | null
+          profile_confidence?: number | null
+          spending_patterns?: Json | null
+          trait_emotional_spender?: number | null
+          trait_frugal?: number | null
+          trait_planner?: number | null
+          trait_risk_tolerant?: number | null
+          trait_social_oriented?: number | null
           user_id?: string
         }
         Relationships: []
@@ -1330,6 +1626,7 @@ export type Database = {
           financial_objectives: string[] | null
           financial_score: number | null
           id: string
+          kora_v2_enabled: boolean
           last_activity_date: string | null
           last_period: string | null
           level: string | null
@@ -1355,6 +1652,7 @@ export type Database = {
           financial_objectives?: string[] | null
           financial_score?: number | null
           id?: string
+          kora_v2_enabled?: boolean
           last_activity_date?: string | null
           last_period?: string | null
           level?: string | null
@@ -1380,6 +1678,7 @@ export type Database = {
           financial_objectives?: string[] | null
           financial_score?: number | null
           id?: string
+          kora_v2_enabled?: boolean
           last_activity_date?: string | null
           last_period?: string | null
           level?: string | null
@@ -1617,10 +1916,12 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      delete_user_kora_data: { Args: { p_user_id: string }; Returns: Json }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_kora_context: { Args: { p_user_id: string }; Returns: Json }
       get_monthly_balances: {
         Args: { p_user_id: string }
         Returns: {
@@ -1635,6 +1936,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      kora_system_cost_today: { Args: never; Returns: number }
       move_to_dlq: {
         Args: {
           dlq_name: string
