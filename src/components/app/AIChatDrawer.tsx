@@ -10,6 +10,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useProfile } from '@/hooks/useProfile';
 import { useKora, type KoraPendingAction } from '@/hooks/useKora';
 import KoraPendingActionCard from '@/components/app/KoraPendingActionCard';
+import AudioRecordButton from '@/components/app/AudioRecordButton';
+import { toast } from 'sonner';
 
 type Msg = {
   role: 'user' | 'assistant';
@@ -489,6 +491,53 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, messages, activeConvoId, kora.enabled, kora.sendMessage]);
 
+  const handleAudioRecorded = useCallback(async (blob: Blob) => {
+    if (!kora.enabled) {
+      toast.error('Áudio disponível apenas com Kora v2');
+      return;
+    }
+    if (loading) return;
+
+    // Mostra placeholder do user enquanto transcreve
+    const placeholder: Msg = { role: 'user', content: '🎙️ Transcrevendo áudio...', ts: new Date() };
+    setMessages((prev) => [...prev, placeholder]);
+    setLoading(true);
+
+    const result = await kora.sendAudio(blob);
+
+    setLoading(false);
+
+    if (!result || !result.success) {
+      setMessages((prev) => {
+        const next = [...prev];
+        next[next.length - 1] = { ...placeholder, content: '⚠️ Erro ao processar áudio' };
+        return next;
+      });
+      toast.error(result?.error || 'Falha na transcrição');
+      return;
+    }
+
+    // Substitui placeholder pela transcrição real
+    setMessages((prev) => {
+      const next = [...prev];
+      next[next.length - 1] = {
+        role: 'user',
+        content: result.transcription || '(áudio sem transcrição)',
+        ts: new Date(),
+      };
+      const brain = result.kora_response as { response_text?: string; pending_actions?: KoraPendingAction[] } | undefined;
+      if (brain?.response_text) {
+        next.push({
+          role: 'assistant',
+          content: brain.response_text,
+          ts: new Date(),
+          pendingActions: brain.pending_actions,
+        });
+      }
+      return next;
+    });
+  }, [kora, loading]);
+
   const hasText = input.trim().length > 0;
 
   const handleTextareaInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
@@ -633,6 +682,9 @@ export default function AIChatDrawer({ open, onClose }: { open: boolean; onClose
                     fontFamily: 'inherit',
                   }}
                 />
+                {kora.enabled && !hasText && (
+                  <AudioRecordButton onRecorded={handleAudioRecorded} disabled={loading} />
+                )}
                 <motion.button
                   whileTap={hasText && !loading ? { scale: 0.85 } : undefined}
                   onClick={() => send(input)}
