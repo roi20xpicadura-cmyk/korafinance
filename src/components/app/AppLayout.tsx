@@ -13,7 +13,7 @@ import icon from '@/assets/korafinance-icon.png';
 import {
   LayoutDashboard, ArrowLeftRight, Target, TrendingUp, FileText,
   CreditCard, Briefcase, BarChart2, Settings2, Crown,
-  LogOut, Menu, X, Bell, ChevronRight, Home, MoreHorizontal, Sparkles,
+  LogOut, Menu, X, Bell, ChevronRight, Home, MoreHorizontal,
   AlertCircle, CalendarDays, Trophy, Gift, Sun, Moon, Plus, Building2, Plug, FlaskConical, Lock, Repeat
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -131,20 +131,7 @@ export default function AppLayout() {
   const [showMoreDrawer, setShowMoreDrawer] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [activeDebtCount, setActiveDebtCount] = useState(0);
-  // Esconde o FAB de IA quando há sheets/dialogs abertos no app.
-  const [anyOverlayOpen, setAnyOverlayOpen] = useState(false);
-  useEffect(() => {
-    const update = () => {
-      const locked = document.body.hasAttribute('data-scroll-locked');
-      const sheetOpen = document.body.hasAttribute('data-bottom-sheet-open');
-      const hasPortalOverlay = !!document.querySelector('[role="dialog"][data-state="open"], [role="alertdialog"][data-state="open"]');
-      setAnyOverlayOpen(locked || sheetOpen || hasPortalOverlay);
-    };
-    update();
-    const obs = new MutationObserver(update);
-    obs.observe(document.body, { attributes: true, attributeFilter: ['data-scroll-locked', 'data-bottom-sheet-open', 'style'], childList: true, subtree: true });
-    return () => obs.disconnect();
-  }, []);
+  // (FAB flutuante de IA removido — atalho fica no header da seção "IA Financeira".)
 
   useEffect(() => {
     if (!user) return;
@@ -716,19 +703,7 @@ export default function AppLayout() {
       </AnimatePresence>
 
 
-      {/* ═══ AI CHAT ═══ */}
-      <button onClick={() => setChatOpen(true)}
-        className={`fixed z-[499] flex items-center justify-center transition-all ${(chatOpen || showMoreDrawer || anyOverlayOpen) ? 'hidden' : ''}`}
-        style={{
-          bottom: isMobile ? 84 : 24, right: isMobile ? 16 : 20,
-          width: 56, height: 56, borderRadius: 18,
-          background: 'linear-gradient(145deg, var(--color-green-500), var(--color-green-700))',
-          boxShadow: '0 8px 24px rgba(124, 58, 237,0.3), 0 0 0 1px rgba(124, 58, 237,0.1)', color: 'white',
-          border: '1px solid rgba(255,255,255,0.15)',
-        }}
-        aria-label="Assistente IA">
-        <Sparkles style={{ width: 24, height: 24 }} />
-      </button>
+      {/* AI Chat drawer — atalho fica no header da seção "IA Financeira" (sem FAB flutuante que cortava conteúdo) */}
       <Suspense fallback={null}><AIChatDrawer open={chatOpen} onClose={() => setChatOpen(false)} /></Suspense>
     </div>
   );
