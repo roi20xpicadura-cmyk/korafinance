@@ -790,6 +790,22 @@ serve(async (req) => {
       const lower = text.toLowerCase().trim();
 
       if (["sim", "s", "ok", "yes", "confirmar", "1"].includes(lower)) {
+        // ── IDEMPOTÊNCIA: claim atômico do pending_confirmation.
+        // Só o primeiro "SIM" consegue zerar a flag e prosseguir; retries/cliques
+        // duplos caem no else e são ignorados silenciosamente.
+        const { data: claimed, error: claimErr } = await supabase
+          .from("whatsapp_context")
+          .update({ pending_confirmation: false, pending_transactions: null })
+          .eq("user_id", userId)
+          .eq("pending_confirmation", true)
+          .select("id")
+          .maybeSingle();
+
+        if (claimErr || !claimed) {
+          console.log(`[CONFIRM DEDUP] user=${userId} já processou SIM, ignorando duplicata`);
+          return new Response("OK", { status: 200 });
+        }
+
         const transactions = (pending.pending_transactions as any[]) || [];
         let saved = 0;
 
@@ -805,11 +821,8 @@ serve(async (req) => {
             source: "whatsapp",
           });
           if (!error) saved++;
+          else console.error("[CONFIRM] insert tx error:", error);
         }
-
-        await supabase.from("whatsapp_context")
-          .update({ pending_confirmation: false, pending_transactions: null })
-          .eq("user_id", userId);
 
         const total = transactions.reduce((s: number, t: any) => s + Number(t.amount), 0);
         const reply = `✅ *${saved} lançamento${saved > 1 ? "s" : ""} salvo${saved > 1 ? "s" : ""}!*\n\n💵 Total: *${fmt(total)}*\n\nTudo registrado no KoraFinance, ${ctx.name}! 🐨`;
@@ -1130,8 +1143,9 @@ Acesse seu dashboard pra revisar e ajustar categorias se quiser, ${ctx.name}! �
             }
           }
         }
-      } catch (_e) {
-        // Plain text reply, keep aiText as finalReply
+      } catch (parseErr) {
+        // JSON inválido vindo da IA → mantém aiText como finalReply, mas loga
+        console.warn("[AI JSON parse] falhou, enviando texto puro:", (parseErr as Error)?.message);
       }
 
       await sendWhatsApp(phone, finalReply);
