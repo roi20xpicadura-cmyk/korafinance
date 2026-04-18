@@ -53,7 +53,7 @@ const MODE_ICONS: Record<KoraDisplayMode, typeof BarChart3> = {
 
 const MAX_HOME_CARDS = 3;
 
-function InsightCard({ item, index }: { item: CardItem; index: number }) {
+const InsightCard = forwardRef<HTMLDivElement, { item: CardItem; index: number }>(({ item, index }, ref) => {
   const meta = getDisplayMeta(item.mode);
   const Icon = MODE_ICONS[item.mode];
 
