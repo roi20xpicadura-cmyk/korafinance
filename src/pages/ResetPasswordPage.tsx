@@ -1,32 +1,43 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import koraIcon from '@/assets/korafinance-icon.png';
 import { toast } from 'sonner';
+
+type Status = 'checking' | 'ready' | 'invalid';
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
   const [loading, setLoading] = useState(false);
-  const [, setReady] = useState(false);
+  const [status, setStatus] = useState<Status>('checking');
 
   useEffect(() => {
+    let resolved = false;
+    const markReady = () => { resolved = true; setStatus('ready'); };
+
     const hash = window.location.hash;
-    if (hash.includes('type=recovery')) {
-      setReady(true);
-    }
-    // Also handle the auth state change for recovery
+    if (hash.includes('type=recovery')) markReady();
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        setReady(true);
-      }
+      if (event === 'PASSWORD_RECOVERY') markReady();
     });
-    return () => subscription.unsubscribe();
+
+    // Fallback: if no recovery signal arrives quickly, treat link as invalid
+    const timer = setTimeout(() => {
+      if (!resolved) setStatus('invalid');
+    }, 1500);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timer);
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (status !== 'ready') return;
     if (password !== confirmPw) { toast.error('As senhas não coincidem'); return; }
     if (password.length < 8) { toast.error('Mínimo 8 caracteres'); return; }
 
@@ -47,25 +58,48 @@ export default function ResetPasswordPage() {
         </div>
 
         <h1 className="text-2xl font-black text-foreground mb-1">Nova senha</h1>
-        <p className="text-sm text-muted mb-6">Defina sua nova senha abaixo.</p>
+        <p className="text-sm text-muted-foreground mb-6">Defina sua nova senha abaixo.</p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="label-upper text-muted block mb-1.5">Nova senha</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={8}
-              className="w-full px-3 py-2.5 rounded-lg border-[1.5px] border-fin-green-border bg-card text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all" />
+        {status === 'checking' && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground py-8">
+            <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            Verificando link de recuperação...
           </div>
-          <div>
-            <label className="label-upper text-muted block mb-1.5">Confirmar senha</label>
-            <input type="password" value={confirmPw} onChange={e => setConfirmPw(e.target.value)} required
-              className="w-full px-3 py-2.5 rounded-lg border-[1.5px] border-fin-green-border bg-card text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all" />
+        )}
+
+        {status === 'invalid' && (
+          <div className="space-y-4">
+            <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+              Este link de recuperação é inválido ou expirou. Solicite um novo e-mail de redefinição.
+            </div>
+            <Link
+              to="/forgot-password"
+              className="inline-block w-full text-center py-2.5 rounded-[9px] bg-primary text-primary-foreground text-sm font-extrabold hover:brightness-110 transition-all"
+            >
+              Solicitar novo link
+            </Link>
           </div>
-          <button type="submit" disabled={loading}
-            className="w-full py-2.5 rounded-[9px] bg-primary text-primary-foreground text-sm font-extrabold hover:brightness-110 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-            {loading && <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />}
-            Salvar nova senha
-          </button>
-        </form>
+        )}
+
+        {status === 'ready' && (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="label-upper text-muted-foreground block mb-1.5">Nova senha</label>
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={8}
+                className="w-full px-3 py-2.5 rounded-lg border-[1.5px] border-fin-green-border bg-card text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all" />
+            </div>
+            <div>
+              <label className="label-upper text-muted-foreground block mb-1.5">Confirmar senha</label>
+              <input type="password" value={confirmPw} onChange={e => setConfirmPw(e.target.value)} required
+                className="w-full px-3 py-2.5 rounded-lg border-[1.5px] border-fin-green-border bg-card text-sm focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all" />
+            </div>
+            <button type="submit" disabled={loading}
+              className="w-full py-2.5 rounded-[9px] bg-primary text-primary-foreground text-sm font-extrabold hover:brightness-110 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+              {loading && <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />}
+              Salvar nova senha
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
