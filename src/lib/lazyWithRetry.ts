@@ -29,10 +29,50 @@ export function lazyWithRetry<T extends ComponentType<any>>(
       }
     }
     console.warn('[lazyWithRetry] dynamic import falhou após retries:', lastErr);
+    reportChunkFailure(lastErr, fallbackToEmpty);
     if (fallbackToEmpty) {
       // Componente vazio — preserva o fluxo da página.
       return { default: (() => null) as unknown as T };
     }
     throw lastErr;
   });
+}
+
+// Telemetria fire-and-forget. Nunca aguarda nem propaga erro.
+function reportChunkFailure(err: unknown, fellBackToEmpty: boolean) {
+  try {
+    // Só reporta em prod (evita ruído em dev/HMR).
+    if (typeof window === 'undefined') return;
+    if (window.location.hostname === 'localhost') return;
+
+    const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL;
+    const anonKey = (import.meta as any).env?.VITE_SUPABASE_PUBLISHABLE_KEY;
+    if (!supabaseUrl || !anonKey) return;
+
+    const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+
+    // Pega o JWT atual se houver (best-effort, sem importar o client).
+    let auth = `Bearer ${anonKey}`;
+    for (const k in localStorage) {
+      if (k.startsWith('sb-') && k.endsWith('-auth-token')) {
+        try {
+          const t = JSON.parse(localStorage.getItem(k) || '{}')?.access_token;
+          if (t) { auth = `Bearer ${t}`; break; }
+        } catch { /* ignore */ }
+      }
+    }
+
+    fetch(`${supabaseUrl}/functions/v1/log-client-error`, {
+      method: 'POST',
+      keepalive: true,
+      headers: { 'Content-Type': 'application/json', apikey: anonKey, Authorization: auth },
+      body: JSON.stringify({
+        kind: 'chunk_load',
+        message: message.slice(0, 2000),
+        url: window.location.href.slice(0, 500),
+        userAgent: navigator.userAgent.slice(0, 500),
+        extra: { fellBackToEmpty },
+      }),
+    }).catch(() => { /* telemetria silenciosa */ });
+  } catch { /* nunca quebra a UX */ }
 }
