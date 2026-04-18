@@ -194,40 +194,40 @@
   }
 
   [data-theme="dark"], .dark {
-    /* Backgrounds — near-black with purple tint */
-    --color-bg-base: #08080F;
-    --color-bg-surface: #110820;
-    --color-bg-elevated: #160B28;
-    --color-bg-sunken: #0F0520;
-    --color-bg-overlay: rgba(0,0,0,0.72);
+    /* Backgrounds — Notion-style soft dark with subtle violet tint */
+    --color-bg-base: #1A1625;
+    --color-bg-surface: #211C30;
+    --color-bg-elevated: #28223A;
+    --color-bg-sunken: #15111F;
+    --color-bg-overlay: rgba(10,8,18,0.78);
 
-    --bg-base: #08080F;
-    --bg-surface: #110820;
-    --bg-elevated: #160B28;
-    --bg-sunken: #0F0520;
+    --bg-base: #1A1625;
+    --bg-surface: #211C30;
+    --bg-elevated: #28223A;
+    --bg-sunken: #15111F;
 
-    /* Text — pure white, boosted contrast */
-    --color-text-strong: #FFFFFF;
-    --color-text-base: rgba(255, 255, 255, 0.92);
-    --color-text-muted: rgba(255, 255, 255, 0.72);
-    --color-text-subtle: rgba(255, 255, 255, 0.55);
-    --color-text-disabled: rgba(255, 255, 255, 0.30);
+    /* Text — off-white, high readability */
+    --color-text-strong: #F5F3FA;
+    --color-text-base: rgba(245, 243, 250, 0.95);
+    --color-text-muted: rgba(245, 243, 250, 0.78);
+    --color-text-subtle: rgba(245, 243, 250, 0.62);
+    --color-text-disabled: rgba(245, 243, 250, 0.38);
 
-    --text-primary: #FFFFFF;
-    --text-secondary: rgba(255, 255, 255, 0.72);
-    --text-tertiary: rgba(255, 255, 255, 0.50);
-    --text-disabled: rgba(255, 255, 255, 0.28);
+    --text-primary: #F5F3FA;
+    --text-secondary: rgba(245, 243, 250, 0.80);
+    --text-tertiary: rgba(245, 243, 250, 0.62);
+    --text-disabled: rgba(245, 243, 250, 0.36);
 
-    /* Borders — violet glow, more visible */
-    --color-border-weak: rgba(167, 139, 250, 0.14);
-    --color-border-base: rgba(167, 139, 250, 0.22);
-    --color-border-strong: rgba(167, 139, 250, 0.38);
-    --color-border-ghost: rgba(255, 255, 255, 0.06);
+    /* Borders — visible separation between surfaces */
+    --color-border-weak: rgba(255, 255, 255, 0.06);
+    --color-border-base: rgba(255, 255, 255, 0.10);
+    --color-border-strong: rgba(167, 139, 250, 0.32);
+    --color-border-ghost: rgba(255, 255, 255, 0.04);
 
-    --border-base: rgba(167, 139, 250, 0.22);
-    --border-weak: rgba(167, 139, 250, 0.14);
-    --border-ghost: rgba(255, 255, 255, 0.06);
-    --border-strong: rgba(167, 139, 250, 0.38);
+    --border-base: rgba(255, 255, 255, 0.10);
+    --border-weak: rgba(255, 255, 255, 0.06);
+    --border-ghost: rgba(255, 255, 255, 0.04);
+    --border-strong: rgba(167, 139, 250, 0.32);
 
     /* Brand re-aliased green tokens → violet (boosted for dark) */
     --color-green-50: rgba(124, 58, 237, 0.20);
