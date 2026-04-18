@@ -135,7 +135,8 @@ const InsightCard = forwardRef<HTMLDivElement, { item: CardItem; index: number }
       )}
     </motion.div>
   );
-}
+});
+InsightCard.displayName = 'InsightCard';
 
 export default function AIInsightsWidget({ onOpenChat }: { onOpenChat: () => void }) {
   const { user } = useAuth();
