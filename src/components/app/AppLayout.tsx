@@ -680,7 +680,7 @@ export default function AppLayout() {
 
       {/* ═══ AI CHAT ═══ */}
       <button onClick={() => setChatOpen(true)}
-        className={`fixed z-[499] flex items-center justify-center transition-all ${(chatOpen || showMoreDrawer) ? 'hidden' : ''}`}
+        className={`fixed z-[499] flex items-center justify-center transition-all ${(chatOpen || showMoreDrawer || anyOverlayOpen) ? 'hidden' : ''}`}
         style={{
           bottom: isMobile ? 84 : 24, right: isMobile ? 16 : 20,
           width: 56, height: 56, borderRadius: 18,
