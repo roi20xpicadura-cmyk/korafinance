@@ -632,6 +632,22 @@ serve(async (req) => {
 
     if (body.fromMe || body.isGroup) return new Response("OK", { status: 200 });
 
+    // ── DEDUP: evita processar o mesmo webhook 2x (Z-API às vezes reentrega) ──
+    const messageId = body.messageId || body.id;
+    if (messageId) {
+      const { error: dedupErr } = await supabase
+        .from("whatsapp_webhook_dedup")
+        .insert({ message_id: String(messageId) });
+      if (dedupErr) {
+        // 23505 = unique violation → já processado
+        if ((dedupErr as any).code === "23505") {
+          console.log(`[DEDUP] skipping duplicate messageId=${messageId}`);
+          return new Response("OK", { status: 200 });
+        }
+        console.error("[DEDUP] insert error:", dedupErr);
+      }
+    }
+
     const phone = (body.phone || "")
       .replace("@s.whatsapp.net", "")
       .replace("@c.us", "")
