@@ -336,8 +336,8 @@
   /* Dark mode: stronger label contrast + crisper icons */
   [data-theme="dark"] .label-upper,
   .dark .label-upper {
-    color: rgba(255, 255, 255, 0.45);
-    font-weight: 800;
+    color: rgba(245, 243, 250, 0.65);
+    font-weight: 700;
   }
   [data-theme="dark"] svg,
   .dark svg {
