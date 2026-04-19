@@ -47,8 +47,12 @@ const AdminRevenuePage = lazy(() => import("@/pages/admin/AdminRevenuePage"));
 const AdminNotificationsPage = lazy(() => import("@/pages/admin/AdminNotificationsPage"));
 const AdminSettingsPage = lazy(() => import("@/pages/admin/AdminSettingsPage"));
 
-const PageSkeleton = forwardRef<HTMLDivElement>(function PageSkeleton(_, _ref) {
-  return <LogoLoader />;
+const PageSkeleton = forwardRef<HTMLDivElement>(function PageSkeleton(_, ref) {
+  return (
+    <div ref={ref}>
+      <LogoLoader />
+    </div>
+  );
 });
 
 function TransactionsRouter() {

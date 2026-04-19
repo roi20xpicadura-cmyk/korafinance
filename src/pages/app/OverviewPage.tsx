@@ -207,29 +207,43 @@ export default function OverviewPage() {
   const showPersonal = profileType === 'personal' || profileType === 'both';
   const showBusiness = profileType === 'business' || profileType === 'both';
 
-  const fetchData = useCallback((month: number, year: number) => {
-    if (!user) return;
+  const fetchData = useCallback(async (month: number, year: number) => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     const periodDate = new Date(year, month);
     const start = format(startOfMonth(periodDate), 'yyyy-MM-dd');
     const end = format(endOfMonth(periodDate), 'yyyy-MM-dd');
     // Also fetch last 6 months for chart
     const chartStart = format(startOfMonth(subMonths(periodDate, 5)), 'yyyy-MM-dd');
-    Promise.all([
-      supabase.from('transactions').select('*').eq('user_id', user.id).gte('date', start).lte('date', end).is('deleted_at', null).order('date', { ascending: false }),
-      supabase.from('transactions').select('*').eq('user_id', user.id).gte('date', chartStart).lte('date', end).is('deleted_at', null),
-      supabase.from('investments').select('*').eq('user_id', user.id),
-      supabase.from('goals').select('*').eq('user_id', user.id).is('deleted_at', null),
-      supabase.from('credit_cards').select('*').eq('user_id', user.id),
-      supabase.from('debts').select('*').eq('user_id', user.id).eq('status', 'active'),
-    ]).then(([txRes, allTxRes, invRes, goalRes, cardRes, debtRes]) => {
+    try {
+      const [txRes, allTxRes, invRes, goalRes, cardRes, debtRes] = await Promise.all([
+        supabase.from('transactions').select('*').eq('user_id', user.id).gte('date', start).lte('date', end).is('deleted_at', null).order('date', { ascending: false }),
+        supabase.from('transactions').select('*').eq('user_id', user.id).gte('date', chartStart).lte('date', end).is('deleted_at', null),
+        supabase.from('investments').select('*').eq('user_id', user.id),
+        supabase.from('goals').select('*').eq('user_id', user.id).is('deleted_at', null),
+        supabase.from('credit_cards').select('*').eq('user_id', user.id),
+        supabase.from('debts').select('*').eq('user_id', user.id).eq('status', 'active'),
+      ]);
+
       setTransactions(txRes.data || []);
       setAllTransactions(allTxRes.data || []);
       setInvestments(invRes.data || []);
       setGoals(goalRes.data || []);
       setCards(cardRes.data || []);
       setDebts(debtRes.data || []);
+    } catch (error) {
+      console.error('[overview] failed to load dashboard data', error);
+      setTransactions([]);
+      setAllTransactions([]);
+      setInvestments([]);
+      setGoals([]);
+      setCards([]);
+      setDebts([]);
+    } finally {
       setLoading(false);
-    });
+    }
   }, [user]);
 
   useEffect(() => {
