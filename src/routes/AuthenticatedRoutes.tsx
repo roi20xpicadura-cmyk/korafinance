@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { Suspense, memo } from "react";
+import { Suspense, forwardRef } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { lazyWithRetry } from "@/lib/lazyWithRetry";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -47,7 +47,7 @@ const AdminRevenuePage = lazy(() => import("@/pages/admin/AdminRevenuePage"));
 const AdminNotificationsPage = lazy(() => import("@/pages/admin/AdminNotificationsPage"));
 const AdminSettingsPage = lazy(() => import("@/pages/admin/AdminSettingsPage"));
 
-const PageSkeleton = memo(function PageSkeleton() {
+const PageSkeleton = forwardRef<HTMLDivElement>(function PageSkeleton(_, _ref) {
   return <LogoLoader />;
 });
 
@@ -65,10 +65,14 @@ export default function AuthenticatedRoutes() {
       <ThemeProvider>
         <Suspense fallback={<PageSkeleton />}>
           <Routes>
-            <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-            <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            {/* Estas rotas são montadas como filhas de "/login/*", "/register/*",
+                etc no App.tsx, então o path relativo aqui precisa ser "" — usar
+                "/login" não casa e cai no NotFound. */}
+            <Route path="" element={<PublicRoute><LoginPage /></PublicRoute>} />
+            <Route path="login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+            <Route path="register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+            <Route path="forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="reset-password" element={<ResetPasswordPage />} />
 
             <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route index element={<OverviewPage />} />
