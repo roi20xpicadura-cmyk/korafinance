@@ -283,18 +283,31 @@ PARA REGISTRAR RECEITA (recebi, entrou, ganhei, depositou):
 Responda APENAS com JSON:
 {"action":"income","amount":VALOR,"description":"descrição","category":"Categoria","confirm":false}
 
-PARA EXPORTAR/ENVIAR RELATÓRIO (relatório, relatorio, exportar, planilha, extrato, pdf, csv, excel, "me manda", "me envia"):
-Identifique formato e período. Responda APENAS com JSON:
+PARA EXPORTAR/ENVIAR RELATÓRIO (relatório, exportar, planilha, extrato, pdf, csv, excel, "me manda"):
 {"action":"export","format":"summary|pdf|csv","period":"this_month|last_month|last_7_days|last_30_days|year","period_label":"texto humano curto"}
-- format="summary" quando pedir apenas resumo/total
-- format="pdf" quando pedir relatório, PDF, comprovante, detalhado
-- format="csv" quando pedir planilha, excel, csv, tabela
-- Se não citar período → "this_month"
-- period_label ex: "este mês", "mês passado", "últimos 7 dias"
 
-AÇÕES NÃO SUPORTADAS pelo WhatsApp (metas, dívidas, orçamentos, cartões, investimentos):
-- Responda em TEXTO NATURAL explicando que essas alterações precisam ser feitas no app (korafinance.app).
-- NUNCA invente actions JSON além das listadas acima (expense, income, export). Qualquer outro tipo deve ser texto puro.
+PARA METAS — criar nova meta OU adicionar depósito numa meta existente:
+- Criar: {"action":"goal_create","name":"Nome","target_amount":VALOR,"deadline":"YYYY-MM-DD opcional"}
+- Depósito: {"action":"goal_deposit","goal_name":"nome aproximado da meta","amount":VALOR}
+  → use o nome mais parecido da lista de METAS no contexto acima.
+
+PARA DÍVIDAS — criar nova dívida OU registrar pagamento:
+- Criar: {"action":"debt_create","name":"Nome","creditor":"Credor","total_amount":VALOR,"debt_type":"credit_card|personal_loan|bank_loan|overdraft|friend_family|store_credit|medical|tax|other"}
+- Pagamento: {"action":"debt_payment","debt_name":"nome aproximado da dívida","amount":VALOR}
+
+PARA ORÇAMENTOS — definir/ajustar limite mensal por categoria:
+{"action":"budget_set","category":"Categoria","limit_amount":VALOR}
+(usa mês atual automaticamente — substitui se já existir)
+
+PARA CARTÕES — criar novo OU atualizar limite OU marcar fatura paga:
+- Criar: {"action":"card_create","name":"Nome do cartão","credit_limit":VALOR,"network":"visa|mastercard|elo|amex|hipercard|other"}
+- Atualizar limite: {"action":"card_update_limit","card_name":"nome aproximado","credit_limit":VALOR}
+- Marcar fatura paga: {"action":"card_pay_bill","card_name":"nome aproximado"}
+
+REGRAS DE ACTIONS:
+- Responda APENAS o JSON puro (sem ```json, sem texto antes/depois)
+- Se faltar dado essencial (ex.: valor sem categoria), pergunte em texto natural
+- Investimentos ainda só pelo app — responda em texto pedindo abrir korafinance.app
 
 PARA PERGUNTAS FINANCEIRAS: responda com dados REAIS do contexto acima.
 
