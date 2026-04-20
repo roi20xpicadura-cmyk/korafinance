@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  CreditCard, TrendingUp, Wallet, Calendar, PlusCircle, ChevronDown,
+  CreditCard, TrendingUp, Wallet, Calendar, PlusCircle,
   ChevronLeft, ChevronRight, AlertTriangle, Clock, Pencil, Trash2, X, Check
 } from 'lucide-react';
 import {
@@ -318,10 +318,7 @@ export default function CardsPage() {
     setPayBillCard(null); fetchData();
   };
 
-  const scrollToForm = () => {
-    setShowForm(true);
-    setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
-  };
+  // Cadastro temporariamente desabilitado — em breve.
 
   const livePreview: Partial<Card> = { name: fName, network: fNetwork, last_four: fLastFour, credit_limit: parseFloat(fLimit) || 0, used_amount: parseFloat(fUsed) || 0, due_day: fDue ? parseInt(fDue) : null, color: fColor };
 
