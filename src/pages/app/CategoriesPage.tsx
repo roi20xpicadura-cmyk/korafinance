@@ -196,6 +196,7 @@ export default function CategoriesPage() {
   const [showTypeMenu, setShowTypeMenu] = useState(false);
   const [txs, setTxs] = useState<Tx[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCat, setSelectedCat] = useState<{ name: string; from: string; to: string; solid: string; value: number } | null>(null);
 
   useEffect(() => {
     if (!user) return;
