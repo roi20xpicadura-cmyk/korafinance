@@ -3,8 +3,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths, format } from 'date-fns';
 import { motion } from 'framer-motion';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import {
-  ChevronDown, TrendingUp, TrendingDown, Wallet, Sparkles,
+  ChevronDown, TrendingUp, TrendingDown, Wallet, Sparkles, X, ChevronRight,
   UtensilsCrossed, Car, Home, ShoppingBag, Heart, GraduationCap,
   Plane, Gamepad2, Shirt, Dumbbell, Baby, PawPrint, Fuel, Bus,
   Coffee, Pizza, ShoppingCart, Smartphone, Wifi, Zap, Droplet,
