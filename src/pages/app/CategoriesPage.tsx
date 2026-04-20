@@ -500,19 +500,23 @@ export default function CategoriesPage() {
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-3 min-w-0">
-                <div
-                  className="flex items-center justify-center flex-shrink-0"
-                  style={{
-                    width: 40, height: 40, borderRadius: '12px',
-                    background: `linear-gradient(135deg, ${c.from}1f, ${c.to}33)`,
-                    border: `1px solid ${c.solid}33`,
-                    color: c.solid,
-                    fontSize: 15, fontWeight: 900,
-                    boxShadow: `0 4px 12px -4px ${c.solid}40`,
-                  }}
-                >
-                  {c.name[0]?.toUpperCase()}
-                </div>
+                {(() => {
+                  const Icon = getCategoryIcon(c.name);
+                  return (
+                    <div
+                      className="flex items-center justify-center flex-shrink-0"
+                      style={{
+                        width: 40, height: 40, borderRadius: '12px',
+                        background: `linear-gradient(135deg, ${c.from}1f, ${c.to}33)`,
+                        border: `1px solid ${c.solid}33`,
+                        color: c.solid,
+                        boxShadow: `0 4px 12px -4px ${c.solid}40`,
+                      }}
+                    >
+                      <Icon style={{ width: 18, height: 18 }} strokeWidth={2.2} />
+                    </div>
+                  );
+                })()}
                 <div className="min-w-0">
                   <div className="flex items-baseline gap-2">
                     <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--color-text-strong)' }} className="truncate">
