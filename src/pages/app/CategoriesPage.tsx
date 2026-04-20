@@ -9,16 +9,20 @@ type Tx = { id: string; amount: number; category: string; type: string; date: st
 type Period = 'this_month' | 'last_month' | 'year';
 type TxType = 'expense' | 'income';
 
-// Paleta premium — gradientes violet com profundidade
+// Paleta multicolor premium — uma cor distinta por categoria
 const PALETTE: { from: string; to: string; solid: string }[] = [
-  { from: '#8B5CF6', to: '#6D28D9', solid: '#7C3AED' },
-  { from: '#A78BFA', to: '#7C3AED', solid: '#8B5CF6' },
-  { from: '#C4B5FD', to: '#8B5CF6', solid: '#A78BFA' },
-  { from: '#DDD6FE', to: '#A78BFA', solid: '#C4B5FD' },
-  { from: '#9333EA', to: '#5B21B6', solid: '#7E22CE' },
-  { from: '#A855F7', to: '#6B21A8', solid: '#9333EA' },
-  { from: '#7C3AED', to: '#4C1D95', solid: '#6D28D9' },
-  { from: '#EDE9FE', to: '#C4B5FD', solid: '#DDD6FE' },
+  { from: '#10B981', to: '#059669', solid: '#10B981' }, // emerald
+  { from: '#3B82F6', to: '#2563EB', solid: '#3B82F6' }, // blue
+  { from: '#F59E0B', to: '#D97706', solid: '#F59E0B' }, // amber
+  { from: '#EC4899', to: '#DB2777', solid: '#EC4899' }, // pink
+  { from: '#8B5CF6', to: '#7C3AED', solid: '#8B5CF6' }, // violet
+  { from: '#F97316', to: '#EA580C', solid: '#F97316' }, // orange
+  { from: '#06B6D4', to: '#0891B2', solid: '#06B6D4' }, // cyan
+  { from: '#EF4444', to: '#DC2626', solid: '#EF4444' }, // red
+  { from: '#14B8A6', to: '#0D9488', solid: '#14B8A6' }, // teal
+  { from: '#A855F7', to: '#9333EA', solid: '#A855F7' }, // purple
+  { from: '#84CC16', to: '#65A30D', solid: '#84CC16' }, // lime
+  { from: '#6366F1', to: '#4F46E5', solid: '#6366F1' }, // indigo
 ];
 
 const PERIOD_LABELS: Record<Period, string> = {
@@ -150,12 +154,12 @@ export default function CategoriesPage() {
         className="relative overflow-hidden"
         style={{
           background:
-            'radial-gradient(120% 80% at 0% 0%, rgba(139,92,246,0.10) 0%, transparent 55%), radial-gradient(100% 70% at 100% 100%, rgba(124,58,237,0.08) 0%, transparent 50%), linear-gradient(180deg, var(--color-bg-surface) 0%, var(--color-bg-surface) 100%)',
+            'radial-gradient(120% 80% at 0% 0%, rgba(16,185,129,0.08) 0%, transparent 55%), radial-gradient(100% 70% at 100% 100%, rgba(59,130,246,0.06) 0%, transparent 50%), linear-gradient(180deg, var(--color-bg-surface) 0%, var(--color-bg-surface) 100%)',
           border: '1px solid var(--color-border-weak)',
           borderRadius: 'var(--radius-2xl)',
           padding: '20px 18px 22px',
           marginBottom: 16,
-          boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 40px -24px rgba(124,58,237,0.18)',
+          boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 40px -24px rgba(16,185,129,0.15)',
         }}
       >
         {/* Premium badge */}
@@ -163,13 +167,13 @@ export default function CategoriesPage() {
           <div
             className="flex items-center gap-1.5"
             style={{
-              background: 'linear-gradient(135deg, rgba(139,92,246,0.12), rgba(124,58,237,0.06))',
-              border: '1px solid rgba(139,92,246,0.25)',
+              background: 'var(--color-green-50)',
+              border: '1px solid var(--color-border-weak)',
               borderRadius: 999,
               padding: '4px 10px',
               fontSize: 10,
               fontWeight: 800,
-              color: '#7C3AED',
+              color: 'var(--color-green-700)',
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
             }}
@@ -264,11 +268,11 @@ export default function CategoriesPage() {
                 fontSize: 12,
                 fontWeight: 800,
                 borderRadius: 'var(--radius-full)',
-                background: period === p ? 'linear-gradient(135deg, #8B5CF6, #6D28D9)' : 'transparent',
+                background: period === p ? 'var(--color-green-600)' : 'transparent',
                 color: period === p ? '#fff' : 'var(--color-text-muted)',
                 cursor: 'pointer',
                 border: 'none',
-                boxShadow: period === p ? '0 4px 12px -2px rgba(124,58,237,0.45)' : 'none',
+                boxShadow: period === p ? '0 4px 12px -2px rgba(16,185,129,0.35)' : 'none',
               }}
             >
               {PERIOD_LABELS[p]}
@@ -291,10 +295,7 @@ export default function CategoriesPage() {
                 style={{
                   fontSize: 24,
                   fontWeight: 900,
-                  background: 'linear-gradient(135deg, var(--color-text-strong), #7C3AED)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
+                  color: 'var(--color-text-strong)',
                   fontVariantNumeric: 'tabular-nums',
                   marginTop: 2,
                   letterSpacing: '-0.02em',
