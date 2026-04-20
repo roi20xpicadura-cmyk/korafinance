@@ -346,14 +346,12 @@ export default function CardsPage() {
       <div className="flex gap-5 text-[13px] font-semibold text-muted-foreground">
         <span>✓ Controle de limite</span><span>✓ Alertas de vencimento</span><span>✓ Histórico de faturas</span>
       </div>
-      <button onClick={scrollToForm}
-        className="bg-[#7C3AED] text-white font-extrabold text-[14px] px-6 py-3 rounded-[10px] hover:bg-[#1A0D35] transition-colors mt-2">
+      <button disabled
+        className="bg-muted text-muted-foreground font-extrabold text-[14px] px-6 py-3 rounded-[10px] mt-2 cursor-not-allowed inline-flex items-center gap-2">
         + Cadastrar meu primeiro cartão
+        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#7C3AED]/15 text-[#7C3AED]">Em breve</span>
       </button>
-      {/* Form still available below */}
-      <div ref={formRef} className="w-full max-w-[700px] mt-6">
-        <AnimatePresence>{showForm && <CardForm />}</AnimatePresence>
-      </div>
+      <p className="text-[12px] text-muted-foreground mt-1">Cadastro de cartões em breve.</p>
     </div>
   );
 
