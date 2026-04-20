@@ -241,13 +241,14 @@
     --color-green-800: #FFFFFF;
     --color-green-900: #EDE9FE;
 
-    /* Danger — boosted */
-    --color-danger-bg: #DC2626;
-    --color-danger-border: rgba(248, 113, 113, 0.45);
-    --color-danger-text: #FFFFFF;
+    /* Danger — sutil no dark (paridade visual com success). O bg sólido
+       vermelho destacava demais ícones de despesa nas listas. */
+    --color-danger-bg: rgba(220, 38, 38, 0.14);
+    --color-danger-border: rgba(248, 113, 113, 0.30);
+    --color-danger-text: #F87171;
     --color-danger-solid: #F87171;
-    --danger-bg: rgba(220, 38, 38, 0.18);
-    --danger-border: rgba(248, 113, 113, 0.40);
+    --danger-bg: rgba(220, 38, 38, 0.14);
+    --danger-border: rgba(248, 113, 113, 0.30);
     --danger-text: #FCA5A5;
 
     /* Warning */
