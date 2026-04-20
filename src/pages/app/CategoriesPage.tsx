@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths, format } from 'date-fns';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, TrendingUp, TrendingDown, Wallet, Sparkles, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ChevronDown, TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
 type Tx = { id: string; amount: number; category: string; type: string; date: string };
 type Period = 'this_month' | 'last_month' | 'year';
@@ -125,7 +125,16 @@ export default function CategoriesPage() {
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value);
     const tot = arr.reduce((s, c) => s + c.value, 0);
-    const colored = arr.map((c, i) => ({ ...c, color: PALETTE[i % PALETTE.length], pct: tot > 0 ? (c.value / tot) * 100 : 0 }));
+    const colored = arr.map((c, i) => {
+      const palette = PALETTE[i % PALETTE.length];
+      return {
+        ...c,
+        from: palette.from,
+        to: palette.to,
+        solid: palette.solid,
+        pct: tot > 0 ? (c.value / tot) * 100 : 0,
+      };
+    });
     return { categories: colored, total: tot };
   }, [txs, txType]);
 
