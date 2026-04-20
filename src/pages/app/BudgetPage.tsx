@@ -302,7 +302,7 @@ export default function BudgetPage() {
             </div>
 
             {/* Category rows */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2.5">
               {allCategoryRows.map((row, i) => {
                 const overspent = row.hasLimit && row.spent > row.limit;
                 const pct = row.hasLimit ? Math.min((row.spent / row.limit) * 100, 100) : 0;
@@ -320,28 +320,22 @@ export default function BudgetPage() {
                       boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: row.hasLimit ? 10 : 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
-                        <div style={{ width: 36, height: 36, borderRadius: 10, background: C.violetSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
-                          {getCatEmoji(row.category)}
-                        </div>
-                        <div style={{ minWidth: 0, flex: 1 }}>
-                          <div style={{ color: C.textStrong, fontSize: 14, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {row.category}
+                    {row.hasLimit ? (
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 10 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
+                          <div style={{ width: 36, height: 36, borderRadius: 10, background: C.violetSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
+                            {getCatEmoji(row.category)}
                           </div>
-                          {row.hasLimit ? (
-                            <div style={{ color: overspent ? C.red : C.textMuted, fontSize: 11 }}>
+                          <div style={{ minWidth: 0, flex: 1 }}>
+                            <div style={{ color: C.textStrong, fontSize: 14, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {row.category}
+                            </div>
+                            <div style={{ color: overspent ? C.red : C.textMuted, fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {formatCurrency(row.spent)} de {formatCurrency(row.limit)}
                             </div>
-                          ) : (
-                            <div style={{ color: C.red, fontSize: 11, fontWeight: 600 }}>
-                              {formatCurrency(row.spent)} gasto · sem limite
-                            </div>
-                          )}
+                          </div>
                         </div>
-                      </div>
-                      {row.hasLimit ? (
-                        <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: 8 }}>
+                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
                           <div style={{ color: overspent ? C.red : C.violet, fontSize: 15, fontWeight: 800 }}>
                             {formatCurrency(row.limit)}
                           </div>
@@ -349,15 +343,30 @@ export default function BudgetPage() {
                             {overspent ? '⚠️ Estourado' : 'limite'}
                           </div>
                         </div>
-                      ) : (
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                          <div style={{ width: 36, height: 36, borderRadius: 10, background: C.violetSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
+                            {getCatEmoji(row.category)}
+                          </div>
+                          <div style={{ minWidth: 0, flex: 1 }}>
+                            <div style={{ color: C.textStrong, fontSize: 14, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {row.category}
+                            </div>
+                            <div style={{ color: C.red, fontSize: 11, fontWeight: 600 }}>
+                              {formatCurrency(row.spent)} gasto · sem limite
+                            </div>
+                          </div>
+                        </div>
                         <button
                           onClick={() => { setBudgetInputs(prev => ({ ...prev, [row.category]: '' })); setShowSetup(true); }}
-                          style={{ background: C.violetSoft, border: `1px solid ${C.violetBorder}`, borderRadius: 8, padding: '6px 12px', color: C.violet, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0, marginLeft: 8 }}
+                          style={{ background: C.violetSoft, border: `1px solid ${C.violetBorder}`, borderRadius: 8, padding: '8px 12px', color: C.violet, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', width: '100%' }}
                         >
                           + Definir limite
                         </button>
-                      )}
-                    </div>
+                      </div>
+                    )}
                     {row.hasLimit && (
                       <div style={{ background: C.trackBg, borderRadius: 99, height: 6, overflow: 'hidden' }}>
                         <motion.div
