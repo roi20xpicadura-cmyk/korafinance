@@ -3,16 +3,22 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { startOfMonth, endOfMonth, startOfYear, endOfYear, subMonths, format } from 'date-fns';
 import { motion } from 'framer-motion';
-import { ChevronDown, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
+import { ChevronDown, TrendingUp, TrendingDown, Wallet, Sparkles } from 'lucide-react';
 
 type Tx = { id: string; amount: number; category: string; type: string; date: string };
 type Period = 'this_month' | 'last_month' | 'year';
 type TxType = 'expense' | 'income';
 
-// Paleta violet harmoniosa (8 tons) — usada em ordem decrescente de gasto
-const PALETTE = [
-  '#7C3AED', '#A78BFA', '#C4B5FD', '#8B5CF6',
-  '#6D28D9', '#DDD6FE', '#5B21B6', '#9333EA',
+// Paleta premium — gradientes violet com profundidade
+const PALETTE: { from: string; to: string; solid: string }[] = [
+  { from: '#8B5CF6', to: '#6D28D9', solid: '#7C3AED' },
+  { from: '#A78BFA', to: '#7C3AED', solid: '#8B5CF6' },
+  { from: '#C4B5FD', to: '#8B5CF6', solid: '#A78BFA' },
+  { from: '#DDD6FE', to: '#A78BFA', solid: '#C4B5FD' },
+  { from: '#9333EA', to: '#5B21B6', solid: '#7E22CE' },
+  { from: '#A855F7', to: '#6B21A8', solid: '#9333EA' },
+  { from: '#7C3AED', to: '#4C1D95', solid: '#6D28D9' },
+  { from: '#EDE9FE', to: '#C4B5FD', solid: '#DDD6FE' },
 ];
 
 const PERIOD_LABELS: Record<Period, string> = {
@@ -35,30 +41,45 @@ function fmt(v: number) {
   return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-function Donut({ slices, total }: { slices: { value: number; color: string }[]; total: number }) {
-  const size = 220;
-  const stroke = 28;
+function Donut({ slices, total }: { slices: { from: string; to: string; value: number }[]; total: number }) {
+  const size = 240;
+  const stroke = 22;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   let offset = 0;
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--color-bg-sunken)" strokeWidth={stroke} />
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90 drop-shadow-[0_8px_24px_rgba(124,58,237,0.18)]">
+      <defs>
+        {slices.map((s, i) => (
+          <linearGradient key={i} id={`donut-grad-${i}`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={s.from} />
+            <stop offset="100%" stopColor={s.to} />
+          </linearGradient>
+        ))}
+        <filter id="donut-glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+      </defs>
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--color-bg-sunken)" strokeWidth={stroke} opacity={0.6} />
       {total > 0 && slices.map((s, i) => {
         const len = (s.value / total) * c;
         const dash = `${len} ${c - len}`;
         const el = (
-          <circle
+          <motion.circle
             key={i}
             cx={size / 2}
             cy={size / 2}
             r={r}
             fill="none"
-            stroke={s.color}
+            stroke={`url(#donut-grad-${i})`}
             strokeWidth={stroke}
             strokeDasharray={dash}
             strokeDashoffset={-offset}
-            strokeLinecap="butt"
+            strokeLinecap="round"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.05 * i, duration: 0.5 }}
           />
         );
         offset += len;
@@ -104,7 +125,16 @@ export default function CategoriesPage() {
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value);
     const tot = arr.reduce((s, c) => s + c.value, 0);
-    const colored = arr.map((c, i) => ({ ...c, color: PALETTE[i % PALETTE.length], pct: tot > 0 ? (c.value / tot) * 100 : 0 }));
+    const colored = arr.map((c, i) => {
+      const palette = PALETTE[i % PALETTE.length];
+      return {
+        ...c,
+        from: palette.from,
+        to: palette.to,
+        solid: palette.solid,
+        pct: tot > 0 ? (c.value / tot) * 100 : 0,
+      };
+    });
     return { categories: colored, total: tot };
   }, [txs, txType]);
 
@@ -113,16 +143,45 @@ export default function CategoriesPage() {
   return (
     <div className="max-w-5xl mx-auto pb-20" style={{ padding: '16px' }}>
       {/* Hero card: tipo + período */}
-      <div
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
         className="relative overflow-hidden"
         style={{
-          background: 'linear-gradient(135deg, var(--color-green-50) 0%, var(--color-bg-surface) 100%)',
+          background:
+            'radial-gradient(120% 80% at 0% 0%, rgba(139,92,246,0.10) 0%, transparent 55%), radial-gradient(100% 70% at 100% 100%, rgba(124,58,237,0.08) 0%, transparent 50%), linear-gradient(180deg, var(--color-bg-surface) 0%, var(--color-bg-surface) 100%)',
           border: '1px solid var(--color-border-weak)',
           borderRadius: 'var(--radius-2xl)',
-          padding: '18px',
+          padding: '20px 18px 22px',
           marginBottom: 16,
+          boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 40px -24px rgba(124,58,237,0.18)',
         }}
       >
+        {/* Premium badge */}
+        <div className="flex items-center justify-between mb-4">
+          <div
+            className="flex items-center gap-1.5"
+            style={{
+              background: 'linear-gradient(135deg, rgba(139,92,246,0.12), rgba(124,58,237,0.06))',
+              border: '1px solid rgba(139,92,246,0.25)',
+              borderRadius: 999,
+              padding: '4px 10px',
+              fontSize: 10,
+              fontWeight: 800,
+              color: '#7C3AED',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+            }}
+          >
+            <Sparkles style={{ width: 11, height: 11 }} />
+            Breakdown
+          </div>
+          <span style={{ fontSize: 11, color: 'var(--color-text-muted)', fontWeight: 600 }}>
+            {PERIOD_LABELS[period]}
+          </span>
+        </div>
+
         {/* Type selector */}
         <div className="flex items-center justify-center mb-4 relative">
           <button
@@ -191,7 +250,7 @@ export default function CategoriesPage() {
             border: '1px solid var(--color-border-weak)',
             borderRadius: 'var(--radius-full)',
             padding: 4,
-            margin: '0 auto 22px',
+            margin: '0 auto 24px',
             width: 'fit-content',
           }}
         >
@@ -199,16 +258,17 @@ export default function CategoriesPage() {
             <button
               key={p}
               onClick={() => setPeriod(p)}
-              className="transition-all"
+              className="transition-all relative"
               style={{
                 padding: '6px 14px',
                 fontSize: 12,
                 fontWeight: 800,
                 borderRadius: 'var(--radius-full)',
-                background: period === p ? 'var(--color-green-600)' : 'transparent',
+                background: period === p ? 'linear-gradient(135deg, #8B5CF6, #6D28D9)' : 'transparent',
                 color: period === p ? '#fff' : 'var(--color-text-muted)',
                 cursor: 'pointer',
                 border: 'none',
+                boxShadow: period === p ? '0 4px 12px -2px rgba(124,58,237,0.45)' : 'none',
               }}
             >
               {PERIOD_LABELS[p]}
@@ -224,9 +284,24 @@ export default function CategoriesPage() {
               <span style={{ fontSize: 11, color: 'var(--color-text-muted)', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 Total
               </span>
-              <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--color-text-strong)', fontVariantNumeric: 'tabular-nums', marginTop: 2 }}>
+              <motion.span
+                key={total}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{
+                  fontSize: 24,
+                  fontWeight: 900,
+                  background: 'linear-gradient(135deg, var(--color-text-strong), #7C3AED)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  fontVariantNumeric: 'tabular-nums',
+                  marginTop: 2,
+                  letterSpacing: '-0.02em',
+                }}
+              >
                 {fmt(total)}
-              </span>
+              </motion.span>
               <span style={{ fontSize: 11, color: 'var(--color-text-subtle)', marginTop: 2 }}>
                 {categories.length} {categories.length === 1 ? 'categoria' : 'categorias'}
               </span>
@@ -235,10 +310,25 @@ export default function CategoriesPage() {
 
           {/* Top 5 legenda */}
           <div className="space-y-2">
-            {categories.slice(0, 5).map(c => (
-              <div key={c.name} className="flex items-center justify-between">
+            {categories.slice(0, 5).map((c, i) => (
+              <motion.div
+                key={c.name}
+                initial={{ opacity: 0, x: 8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 + i * 0.05 }}
+                className="flex items-center justify-between"
+              >
                 <div className="flex items-center gap-2 min-w-0">
-                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: c.color, flexShrink: 0 }} />
+                  <span
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: '50%',
+                      background: `linear-gradient(135deg, ${c.from}, ${c.to})`,
+                      boxShadow: `0 0 8px ${c.solid}66`,
+                      flexShrink: 0,
+                    }}
+                  />
                   <span style={{ fontSize: 13, color: 'var(--color-text-base)', fontWeight: 600 }} className="truncate">
                     {c.name}
                   </span>
@@ -246,7 +336,7 @@ export default function CategoriesPage() {
                 <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--color-text-strong)', fontVariantNumeric: 'tabular-nums' }}>
                   {c.pct.toFixed(1)}%
                 </span>
-              </div>
+              </motion.div>
             ))}
             {categories.length === 0 && !loading && (
               <div className="flex flex-col items-center justify-center py-4 text-center">
@@ -258,7 +348,7 @@ export default function CategoriesPage() {
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Lista detalhada */}
       <div
@@ -303,11 +393,12 @@ export default function CategoriesPage() {
         {!loading && categories.map((c, i) => (
           <motion.div
             key={c.name}
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.03 }}
+            transition={{ delay: i * 0.04, ease: 'easeOut' }}
+            whileHover={{ x: 2 }}
             style={{
-              padding: '12px',
+              padding: '14px 12px',
               borderBottom: i < categories.length - 1 ? '1px solid var(--color-border-weak)' : 'none',
             }}
           >
@@ -316,10 +407,12 @@ export default function CategoriesPage() {
                 <div
                   className="flex items-center justify-center flex-shrink-0"
                   style={{
-                    width: 36, height: 36, borderRadius: '50%',
-                    background: `${c.color}22`,
-                    color: c.color,
-                    fontSize: 14, fontWeight: 900,
+                    width: 40, height: 40, borderRadius: '12px',
+                    background: `linear-gradient(135deg, ${c.from}1f, ${c.to}33)`,
+                    border: `1px solid ${c.solid}33`,
+                    color: c.solid,
+                    fontSize: 15, fontWeight: 900,
+                    boxShadow: `0 4px 12px -4px ${c.solid}40`,
                   }}
                 >
                   {c.name[0]?.toUpperCase()}
@@ -329,7 +422,17 @@ export default function CategoriesPage() {
                     <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--color-text-strong)' }} className="truncate">
                       {c.name}
                     </span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-text-subtle)' }}>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 800,
+                        color: c.solid,
+                        background: `${c.solid}14`,
+                        padding: '2px 6px',
+                        borderRadius: 999,
+                        letterSpacing: '0.02em',
+                      }}
+                    >
                       {c.pct.toFixed(1)}%
                     </span>
                   </div>
@@ -337,21 +440,26 @@ export default function CategoriesPage() {
               </div>
               <span
                 style={{
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: 900,
-                  color: txType === 'expense' ? 'var(--color-danger-solid)' : 'var(--color-success-solid)',
+                  color: 'var(--color-text-strong)',
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
                 {fmt(c.value)}
               </span>
             </div>
-            <div style={{ height: 6, background: 'var(--color-bg-sunken)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
+            <div style={{ height: 6, background: 'var(--color-bg-sunken)', borderRadius: 'var(--radius-full)', overflow: 'hidden', marginLeft: 52 }}>
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${c.pct}%` }}
-                transition={{ duration: 0.6, delay: i * 0.03, ease: 'easeOut' }}
-                style={{ height: '100%', background: c.color, borderRadius: 'var(--radius-full)' }}
+                transition={{ duration: 0.8, delay: 0.1 + i * 0.04, ease: [0.16, 1, 0.3, 1] }}
+                style={{
+                  height: '100%',
+                  background: `linear-gradient(90deg, ${c.from}, ${c.to})`,
+                  borderRadius: 'var(--radius-full)',
+                  boxShadow: `0 0 12px ${c.solid}55`,
+                }}
               />
             </div>
           </motion.div>
