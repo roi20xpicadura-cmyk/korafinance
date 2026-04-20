@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, forwardRef } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, MessageCircle, RefreshCw, X, CheckCircle2, BarChart3, AlertTriangle, TrendingUp, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -53,13 +53,12 @@ const MODE_ICONS: Record<KoraDisplayMode, typeof BarChart3> = {
 
 const MAX_HOME_CARDS = 3;
 
-const InsightCard = forwardRef<HTMLDivElement, { item: CardItem; index: number }>(({ item, index }, ref) => {
+function InsightCard({ item, index }: { item: CardItem; index: number }) {
   const meta = getDisplayMeta(item.mode);
   const Icon = MODE_ICONS[item.mode];
 
   return (
     <motion.div
-      ref={ref}
       layout
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
