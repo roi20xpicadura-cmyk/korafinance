@@ -142,8 +142,8 @@ function fmt(v: number) {
 }
 
 function Donut({ slices, total }: { slices: { from: string; to: string; value: number }[]; total: number }) {
-  const size = 240;
-  const stroke = 22;
+  const size = 200;
+  const stroke = 20;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   let offset = 0;
@@ -242,7 +242,7 @@ export default function CategoriesPage() {
   const isEmpty = !loading && categories.length === 0;
 
   return (
-    <div className="max-w-5xl mx-auto pb-20" style={{ padding: '16px' }}>
+    <div className="max-w-5xl mx-auto pb-20" style={{ padding: '12px' }}>
       {/* Hero card: tipo + período */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
@@ -254,13 +254,13 @@ export default function CategoriesPage() {
             'radial-gradient(120% 80% at 0% 0%, rgba(16,185,129,0.08) 0%, transparent 55%), radial-gradient(100% 70% at 100% 100%, rgba(59,130,246,0.06) 0%, transparent 50%), linear-gradient(180deg, var(--color-bg-surface) 0%, var(--color-bg-surface) 100%)',
           border: '1px solid var(--color-border-weak)',
           borderRadius: 'var(--radius-2xl)',
-          padding: '20px 18px 22px',
-          marginBottom: 16,
+          padding: '14px 14px 16px',
+          marginBottom: 12,
           boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 40px -24px rgba(16,185,129,0.15)',
         }}
       >
         {/* Premium badge */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3">
           <div
             className="flex items-center gap-1.5"
             style={{
@@ -284,7 +284,7 @@ export default function CategoriesPage() {
         </div>
 
         {/* Type selector */}
-        <div className="flex items-center justify-center mb-4 relative">
+        <div className="flex items-center justify-center mb-3 relative">
           <button
             onClick={() => setShowTypeMenu(v => !v)}
             className="flex items-center gap-2 transition-all"
@@ -350,8 +350,8 @@ export default function CategoriesPage() {
             background: 'var(--color-bg-sunken)',
             border: '1px solid var(--color-border-weak)',
             borderRadius: 'var(--radius-full)',
-            padding: 4,
-            margin: '0 auto 24px',
+            padding: 3,
+            margin: '0 auto 14px',
             width: 'fit-content',
           }}
         >
@@ -378,7 +378,7 @@ export default function CategoriesPage() {
         </div>
 
         {/* Donut + summary */}
-        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-3 md:gap-6">
           <div className="flex justify-center relative">
             <Donut slices={categories} total={total} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
