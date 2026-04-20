@@ -242,7 +242,7 @@ export default function CategoriesPage() {
   const isEmpty = !loading && categories.length === 0;
 
   return (
-    <div className="max-w-5xl mx-auto pb-20" style={{ padding: '16px' }}>
+    <div className="max-w-5xl mx-auto pb-20" style={{ padding: '12px' }}>
       {/* Hero card: tipo + período */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
