@@ -43,6 +43,7 @@ export default function BudgetPage() {
   const planLimits = PLAN_LIMITS[plan];
   const [budgets, setBudgets] = useState<BudgetRow[]>([]);
   const [transactions, setTransactions] = useState<TransactionRow[]>([]);
+  const [historyAvg, setHistoryAvg] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [showSetup, setShowSetup] = useState(false);
@@ -55,12 +56,22 @@ export default function BudgetPage() {
     if (!user) return;
     const start = format(startOfMonth(currentMonth), 'yyyy-MM-dd');
     const end = format(endOfMonth(currentMonth), 'yyyy-MM-dd');
-    const [bRes, tRes] = await Promise.all([
+    const histStart = format(startOfMonth(subMonths(currentMonth, 3)), 'yyyy-MM-dd');
+    const histEnd = format(endOfMonth(subMonths(currentMonth, 1)), 'yyyy-MM-dd');
+    const [bRes, tRes, hRes] = await Promise.all([
       supabase.from('budgets').select('*').eq('user_id', user.id).eq('month_year', monthYear),
       supabase.from('transactions').select('*').eq('user_id', user.id).eq('type', 'expense').gte('date', start).lte('date', end),
+      supabase.from('transactions').select('category, amount').eq('user_id', user.id).eq('type', 'expense').gte('date', histStart).lte('date', histEnd),
     ]);
     setBudgets(bRes.data || []);
     setTransactions(tRes.data || []);
+    const catTotals: Record<string, number> = {};
+    (hRes.data || []).forEach((t: { category: string; amount: number }) => {
+      catTotals[t.category] = (catTotals[t.category] || 0) + Number(t.amount);
+    });
+    const avg: Record<string, number> = {};
+    Object.entries(catTotals).forEach(([cat, total]) => { avg[cat] = Math.ceil((total / 3) * 1.1); });
+    setHistoryAvg(avg);
     setLoading(false);
   }, [user, monthYear, currentMonth]);
 
@@ -160,6 +171,17 @@ export default function BudgetPage() {
     fetchData();
   };
 
+  const handleAcceptSuggestion = async (category: string, amount: number) => {
+    if (!user || !amount || amount <= 0) return;
+    if (planLimits.budgets !== Infinity && budgets.length >= planLimits.budgets) {
+      toast.error(`Plano ${plan} permite até ${planLimits.budgets} orçamentos.`);
+      return;
+    }
+    await supabase.from('budgets').insert({ user_id: user.id, category, month_year: monthYear, limit_amount: amount });
+    toast.success(`Limite de ${formatCurrency(amount)} definido para ${category}`);
+    fetchData();
+  };
+
   const getProgressColor = (pct: number) => {
     if (pct >= 100) return C.red;
     if (pct >= 80) return C.amber;
@@ -179,10 +201,10 @@ export default function BudgetPage() {
   if (loading) return <div className="p-7"><div className="h-96 rounded-2xl skeleton-shimmer" /></div>;
 
   const kpis = [
-    { label: 'Orçamento Total', value: formatCurrency(totalBudget), Icon: DollarSign, iconBg: C.violetSoft, iconColor: C.violet, valColor: C.violet },
-    { label: 'Total Gasto', value: formatCurrency(totalSpent), Icon: TrendingUp, iconBg: C.redSoft, iconColor: C.red, valColor: C.red },
+    { label: 'Orçamento', value: formatCurrency(totalBudget), Icon: DollarSign, iconBg: C.violetSoft, iconColor: C.violet, valColor: C.violet },
+    { label: 'Gasto', value: formatCurrency(totalSpent), Icon: TrendingUp, iconBg: C.redSoft, iconColor: C.red, valColor: C.red },
     { label: 'Disponível', value: formatCurrency(Math.max(0, totalBudget - totalSpent)), Icon: PieChart, iconBg: C.greenSoft, iconColor: C.green, valColor: C.green },
-    { label: 'No Limite', value: String(overBudgetCount), Icon: AlertCircle, iconBg: C.amberSoft, iconColor: C.amber, valColor: C.amber },
+    { label: 'No limite', value: String(overBudgetCount), Icon: AlertCircle, iconBg: C.amberSoft, iconColor: C.amber, valColor: C.amber },
   ];
 
   // Combine budgeted + unbudgeted into one unified category list
@@ -233,27 +255,34 @@ export default function BudgetPage() {
           </button>
         </div>
 
-        {/* KPI cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 px-4">
+        {/* KPI cards — compact */}
+        <div className="grid grid-cols-4 gap-2 px-4">
           {kpis.map((s, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06 }}
+              transition={{ delay: i * 0.05 }}
               style={{
                 background: C.white,
                 border: `1px solid ${C.cardBorder}`,
-                borderRadius: 16,
-                padding: 14,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                borderRadius: 12,
+                padding: '10px 8px',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                gap: 4,
+                minWidth: 0,
               }}
             >
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: s.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
-                <s.Icon style={{ width: 18, height: 18, color: s.iconColor }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, width: '100%' }}>
+                <div style={{ width: 22, height: 22, borderRadius: 6, background: s.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <s.Icon style={{ width: 12, height: 12, color: s.iconColor }} />
+                </div>
+                <p style={{ color: C.textMuted, fontSize: 10, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.label}</p>
               </div>
-              <p style={{ color: C.textMuted, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>{s.label}</p>
-              <p style={{ color: s.valColor, fontSize: 20, fontWeight: 900 }}>{s.value}</p>
+              <p style={{ color: s.valColor, fontSize: 14, fontWeight: 800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>{s.value}</p>
             </motion.div>
           ))}
         </div>
@@ -344,29 +373,42 @@ export default function BudgetPage() {
                           </div>
                         </div>
                       </div>
-                    ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-                          <div style={{ width: 36, height: 36, borderRadius: 10, background: C.violetSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
-                            {getCatEmoji(row.category)}
-                          </div>
-                          <div style={{ minWidth: 0, flex: 1 }}>
-                            <div style={{ color: C.textStrong, fontSize: 14, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {row.category}
+                    ) : (() => {
+                      const suggested = historyAvg[row.category] || 0;
+                      return (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                            <div style={{ width: 36, height: 36, borderRadius: 10, background: C.violetSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
+                              {getCatEmoji(row.category)}
                             </div>
-                            <div style={{ color: C.red, fontSize: 11, fontWeight: 600 }}>
-                              {formatCurrency(row.spent)} gasto · sem limite
+                            <div style={{ minWidth: 0, flex: 1 }}>
+                              <div style={{ color: C.textStrong, fontSize: 14, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {row.category}
+                              </div>
+                              <div style={{ color: C.textMuted, fontSize: 11, fontWeight: 500 }}>
+                                {formatCurrency(row.spent)} gasto · sem limite
+                              </div>
                             </div>
                           </div>
+                          {suggested > 0 ? (
+                            <button
+                              onClick={() => handleAcceptSuggestion(row.category, suggested)}
+                              style={{ background: C.violetSoft, border: `1px solid ${C.violetBorder}`, borderRadius: 8, padding: '8px 12px', color: C.violetText, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                              title="Sugestão baseada na média dos últimos 3 meses + 10%"
+                            >
+                              ✨ Usar sugestão: {formatCurrency(suggested)}
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => { setBudgetInputs(prev => ({ ...prev, [row.category]: '' })); setShowSetup(true); }}
+                              style={{ background: C.violetSoft, border: `1px solid ${C.violetBorder}`, borderRadius: 8, padding: '8px 12px', color: C.violet, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', width: '100%' }}
+                            >
+                              + Definir limite
+                            </button>
+                          )}
                         </div>
-                        <button
-                          onClick={() => { setBudgetInputs(prev => ({ ...prev, [row.category]: '' })); setShowSetup(true); }}
-                          style={{ background: C.violetSoft, border: `1px solid ${C.violetBorder}`, borderRadius: 8, padding: '8px 12px', color: C.violet, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', width: '100%' }}
-                        >
-                          + Definir limite
-                        </button>
-                      </div>
-                    )}
+                      );
+                    })()}
                     {row.hasLimit && (
                       <div style={{ background: C.trackBg, borderRadius: 99, height: 6, overflow: 'hidden' }}>
                         <motion.div
