@@ -219,9 +219,9 @@ export default function BudgetPage() {
   if (loading) return <div className="p-7"><div className="h-96 rounded-2xl skeleton-shimmer" /></div>;
 
   const kpis = [
-    { label: 'Orçamento', value: formatCurrency(totalBudget), Icon: DollarSign, iconBg: C.violetSoft, iconColor: C.violet, valColor: C.violet },
-    { label: 'Gasto', value: formatCurrency(totalSpent), Icon: TrendingUp, iconBg: C.redSoft, iconColor: C.red, valColor: C.red },
-    { label: 'Disponível', value: formatCurrency(Math.max(0, totalBudget - totalSpent)), Icon: PieChart, iconBg: C.greenSoft, iconColor: C.green, valColor: C.green },
+    { label: 'Orçamento', value: formatCompact(totalBudget), Icon: DollarSign, iconBg: C.violetSoft, iconColor: C.violet, valColor: C.violet },
+    { label: 'Gasto', value: formatCompact(totalSpent), Icon: TrendingUp, iconBg: C.redSoft, iconColor: C.red, valColor: C.red },
+    { label: 'Disponível', value: formatCompact(Math.max(0, totalBudget - totalSpent)), Icon: PieChart, iconBg: C.greenSoft, iconColor: C.green, valColor: C.green },
     { label: 'No limite', value: String(overBudgetCount), Icon: AlertCircle, iconBg: C.amberSoft, iconColor: C.amber, valColor: C.amber },
   ];
 
