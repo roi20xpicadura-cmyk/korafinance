@@ -22,8 +22,50 @@ function fmt(v: number): string {
 }
 
 async function sendWhatsApp(phone: string, text: string): Promise<boolean> {
+  const normalizedPhone = String(phone || "").replace(/\D/g, "");
+  const normalizedText = String(text || "").trim().replace(/\s+/g, " ");
+  if (!normalizedPhone || !normalizedText) {
+    console.warn("[Z-API SEND] skipped empty payload");
+    return false;
+  }
+
+  const bucketMs = 2 * 60 * 1000;
+  const bucket = Math.floor(Date.now() / bucketMs);
+  const fingerprint = Array.from(normalizedText).reduce(
+    (acc, char) => ((acc * 31) + char.charCodeAt(0)) % 2147483647,
+    7,
+  );
+  const dedupKey = `out:${normalizedPhone}:${fingerprint}:${bucket}`;
+
+  const { error: dedupErr } = await supabase
+    .from("whatsapp_webhook_dedup")
+    .insert({ message_id: dedupKey });
+
+  if (dedupErr) {
+    if ((dedupErr as unknown as { code?: string }).code === "23505") {
+      console.log(`[Z-API SEND] duplicate skipped ${dedupKey}`);
+      return false;
+    }
+    console.error("[Z-API SEND] dedup insert error", dedupErr);
+  }
+
+  const tenMinutesAgo = new Date(Date.now() - (10 * 60 * 1000)).toISOString();
+  const { count: recentOutboundCount, error: recentOutboundErr } = await supabase
+    .from("whatsapp_messages")
+    .select("id", { count: "exact", head: true })
+    .eq("phone_number", normalizedPhone)
+    .eq("direction", "outbound")
+    .gte("created_at", tenMinutesAgo);
+
+  if (recentOutboundErr) {
+    console.error("[Z-API SEND] recent outbound count error", recentOutboundErr);
+  } else if ((recentOutboundCount ?? 0) >= 6) {
+    console.error(`[Z-API SEND] circuit breaker open for ${normalizedPhone} (${recentOutboundCount} msgs/10m)`);
+    return false;
+  }
+
   const url = `https://api.z-api.io/instances/${ZAPI_INSTANCE_ID}/token/${ZAPI_TOKEN}/send-text`;
-  console.log("[Z-API SEND] →", phone, "| len:", text.length);
+  console.log("[Z-API SEND] →", normalizedPhone, "| len:", normalizedText.length);
   try {
     const res = await fetch(url, {
       method: "POST",
@@ -31,7 +73,7 @@ async function sendWhatsApp(phone: string, text: string): Promise<boolean> {
         "Content-Type": "application/json",
         "Client-Token": ZAPI_CLIENT_TOKEN,
       },
-      body: JSON.stringify({ phone, message: text }),
+        body: JSON.stringify({ phone: normalizedPhone, message: normalizedText }),
     });
     const respText = await res.text();
     console.log("[Z-API SEND] status:", res.status, "| body:", respText.slice(0, 300));
