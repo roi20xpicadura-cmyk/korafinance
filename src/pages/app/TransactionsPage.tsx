@@ -182,16 +182,19 @@ export default function TransactionsPage({ profile }: TransactionsPageProps = {}
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--color-bg-base)', paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
-      {/* Page header */}
-      <div style={{ padding: '14px 16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div>
-          {/* Profile badge — only when route locks the page to a profile */}
+      {/* Page header — chip de contexto + ações (título "Lançamentos" já vem do AppLayout) */}
+      <div style={{
+        padding: '14px 16px 0',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        gap: 12, flexWrap: 'wrap',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
           {profile && (
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               background: profile === 'personal' ? 'rgba(124,58,237,0.12)' : 'rgba(37,99,235,0.12)',
               border: `1px solid ${profile === 'personal' ? 'rgba(124,58,237,0.25)' : 'rgba(37,99,235,0.25)'}`,
-              borderRadius: 99, padding: '3px 10px', marginBottom: 6,
+              borderRadius: 99, padding: '4px 10px', flexShrink: 0,
             }}>
               <span style={{ fontSize: 11 }}>{profile === 'personal' ? '🏠' : '💼'}</span>
               <span style={{
@@ -202,32 +205,35 @@ export default function TransactionsPage({ profile }: TransactionsPageProps = {}
               </span>
             </div>
           )}
-          <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--color-text-strong)', letterSpacing: '-0.03em', lineHeight: 1 }}>
-            Lançamentos
-          </h1>
-          <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 3, textTransform: 'capitalize' }}>
+          <p style={{
+            fontSize: 13, fontWeight: 600, color: 'var(--color-text-muted)',
+            textTransform: 'capitalize', margin: 0, letterSpacing: '-0.01em',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
             {periodLabel}
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
           <motion.button whileTap={{ scale: 0.95 }} onClick={() => setShowImport(true)}
+            aria-label="Importar lançamentos"
             style={{
-              width: 36, height: 36, borderRadius: 10,
+              width: 38, height: 38, borderRadius: 10,
               background: 'var(--color-bg-surface)',
               border: '1px solid var(--color-border-base)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', color: 'var(--color-text-muted)',
             }}>
-            <Upload style={{ width: 15, height: 15 }} />
+            <Upload style={{ width: 16, height: 16 }} />
           </motion.button>
           <motion.button whileTap={{ scale: 0.95 }} onClick={() => setShowSheet(true)}
             style={{
-              display: 'flex', alignItems: 'center', gap: 6, height: 36, padding: '0 14px',
-              background: 'var(--color-green-600)', border: 'none', borderRadius: 10,
+              display: 'flex', alignItems: 'center', gap: 6, height: 38, padding: '0 16px',
+              background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)',
+              border: 'none', borderRadius: 10,
               color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(34, 197, 94, 0.3)',
+              boxShadow: '0 4px 14px rgba(124,58,237,0.35)',
             }}>
-            <Plus style={{ width: 14, height: 14 }} /> Novo
+            <Plus style={{ width: 15, height: 15 }} /> Novo
           </motion.button>
         </div>
       </div>
