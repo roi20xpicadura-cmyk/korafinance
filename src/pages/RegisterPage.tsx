@@ -107,7 +107,7 @@ export default function RegisterPage() {
           setError('Essa senha foi vazada em outros sites e não é segura. Tente uma combinação única, com letras, números e símbolos.');
         } else if (raw.includes('already registered') || raw.includes('already been registered') || raw.includes('user already exists')) {
           setErrorKind('email_exists');
-          setError('Este e-mail já tem uma conta. Faça login ou continue com Google.');
+          setError('Já existe uma conta com este e-mail.');
         } else if (raw.includes('invalid') && raw.includes('email')) {
           setErrorKind('invalid_email');
           setError('E-mail inválido. Verifique se digitou corretamente.');
