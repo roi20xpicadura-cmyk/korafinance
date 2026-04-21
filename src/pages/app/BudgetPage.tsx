@@ -44,6 +44,8 @@ export default function BudgetPage() {
   const [budgets, setBudgets] = useState<BudgetRow[]>([]);
   const [transactions, setTransactions] = useState<TransactionRow[]>([]);
   const [historyAvg, setHistoryAvg] = useState<Record<string, number>>({});
+  const [historyBreakdown, setHistoryBreakdown] = useState<Record<string, Record<string, number>>>({});
+  const [auditCategory, setAuditCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [showSetup, setShowSetup] = useState(false);
