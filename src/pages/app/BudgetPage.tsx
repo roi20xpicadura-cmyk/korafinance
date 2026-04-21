@@ -63,7 +63,7 @@ export default function BudgetPage() {
     const [bRes, tRes, hRes] = await Promise.all([
       supabase.from('budgets').select('*').eq('user_id', user.id).eq('month_year', monthYear),
       supabase.from('transactions').select('*').eq('user_id', user.id).eq('type', 'expense').gte('date', start).lte('date', end),
-      supabase.from('transactions').select('category, amount').eq('user_id', user.id).eq('type', 'expense').gte('date', histStart).lte('date', histEnd),
+      supabase.from('transactions').select('category, amount, date').eq('user_id', user.id).eq('type', 'expense').gte('date', histStart).lte('date', histEnd),
     ]);
     setBudgets(bRes.data || []);
     setTransactions(tRes.data || []);
