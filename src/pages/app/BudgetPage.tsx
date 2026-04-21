@@ -409,13 +409,23 @@ export default function BudgetPage() {
                             </div>
                           </div>
                           {suggested > 0 ? (
-                            <button
-                              onClick={() => handleAcceptSuggestion(row.category, suggested)}
-                              style={{ background: C.violetSoft, border: `1px solid ${C.violetBorder}`, borderRadius: 8, padding: '8px 12px', color: C.violetText, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
-                              title="Sugestão baseada na média dos últimos 3 meses + 10%"
-                            >
-                              ✨ Usar sugestão: {formatCurrency(suggested)}
-                            </button>
+                            <div style={{ display: 'flex', gap: 6 }}>
+                              <button
+                                onClick={() => handleAcceptSuggestion(row.category, suggested)}
+                                style={{ flex: 1, background: C.violetSoft, border: `1px solid ${C.violetBorder}`, borderRadius: 8, padding: '8px 12px', color: C.violetText, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                                title="Sugestão baseada na média dos últimos 3 meses + 10%"
+                              >
+                                ✨ Usar: {formatCurrency(suggested)}
+                              </button>
+                              <button
+                                onClick={() => setAuditCategory(row.category)}
+                                style={{ background: C.white, border: `1px solid ${C.violetBorder}`, borderRadius: 8, padding: '8px 10px', color: C.violet, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                                title="Ver como foi calculado"
+                                aria-label="Ver detalhes do cálculo"
+                              >
+                                Detalhes
+                              </button>
+                            </div>
                           ) : (
                             <button
                               onClick={() => { setBudgetInputs(prev => ({ ...prev, [row.category]: '' })); setShowSetup(true); }}
