@@ -143,7 +143,7 @@ export default function RegisterPage() {
     if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
       setLoading(false);
       setErrorKind('email_exists');
-      setError('Este e-mail já tem uma conta. Faça login ou continue com Google.');
+      setError('Já existe uma conta com este e-mail.');
       haptic.error();
       return;
     }
