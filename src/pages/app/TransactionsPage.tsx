@@ -569,8 +569,7 @@ export default function TransactionsPage({ profile }: TransactionsPageProps = {}
             );
           })}
 
-          {/* Load more / total */}
-          {hasMore ? (
+          {hasMore && (
             <div style={{ padding: '12px 16px' }}>
               <motion.button whileTap={{ scale: 0.97 }} onClick={() => setPage(p => p + 1)}
                 style={{
@@ -583,14 +582,25 @@ export default function TransactionsPage({ profile }: TransactionsPageProps = {}
                 Ver mais lançamentos
               </motion.button>
             </div>
-          ) : (
-            <div style={{
-              textAlign: 'center', padding: 16,
-              fontSize: 12, color: 'var(--color-text-muted)',
-            }}>
-              {filtered.length} lançamento{filtered.length !== 1 ? 's' : ''} no total
-            </div>
           )}
+        </div>
+      )}
+
+      {/* Footer fixo sutil — acima do bottom nav */}
+      {filtered.length > 0 && (
+        <div style={{
+          position: 'fixed',
+          left: 0, right: 0,
+          bottom: 'calc(64px + env(safe-area-inset-bottom))',
+          padding: '6px 16px',
+          background: 'linear-gradient(to top, var(--color-bg-base), transparent)',
+          textAlign: 'center',
+          fontSize: 11, fontWeight: 500,
+          color: 'var(--color-text-muted)',
+          pointerEvents: 'none',
+          zIndex: 5,
+        }}>
+          {filtered.length} lançamento{filtered.length !== 1 ? 's' : ''} · {balance < 0 ? '−' : ''}R$ {formatBRL(Math.abs(balance))} de saldo
         </div>
       )}
 
