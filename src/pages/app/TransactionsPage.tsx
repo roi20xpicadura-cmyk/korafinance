@@ -196,71 +196,37 @@ export default function TransactionsPage({ profile }: TransactionsPageProps = {}
           <motion.button whileTap={{ scale: 0.95 }} onClick={() => setShowSheet(true)}
             style={{
               display: 'flex', alignItems: 'center', gap: 6, height: 36, padding: '0 14px',
-              background: 'var(--color-green-600)', border: 'none', borderRadius: 10,
+              background: 'hsl(var(--primary))', border: 'none', borderRadius: 10,
               color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(34, 197, 94, 0.3)',
+              boxShadow: '0 2px 8px hsl(var(--primary) / 0.3)',
             }}>
             <Plus style={{ width: 14, height: 14 }} /> Novo
           </motion.button>
         </div>
       </div>
 
-      {/* Summary */}
-      <div style={{
-        margin: '12px 16px',
-        background: 'var(--color-bg-surface)',
-        borderRadius: 16, padding: '16px 18px',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-        border: '1px solid var(--color-border-weak)',
-      }}>
-        {/* Saldo central */}
-        <div style={{ textAlign: 'center', marginBottom: 14 }}>
-          <div style={{
-            fontSize: 10, fontWeight: 700, color: 'var(--color-text-muted)',
-            textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4,
-          }}>
-            Saldo do mês
-          </div>
-          <div className="text-2xl md:text-3xl" style={{
-            fontWeight: 800, fontFamily: 'var(--font-mono)', letterSpacing: '-0.02em',
-            color: balance < 0 ? 'var(--color-danger-text)' : 'var(--color-text-strong)',
-          }}>
-            {balance < 0 ? '−' : ''}R$ {formatBRL(Math.abs(balance))}
-          </div>
-        </div>
-        {/* Receitas / Despesas — sóbrios */}
+      {/* Summary — minimal: só o saldo, grande e centrado */}
+      <div style={{ padding: '20px 20px 18px', textAlign: 'center' }}>
         <div style={{
-          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0,
-          borderTop: '0.5px solid var(--color-border-weak)', paddingTop: 12,
+          fontSize: 10, fontWeight: 600, color: 'var(--color-text-muted)',
+          textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6,
         }}>
-          <div style={{ padding: '0 8px', borderRight: '0.5px solid var(--color-border-weak)', textAlign: 'center' }}>
-            <div style={{
-              fontSize: 10, fontWeight: 700, color: 'var(--color-text-muted)',
-              textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3,
-            }}>
-              Receitas
-            </div>
-            <div className="text-sm md:text-base" style={{
-              fontWeight: 700, fontFamily: 'var(--font-mono)', letterSpacing: '-0.01em',
-              color: 'var(--color-text-strong)',
-            }}>
-              +R$ {formatBRL(totals.inc)}
-            </div>
-          </div>
-          <div style={{ padding: '0 8px', textAlign: 'center' }}>
-            <div style={{
-              fontSize: 10, fontWeight: 700, color: 'var(--color-text-muted)',
-              textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3,
-            }}>
-              Despesas
-            </div>
-            <div className="text-sm md:text-base" style={{
-              fontWeight: 700, fontFamily: 'var(--font-mono)', letterSpacing: '-0.01em',
-              color: 'var(--color-text-strong)',
-            }}>
-              −R$ {formatBRL(totals.exp)}
-            </div>
-          </div>
+          Saldo do mês
+        </div>
+        <div className="text-3xl md:text-4xl" style={{
+          fontWeight: 700, fontFamily: 'var(--font-mono)', letterSpacing: '-0.03em',
+          color: balance < 0 ? 'var(--color-danger-text)' : 'var(--color-text-strong)',
+          lineHeight: 1.1,
+        }}>
+          {balance < 0 ? '−' : ''}R$ {formatBRL(Math.abs(balance))}
+        </div>
+        <div style={{
+          marginTop: 8, fontSize: 12, color: 'var(--color-text-muted)',
+          fontFamily: 'var(--font-mono)',
+        }}>
+          <span>+R$ {formatBRL(totals.inc)}</span>
+          <span style={{ margin: '0 8px', opacity: 0.4 }}>·</span>
+          <span>−R$ {formatBRL(totals.exp)}</span>
         </div>
       </div>
 
@@ -272,10 +238,10 @@ export default function TransactionsPage({ profile }: TransactionsPageProps = {}
             onClick={() => { setFilter(f.id); setPage(1); }}
             style={{
               height: 32, padding: '0 14px', borderRadius: 99,
-              border: `1.5px solid ${filter === f.id ? 'var(--color-green-600)' : 'var(--color-border-base)'}`,
-              background: filter === f.id ? 'var(--color-success-bg)' : 'var(--color-bg-surface)',
+              border: `1px solid ${filter === f.id ? 'hsl(var(--primary))' : 'var(--color-border-base)'}`,
+              background: filter === f.id ? 'hsl(var(--primary))' : 'var(--color-bg-surface)',
               fontSize: 13, fontWeight: filter === f.id ? 700 : 500,
-              color: filter === f.id ? 'var(--color-success-text)' : 'var(--color-text-muted)',
+              color: filter === f.id ? 'hsl(var(--primary-foreground))' : 'var(--color-text-muted)',
               cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
               transition: 'all 150ms',
             }}>
@@ -334,10 +300,10 @@ export default function TransactionsPage({ profile }: TransactionsPageProps = {}
           {!search && filter === 'all' && (
             <motion.button whileTap={{ scale: 0.97 }} onClick={() => setShowSheet(true)}
               style={{
-                height: 44, padding: '0 24px', background: 'var(--color-green-600)',
+                height: 44, padding: '0 24px', background: 'hsl(var(--primary))',
                 border: 'none', borderRadius: 12, color: 'white',
                 fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(34, 197, 94, 0.25)',
+                boxShadow: '0 4px 14px hsl(var(--primary) / 0.25)',
               }}>
               + Adicionar primeiro lançamento
             </motion.button>
