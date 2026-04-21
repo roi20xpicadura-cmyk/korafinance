@@ -44,6 +44,8 @@ export default function BudgetPage() {
   const [budgets, setBudgets] = useState<BudgetRow[]>([]);
   const [transactions, setTransactions] = useState<TransactionRow[]>([]);
   const [historyAvg, setHistoryAvg] = useState<Record<string, number>>({});
+  const [historyBreakdown, setHistoryBreakdown] = useState<Record<string, Record<string, number>>>({});
+  const [auditCategory, setAuditCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [showSetup, setShowSetup] = useState(false);
@@ -61,17 +63,33 @@ export default function BudgetPage() {
     const [bRes, tRes, hRes] = await Promise.all([
       supabase.from('budgets').select('*').eq('user_id', user.id).eq('month_year', monthYear),
       supabase.from('transactions').select('*').eq('user_id', user.id).eq('type', 'expense').gte('date', start).lte('date', end),
-      supabase.from('transactions').select('category, amount').eq('user_id', user.id).eq('type', 'expense').gte('date', histStart).lte('date', histEnd),
+      supabase.from('transactions').select('category, amount, date').eq('user_id', user.id).eq('type', 'expense').gte('date', histStart).lte('date', histEnd),
     ]);
     setBudgets(bRes.data || []);
     setTransactions(tRes.data || []);
     const catTotals: Record<string, number> = {};
-    (hRes.data || []).forEach((t: { category: string; amount: number }) => {
+    const breakdown: Record<string, Record<string, number>> = {};
+    // Pre-fill 3 prior months as zero so even months without data show up
+    const monthKeys: string[] = [];
+    for (let i = 3; i >= 1; i--) {
+      monthKeys.push(format(subMonths(currentMonth, i), 'yyyy-MM'));
+    }
+    (hRes.data || []).forEach((t: { category: string; amount: number; date: string }) => {
       catTotals[t.category] = (catTotals[t.category] || 0) + Number(t.amount);
+      const mk = (t.date || '').slice(0, 7);
+      if (!breakdown[t.category]) breakdown[t.category] = {};
+      breakdown[t.category][mk] = (breakdown[t.category][mk] || 0) + Number(t.amount);
+    });
+    // Ensure every category has all 3 month keys (even if 0)
+    Object.keys(breakdown).forEach(cat => {
+      monthKeys.forEach(mk => {
+        if (breakdown[cat][mk] === undefined) breakdown[cat][mk] = 0;
+      });
     });
     const avg: Record<string, number> = {};
     Object.entries(catTotals).forEach(([cat, total]) => { avg[cat] = Math.ceil((total / 3) * 1.1); });
     setHistoryAvg(avg);
+    setHistoryBreakdown(breakdown);
     setLoading(false);
   }, [user, monthYear, currentMonth]);
 
@@ -368,8 +386,17 @@ export default function BudgetPage() {
                           <div style={{ color: overspent ? C.red : C.violet, fontSize: 15, fontWeight: 800 }}>
                             {formatCurrency(row.limit)}
                           </div>
-                          <div style={{ fontSize: 10, color: overspent ? C.red : C.textMuted, fontWeight: 600 }}>
+                          <div style={{ fontSize: 10, color: overspent ? C.red : C.textMuted, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
                             {overspent ? '⚠️ Estourado' : 'limite'}
+                            {!overspent && historyAvg[row.category] === row.limit && (
+                              <button
+                                onClick={() => setAuditCategory(row.category)}
+                                title="Limite veio da média dos últimos 3 meses + 10%. Clique para auditar."
+                                style={{ background: C.violetSoft, color: C.violetText, border: `1px solid ${C.violetBorder}`, borderRadius: 6, padding: '1px 6px', fontSize: 9, fontWeight: 700, cursor: 'pointer' }}
+                              >
+                                ✨ histórico
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -391,13 +418,23 @@ export default function BudgetPage() {
                             </div>
                           </div>
                           {suggested > 0 ? (
-                            <button
-                              onClick={() => handleAcceptSuggestion(row.category, suggested)}
-                              style={{ background: C.violetSoft, border: `1px solid ${C.violetBorder}`, borderRadius: 8, padding: '8px 12px', color: C.violetText, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
-                              title="Sugestão baseada na média dos últimos 3 meses + 10%"
-                            >
-                              ✨ Usar sugestão: {formatCurrency(suggested)}
-                            </button>
+                            <div style={{ display: 'flex', gap: 6 }}>
+                              <button
+                                onClick={() => handleAcceptSuggestion(row.category, suggested)}
+                                style={{ flex: 1, background: C.violetSoft, border: `1px solid ${C.violetBorder}`, borderRadius: 8, padding: '8px 12px', color: C.violetText, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                                title="Sugestão baseada na média dos últimos 3 meses + 10%"
+                              >
+                                ✨ Usar: {formatCurrency(suggested)}
+                              </button>
+                              <button
+                                onClick={() => setAuditCategory(row.category)}
+                                style={{ background: C.white, border: `1px solid ${C.violetBorder}`, borderRadius: 8, padding: '8px 10px', color: C.violet, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                                title="Ver como foi calculado"
+                                aria-label="Ver detalhes do cálculo"
+                              >
+                                Detalhes
+                              </button>
+                            </div>
                           ) : (
                             <button
                               onClick={() => { setBudgetInputs(prev => ({ ...prev, [row.category]: '' })); setShowSetup(true); }}
@@ -448,6 +485,122 @@ export default function BudgetPage() {
             </div>
           </div>
         )}
+
+        {/* Audit Modal */}
+        <AnimatePresence>
+          {auditCategory && (() => {
+            const breakdown = historyBreakdown[auditCategory] || {};
+            const months = Object.keys(breakdown).sort();
+            const total = months.reduce((s, m) => s + (breakdown[m] || 0), 0);
+            const avg = months.length > 0 ? total / months.length : 0;
+            const buffered = Math.ceil(avg * 1.1);
+            const suggested = historyAvg[auditCategory] || buffered;
+            const max = Math.max(1, ...months.map(m => breakdown[m] || 0));
+            return (
+              <>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50" onClick={() => setAuditCategory(null)} />
+                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+                  className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[460px] md:max-h-[80vh] z-50 rounded-2xl overflow-y-auto p-6"
+                  style={{ background: C.white, border: `1px solid ${C.cardBorder}`, boxShadow: '0 10px 40px rgba(0,0,0,0.12)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{ width: 40, height: 40, borderRadius: 12, background: C.violetSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
+                        {getCatEmoji(auditCategory)}
+                      </div>
+                      <div>
+                        <h3 style={{ color: C.textStrong, fontSize: 16, fontWeight: 800 }}>{auditCategory}</h3>
+                        <div style={{ color: C.textMuted, fontSize: 11, fontWeight: 600 }}>Como calculamos a sugestão</div>
+                      </div>
+                    </div>
+                    <button onClick={() => setAuditCategory(null)} style={{ color: C.textMuted, fontSize: 18, background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
+                  </div>
+
+                  {/* Breakdown bars */}
+                  <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {months.length === 0 ? (
+                      <div style={{ color: C.textMuted, fontSize: 13, padding: 16, textAlign: 'center', background: '#FAFAFB', borderRadius: 10 }}>
+                        Sem histórico para esta categoria.
+                      </div>
+                    ) : months.map(mk => {
+                      const v = breakdown[mk] || 0;
+                      const pct = (v / max) * 100;
+                      const label = format(new Date(mk + '-01'), 'MMM/yy', { locale: ptBR });
+                      return (
+                        <div key={mk}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                            <span style={{ color: C.textBody, fontSize: 12, fontWeight: 600, textTransform: 'capitalize' }}>{label}</span>
+                            <span style={{ color: C.textStrong, fontSize: 12, fontWeight: 700 }}>{formatCurrency(v)}</span>
+                          </div>
+                          <div style={{ background: C.trackBg, borderRadius: 99, height: 8, overflow: 'hidden' }}>
+                            <div style={{ width: `${pct}%`, height: '100%', background: C.violet, borderRadius: 99 }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Calculation summary */}
+                  <div style={{ marginTop: 18, padding: 14, background: C.violetSoft, border: `1px solid ${C.violetBorder}`, borderRadius: 12 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: C.textBody, marginBottom: 6 }}>
+                      <span>Total ({months.length}{months.length === 1 ? ' mês' : ' meses'})</span>
+                      <span style={{ fontWeight: 700, color: C.textStrong }}>{formatCurrency(total)}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: C.textBody, marginBottom: 6 }}>
+                      <span>Média mensal</span>
+                      <span style={{ fontWeight: 700, color: C.textStrong }}>{formatCurrency(avg)}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: C.textBody, marginBottom: 8 }}>
+                      <span>Margem de segurança (+10%)</span>
+                      <span style={{ fontWeight: 700, color: C.textStrong }}>+ {formatCurrency(buffered - Math.floor(avg))}</span>
+                    </div>
+                    <div style={{ height: 1, background: C.violetBorder, margin: '8px 0' }} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: C.violetText, fontSize: 13, fontWeight: 700 }}>Sugestão final</span>
+                      <span style={{ color: C.violet, fontSize: 18, fontWeight: 800 }}>{formatCurrency(suggested)}</span>
+                    </div>
+                  </div>
+
+                  {/* Custom override + actions */}
+                  <div style={{ marginTop: 14 }}>
+                    <label style={{ color: C.textMuted, fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 6 }}>Ajustar antes de aceitar (opcional)</label>
+                    <div style={{ position: 'relative' }}>
+                      <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 13, fontWeight: 600, color: C.textMuted }}>R$</span>
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        defaultValue={String(suggested)}
+                        onChange={e => setBudgetInputs(prev => ({ ...prev, [`__audit_${auditCategory}`]: e.target.value }))}
+                        style={{ width: '100%', height: 42, paddingLeft: 38, paddingRight: 12, fontSize: 14, fontWeight: 700, borderRadius: 10, outline: 'none', background: C.white, border: `1.5px solid ${C.cardBorder}`, color: C.textStrong }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+                    <button
+                      onClick={() => setAuditCategory(null)}
+                      style={{ flex: 1, height: 44, borderRadius: 10, fontSize: 13, fontWeight: 700, color: C.textBody, background: C.white, border: `1px solid ${C.cardBorder}`, cursor: 'pointer' }}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={() => {
+                        const override = parseFloat((budgetInputs[`__audit_${auditCategory}`] || '').replace(',', '.'));
+                        const finalAmount = !isNaN(override) && override > 0 ? Math.ceil(override) : suggested;
+                        const cat = auditCategory;
+                        setAuditCategory(null);
+                        if (cat) handleAcceptSuggestion(cat, finalAmount);
+                      }}
+                      style={{ flex: 2, height: 44, borderRadius: 10, fontSize: 13, fontWeight: 800, color: C.white, background: C.violet, border: 'none', cursor: 'pointer' }}
+                    >
+                      Aceitar e definir limite
+                    </button>
+                  </div>
+                </motion.div>
+              </>
+            );
+          })()}
+        </AnimatePresence>
 
         {/* Setup Modal */}
         <AnimatePresence>
