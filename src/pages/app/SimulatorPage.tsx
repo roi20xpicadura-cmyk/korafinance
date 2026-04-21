@@ -63,7 +63,7 @@ const LazySimChart = lazy(() => import('recharts').then(m => ({
   }
 })));
 
-function ImpactCard({ label, baseline, simulated, unit, inverse, accentKey }: {
+function ImpactCard({ label, baseline, simulated, inverse, accentKey }: {
   label: string; baseline: number; simulated: number; unit: string; inverse?: boolean;
   accentKey: 'sobra' | 'ano' | 'score' | 'divida';
 }) {
