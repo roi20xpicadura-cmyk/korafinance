@@ -294,22 +294,20 @@ export default function BudgetPage() {
                 background: C.white,
                 border: `1px solid ${C.cardBorder}`,
                 borderRadius: 12,
-                padding: '10px 8px',
+                padding: '10px 8px 12px',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'flex-start',
-                gap: 4,
+                gap: 8,
                 minWidth: 0,
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, width: '100%' }}>
-                <div style={{ width: 22, height: 22, borderRadius: 6, background: s.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <s.Icon style={{ width: 12, height: 12, color: s.iconColor }} />
-                </div>
-                <p style={{ color: C.textMuted, fontSize: 10, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.label}</p>
+              <div style={{ width: 24, height: 24, borderRadius: 7, background: s.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <s.Icon style={{ width: 13, height: 13, color: s.iconColor }} />
               </div>
-              <p style={{ color: s.valColor, fontSize: 14, fontWeight: 800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>{s.value}</p>
+              <p style={{ color: C.textMuted, fontSize: 10, fontWeight: 600, lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>{s.label}</p>
+              <p style={{ color: s.valColor, fontSize: 15, fontWeight: 800, lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', letterSpacing: '-0.01em' }} title={s.value}>{s.value}</p>
             </motion.div>
           ))}
         </div>
