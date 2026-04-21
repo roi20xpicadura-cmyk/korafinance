@@ -185,27 +185,7 @@ export default function TransactionsPage({ profile }: TransactionsPageProps = {}
       {/* Page header */}
       <div style={{ padding: '14px 16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          {/* Profile badge — only when route locks the page to a profile */}
-          {profile && (
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              background: profile === 'personal' ? 'rgba(124,58,237,0.12)' : 'rgba(37,99,235,0.12)',
-              border: `1px solid ${profile === 'personal' ? 'rgba(124,58,237,0.25)' : 'rgba(37,99,235,0.25)'}`,
-              borderRadius: 99, padding: '3px 10px', marginBottom: 6,
-            }}>
-              <span style={{ fontSize: 11 }}>{profile === 'personal' ? '🏠' : '💼'}</span>
-              <span style={{
-                fontSize: 10, fontWeight: 800, letterSpacing: '0.04em',
-                color: profile === 'personal' ? 'var(--color-green-600)' : '#3B82F6',
-              }}>
-                {profile === 'personal' ? 'PESSOAL' : 'NEGÓCIO'}
-              </span>
-            </div>
-          )}
-          <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--color-text-strong)', letterSpacing: '-0.03em', lineHeight: 1 }}>
-            Lançamentos
-          </h1>
-          <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 3, textTransform: 'capitalize' }}>
+          <p style={{ fontSize: 12, color: 'var(--color-text-muted)', textTransform: 'capitalize' }}>
             {periodLabel}
           </p>
         </div>
