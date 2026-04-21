@@ -196,24 +196,37 @@ export default function GoalsPage() {
     }}>
       {/* Header */}
       <div style={{
-        padding: '16px 20px 0',
+        padding: '14px 20px 0',
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-end',
         justifyContent: 'space-between',
+        gap: 12,
       }}>
-        <div>
-          <h1 style={{
-            fontSize: 22, fontWeight: 900,
-            color: 'var(--color-text-strong)',
-            letterSpacing: '-0.03em',
-            lineHeight: 1,
-          }}>
-            Minhas Metas
-          </h1>
-          {goals.length > 0 && (
-            <p style={{ fontSize: 12, color: 'var(--color-text-subtle)', marginTop: 3 }}>
-              {activeGoals.length} ativa{activeGoals.length !== 1 ? 's' : ''}
-              {completedGoals.length > 0 && ` · ${completedGoals.length} concluída${completedGoals.length !== 1 ? 's' : ''}`}
+        <div style={{ minWidth: 0 }}>
+          {goals.length > 0 ? (
+            <p style={{
+              fontSize: 13,
+              color: 'var(--color-text-subtle)',
+              fontWeight: 500,
+              lineHeight: 1.3,
+            }}>
+              <span style={{ color: 'var(--color-text-strong)', fontWeight: 700 }}>
+                {activeGoals.length}
+              </span>
+              {' '}meta{activeGoals.length !== 1 ? 's' : ''} ativa{activeGoals.length !== 1 ? 's' : ''}
+              {completedGoals.length > 0 && (
+                <>
+                  {' · '}
+                  <span style={{ color: 'hsl(var(--primary))', fontWeight: 700 }}>
+                    {completedGoals.length}
+                  </span>
+                  {' '}concluída{completedGoals.length !== 1 ? 's' : ''}
+                </>
+              )}
+            </p>
+          ) : (
+            <p style={{ fontSize: 13, color: 'var(--color-text-subtle)' }}>
+              Defina onde você quer chegar
             </p>
           )}
         </div>
@@ -222,15 +235,16 @@ export default function GoalsPage() {
           onClick={() => openAddGoal()}
           style={{
             display: 'flex', alignItems: 'center', gap: 6,
-            height: 36, padding: '0 14px',
+            height: 34, padding: '0 12px',
             background: 'hsl(var(--primary))',
             border: 'none', borderRadius: 10,
-            color: 'white', fontSize: 13, fontWeight: 700,
+            color: 'white', fontSize: 12.5, fontWeight: 700,
             cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(124, 58, 237,0.3)',
+            boxShadow: '0 2px 8px hsl(var(--primary) / 0.28)',
+            flexShrink: 0,
           }}
         >
-          <Plus size={14} />
+          <Plus size={14} strokeWidth={2.5} />
           Nova meta
         </motion.button>
       </div>
