@@ -390,9 +390,22 @@ export default function WhatsAppSection() {
   };
 
   return (
-    <section className="relative py-16 md:py-28 px-4 overflow-hidden bg-gradient-to-b from-[#f0fdf4] via-white to-[#f0fdf4]">
-      <div className="pointer-events-none absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-[#22c55e]/10 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#4ade80]/10 blur-3xl" />
+    <section className="relative py-20 md:py-32 px-4 overflow-hidden bg-[#0a0613]">
+      {/* Background — premium violet mesh */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(124,58,237,0.35),transparent_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_85%_90%,rgba(34,197,94,0.18),transparent_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_15%_80%,rgba(167,139,250,0.20),transparent_70%)]" />
+      <div
+        className="absolute inset-0 opacity-[0.04] pointer-events-none"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(167,139,250,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(167,139,250,0.5) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+        }}
+      />
+      {/* Top + bottom fade */}
+      <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-[#0a0613] to-transparent" />
+      <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-[#0a0613] to-transparent" />
 
       <div className="relative max-w-[1200px] mx-auto">
         {/* Header */}
@@ -401,49 +414,56 @@ export default function WhatsAppSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease }}
-          className="text-center mb-8 md:mb-12"
+          className="text-center mb-10 md:mb-14"
         >
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#bbf7d0] bg-[#f0fdf4] mb-5">
-            <Sparkles className="w-3 h-3 text-[#16a34a]" />
-            <span className="text-[11px] font-[800] text-[#15803d] uppercase tracking-[1px]">Demo ao vivo · IA real</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#a78bfa]/30 bg-[#7C3AED]/10 backdrop-blur-md mb-6 shadow-[0_0_30px_rgba(124,58,237,0.25)]">
+            <span className="relative flex w-2 h-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#22c55e] opacity-75" />
+              <span className="relative inline-flex w-2 h-2 rounded-full bg-[#22c55e]" />
+            </span>
+            <span className="text-[11px] font-[800] text-white uppercase tracking-[1.5px]">Demo ao vivo · IA real</span>
           </div>
-          <h2 className="text-[28px] md:text-[48px] font-[900] text-[#0f172a] tracking-[-1px] md:tracking-[-2px] leading-[1.1]">
-            Converse com a Kora <br className="hidden md:block" />
-            <span className="text-[#16a34a]">no WhatsApp. Agora.</span>
+          <h2 className="text-[32px] md:text-[56px] font-[900] text-white tracking-[-1.5px] md:tracking-[-2.5px] leading-[1.05]">
+            Converse com a Kora<br className="hidden md:block" />
+            <span className="bg-gradient-to-r from-[#a78bfa] via-[#c4b5fd] to-[#86efac] bg-clip-text text-transparent">no WhatsApp. Agora mesmo.</span>
           </h2>
-          <p className="text-[15px] md:text-[18px] text-[#64748b] mt-4 max-w-[580px] mx-auto leading-[1.6]">
-            Não é vídeo. Não é gif. É a IA real do KoraFinance respondendo às suas mensagens com uma carteira fictícia. Teste agora 👇
+          <p className="text-[15px] md:text-[18px] text-white/60 mt-5 max-w-[600px] mx-auto leading-[1.6]">
+            Não é vídeo. Não é gif. É a IA real do <span className="text-white font-semibold">KoraFinance</span> respondendo às suas mensagens com uma carteira fictícia.
           </p>
         </motion.div>
 
         {/* Persona toggle */}
-        <div className="flex justify-center mb-8">
-          <div className="inline-flex p-1 bg-white border border-[#e2e8f0] rounded-full shadow-sm">
+        <div className="flex justify-center mb-12">
+          <div className="inline-flex p-1 bg-white/[0.04] border border-white/10 rounded-full backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
             {([
-              { id: 'personal' as const, label: '👤 Vida pessoal', sub: 'Lucas' },
-              { id: 'business' as const, label: '💼 Meu negócio', sub: 'Mariana' },
+              { id: 'personal' as const, emoji: '👤', label: 'Vida pessoal', sub: 'Lucas' },
+              { id: 'business' as const, emoji: '💼', label: 'Meu negócio', sub: 'Mariana' },
             ]).map(opt => (
               <button
                 key={opt.id}
                 onClick={() => switchPersona(opt.id)}
-                className={`relative px-4 md:px-5 py-2 rounded-full text-[13px] md:text-[14px] font-bold transition-colors ${
-                  persona === opt.id ? 'text-white' : 'text-[#64748b] hover:text-[#0f172a]'
+                className={`relative px-5 md:px-6 py-2.5 rounded-full text-[13px] md:text-[14px] font-bold transition-colors ${
+                  persona === opt.id ? 'text-white' : 'text-white/50 hover:text-white/80'
                 }`}
               >
                 {persona === opt.id && (
                   <motion.div
                     layoutId="persona-pill"
-                    className="absolute inset-0 bg-[#16a34a] rounded-full"
+                    className="absolute inset-0 bg-gradient-to-r from-[#7C3AED] to-[#8B5CF6] rounded-full shadow-[0_4px_20px_rgba(124,58,237,0.5)]"
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
                 )}
-                <span className="relative">{opt.label}</span>
+                <span className="relative flex items-center gap-2">
+                  <span>{opt.emoji}</span>
+                  <span>{opt.label}</span>
+                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-md ${persona === opt.id ? 'bg-white/20' : 'bg-white/5'}`}>{opt.sub}</span>
+                </span>
               </button>
             ))}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-10 lg:gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-12 lg:gap-20 items-start">
           {/* Phone */}
           <motion.div
             initial={{ opacity: 0, scale: 0.92 }}
