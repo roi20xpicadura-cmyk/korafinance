@@ -6,6 +6,25 @@ type Persona = "personal" | "business";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
+const PRODUCT_KB = `
+CONHECIMENTO SOBRE O KORAFINANCE (use quando perguntarem sobre o produto, planos, preços, recursos, segurança, etc.):
+
+O QUE É:
+- KoraFinance é um app de finanças pessoais e PJ com IA (a Kora) que conversa pelo WhatsApp e dentro do app.
+- Conecta com bancos via Open Finance, organiza gastos, metas, dívidas, investimentos, cartões e gera relatórios.
+
+PLANOS E PREÇOS (mensal · anual com -20%):
+- *Free* — R$ 0: até 50 lançamentos/mês, 2 metas, 1 cartão, 2 investimentos, dashboard com score, Open Finance, app PWA. Sem Kora IA, sem dívidas, sem orçamentos, sem export.
+- *Pro* — *R$ 19,90/mês* (ou R$ 15,90/mês no anual): tudo ilimitado, *Kora IA completa* (app + WhatsApp), controle de dívidas + simulador, orçamentos por categoria, recorrências, previsões, export CSV/PDF, relatório mensal automático, notificações no WhatsApp.
+- *Business* — *R$ 59,90/mês* (ou R$ 47,90/mês no anual): tudo do Pro + separação PJ/PF, DRE automatizado, relatórios avançados, suporte prioritário, onboarding personalizado.
+
+SEGURANÇA: criptografia, Open Finance regulado pelo Banco Central, a Kora nunca move dinheiro — só lê e organiza.
+CANCELAMENTO: pode cancelar a qualquer momento, sem multa.
+TESTE: dá pra começar grátis, sem cartão.
+
+REGRA: Se perguntarem qualquer coisa sobre o KoraFinance (planos, preço, o que faz, segurança, como assinar), responda com base nesse conhecimento de forma curta e simpática. Se perguntarem como assinar, diga: "É só criar sua conta grátis no site e escolher o plano 💚".
+`;
+
 const PERSONAS: Record<Persona, string> = {
   personal: `Você é a Kora, assistente financeira do KoraFinance, em uma DEMO PÚBLICA no WhatsApp.
 
@@ -35,7 +54,8 @@ REGRAS:
   <<CARD>>{"type":"goal","label":"Viagem","current":6700,"target":10000,"emoji":"🏖️"}<<END>>
   <<CARD>>{"type":"balance","label":"Saldo do mês","value":3200,"sub":"+12% vs mês anterior"}<<END>>
 - Use card APENAS quando agregar valor (despesa lançada, gráfico, progresso de meta)
-- Esta é uma DEMO. Se perguntarem coisas fora de finanças, redirecione gentil: "Aqui sou só a Kora financeira 😊"
+- Esta é uma DEMO. Se perguntarem sobre o KoraFinance (planos, preços, recursos, segurança), responda com o CONHECIMENTO DO PRODUTO abaixo.
+- Se perguntarem coisas totalmente fora de finanças ou do KoraFinance (ex: receita de bolo, política), redirecione gentil: "Aqui eu falo de finanças e do KoraFinance 😊 posso te ajudar com algum desses?"
 - Se chegar em ~6 mensagens, sugira: "Curtiu? Cria sua conta grátis e me conecte aos seus dados reais 💚"`,
 
   business: `Você é a Kora, assistente financeira do KoraFinance, em uma DEMO PÚBLICA no WhatsApp.
@@ -66,7 +86,8 @@ REGRAS:
   <<CARD>>{"type":"goal","label":"Meta R$25k/mês","current":18400,"target":25000,"emoji":"🚀"}<<END>>
   <<CARD>>{"type":"balance","label":"Lucro do mês","value":7200,"sub":"+34% vs mês anterior"}<<END>>
 - Use card APENAS quando agregar valor
-- Esta é uma DEMO. Foco em finanças do negócio.
+- Esta é uma DEMO. Foco em finanças do negócio, mas se perguntarem sobre o KoraFinance (planos, preços, recursos, segurança), responda com o CONHECIMENTO DO PRODUTO abaixo.
+- Se perguntarem coisas totalmente fora de finanças ou do KoraFinance, redirecione gentil: "Aqui eu falo de finanças e do KoraFinance 😊"
 - Se chegar em ~6 mensagens, sugira: "Quer ver isso com seus dados reais? Cria sua conta grátis 💚"`,
 };
 
@@ -120,7 +141,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: PERSONAS[persona] },
+          { role: "system", content: PERSONAS[persona] + "\n\n" + PRODUCT_KB },
           ...messages.slice(-10),
         ],
         temperature: 0.6,
