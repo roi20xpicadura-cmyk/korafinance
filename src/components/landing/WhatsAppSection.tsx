@@ -390,7 +390,7 @@ export default function WhatsAppSection() {
   };
 
   return (
-    <section className="relative py-16 sm:py-20 md:py-32 px-3 sm:px-4 overflow-hidden bg-[#0a0613]">
+    <section className="relative py-16 sm:py-20 md:py-32 px-3 sm:px-4 overflow-x-clip bg-[#0a0613]">
       {/* Background — premium violet mesh */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(124,58,237,0.35),transparent_60%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_85%_90%,rgba(34,197,94,0.18),transparent_70%)]" />
@@ -442,7 +442,7 @@ export default function WhatsAppSection() {
               <button
                 key={opt.id}
                 onClick={() => switchPersona(opt.id)}
-                className={`relative px-3.5 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-full text-[12px] sm:text-[13px] md:text-[14px] font-bold transition-colors ${
+                className={`relative whitespace-nowrap px-3 min-[400px]:px-3.5 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-full text-[11.5px] min-[400px]:text-[12px] sm:text-[13px] md:text-[14px] font-bold transition-colors ${
                   persona === opt.id ? 'text-white' : 'text-white/50 hover:text-white/80'
                 }`}
               >
@@ -453,10 +453,10 @@ export default function WhatsAppSection() {
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
                 )}
-                <span className="relative flex items-center gap-1.5 sm:gap-2">
+                <span className="relative flex items-center gap-1 min-[400px]:gap-1.5 sm:gap-2">
                   <span>{opt.emoji}</span>
                   <span>{opt.label}</span>
-                  <span className={`hidden sm:inline text-[10px] font-semibold px-1.5 py-0.5 rounded-md ${persona === opt.id ? 'bg-white/20' : 'bg-white/5'}`}>{opt.sub}</span>
+                  <span className={`hidden md:inline text-[10px] font-semibold px-1.5 py-0.5 rounded-md ${persona === opt.id ? 'bg-white/20' : 'bg-white/5'}`}>{opt.sub}</span>
                 </span>
               </button>
             ))}
@@ -473,7 +473,7 @@ export default function WhatsAppSection() {
             className="flex justify-center lg:sticky lg:top-24 relative"
           >
             {/* Glow halo behind phone */}
-            <div className="absolute -inset-6 sm:-inset-10 bg-gradient-to-br from-[#7C3AED]/30 via-[#8B5CF6]/20 to-[#22c55e]/20 blur-3xl rounded-full pointer-events-none" />
+            <div className="absolute -inset-4 sm:-inset-10 bg-gradient-to-br from-[#7C3AED]/30 via-[#8B5CF6]/20 to-[#22c55e]/20 blur-3xl rounded-full pointer-events-none" />
 
             {/* Floating decorative card — top right (lg+ only to avoid overlap on tablet) */}
             <motion.div
@@ -514,11 +514,12 @@ export default function WhatsAppSection() {
               </div>
             </motion.div>
 
-            <div className="relative w-[290px] sm:w-[340px] md:w-[360px] aspect-[9/19] rounded-[40px] sm:rounded-[44px] border-[8px] sm:border-[10px] border-[#0a0a0a] bg-[#0a0a0a] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.7),0_0_0_1px_rgba(167,139,250,0.15)]">
-              <div className="absolute -left-[12px] top-[22%] w-[3px] h-8 rounded-l bg-[#1a1a1a]" />
-              <div className="absolute -left-[12px] top-[32%] w-[3px] h-14 rounded-l bg-[#1a1a1a]" />
-              <div className="absolute -left-[12px] top-[44%] w-[3px] h-14 rounded-l bg-[#1a1a1a]" />
-              <div className="absolute -right-[12px] top-[28%] w-[3px] h-20 rounded-r bg-[#1a1a1a]" />
+            <div className="relative w-[270px] min-[400px]:w-[300px] min-[520px]:w-[330px] sm:w-[340px] md:w-[360px] aspect-[9/19] rounded-[36px] sm:rounded-[44px] border-[7px] sm:border-[10px] border-[#0a0a0a] bg-[#0a0a0a] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.7),0_0_0_1px_rgba(167,139,250,0.15)]">
+              {/* Side buttons — hidden on mobile to avoid overflow */}
+              <div className="hidden sm:block absolute -left-[12px] top-[22%] w-[3px] h-8 rounded-l bg-[#1a1a1a]" />
+              <div className="hidden sm:block absolute -left-[12px] top-[32%] w-[3px] h-14 rounded-l bg-[#1a1a1a]" />
+              <div className="hidden sm:block absolute -left-[12px] top-[44%] w-[3px] h-14 rounded-l bg-[#1a1a1a]" />
+              <div className="hidden sm:block absolute -right-[12px] top-[28%] w-[3px] h-20 rounded-r bg-[#1a1a1a]" />
 
               <div className="relative w-full h-full rounded-[34px] overflow-hidden flex flex-col bg-[#0b141a]">
                 {/* Notch */}
