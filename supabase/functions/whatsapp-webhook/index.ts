@@ -2,7 +2,10 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
-const ANTHROPIC_MODEL = "claude-sonnet-4-5";
+// Modelo padrão de texto: Haiku é ~3-4x mais rápido que o Sonnet e mantém
+// ótima qualidade pra respostas curtas de finanças (lançamentos, dúvidas,
+// status). Se precisar voltar pro Sonnet, basta trocar a constante.
+const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 
 const ZAPI_INSTANCE_ID = Deno.env.get("ZAPI_INSTANCE_ID")!;
