@@ -514,7 +514,7 @@ export default function WhatsAppSection() {
               </div>
             </motion.div>
 
-            <div className="relative w-[280px] xs:w-[300px] sm:w-[340px] md:w-[360px] aspect-[9/19] rounded-[40px] sm:rounded-[44px] border-[8px] sm:border-[10px] border-[#0a0a0a] bg-[#0a0a0a] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.7),0_0_0_1px_rgba(167,139,250,0.15)]">
+            <div className="relative w-[290px] sm:w-[340px] md:w-[360px] aspect-[9/19] rounded-[40px] sm:rounded-[44px] border-[8px] sm:border-[10px] border-[#0a0a0a] bg-[#0a0a0a] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.7),0_0_0_1px_rgba(167,139,250,0.15)]">
               <div className="absolute -left-[12px] top-[22%] w-[3px] h-8 rounded-l bg-[#1a1a1a]" />
               <div className="absolute -left-[12px] top-[32%] w-[3px] h-14 rounded-l bg-[#1a1a1a]" />
               <div className="absolute -left-[12px] top-[44%] w-[3px] h-14 rounded-l bg-[#1a1a1a]" />
