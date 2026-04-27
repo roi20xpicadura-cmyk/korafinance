@@ -1034,7 +1034,7 @@ Acesse seu dashboard pra revisar e ajustar categorias se quiser, ${ctx.name}! ðŸ
       const systemPrompt = buildSystemPrompt(ctx);
 
       const messages = (history?.reverse() || [])
-        .slice(-6)
+        .slice(-4)
         .filter((m: any) => m.role && m.content)
         .map((m: any) => ({
           role: m.role === "assistant" ? "assistant" : "user",
@@ -1052,7 +1052,7 @@ Acesse seu dashboard pra revisar e ajustar categorias se quiser, ${ctx.name}! ðŸ
         },
         body: JSON.stringify({
           model: ANTHROPIC_MODEL,
-          max_tokens: 600,
+          max_tokens: 400,
           system: systemPrompt,
           messages,
         }),
