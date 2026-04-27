@@ -6,14 +6,18 @@ import {
   BarChart3,
   CreditCard,
   FileText,
-  Home,
-  ListOrdered,
+  LayoutDashboard,
+  ArrowLeftRight,
   RefreshCw,
   Sparkles,
   Target,
   TrendingUp,
+  Bell,
+  Search,
+  Plus,
 } from 'lucide-react';
 import { demoStore } from './demoStore';
+import koraIcon from '@/assets/korafinance-icon.png';
 import DemoOverview from './screens/DemoOverview';
 import DemoTransactions from './screens/DemoTransactions';
 import DemoGoals from './screens/DemoGoals';
@@ -22,13 +26,23 @@ import DemoInvestments from './screens/DemoInvestments';
 import DemoDRE from './screens/DemoDRE';
 
 const TABS = [
-  { key: 'overview',    label: 'Visão geral',    icon: Home },
-  { key: 'transactions', label: 'Transações',    icon: ListOrdered },
-  { key: 'goals',       label: 'Metas',          icon: Target },
-  { key: 'cards',       label: 'Cartões',        icon: CreditCard },
-  { key: 'investments', label: 'Investimentos',  icon: TrendingUp },
-  { key: 'dre',         label: 'DRE',            icon: FileText },
+  { key: 'overview',     label: 'Visão Geral',    icon: LayoutDashboard },
+  { key: 'transactions', label: 'Lançamentos',    icon: ArrowLeftRight },
+  { key: 'goals',        label: 'Metas',          icon: Target },
+  { key: 'cards',        label: 'Cartões',        icon: CreditCard },
+  { key: 'investments',  label: 'Investimentos',  icon: TrendingUp },
+  { key: 'dre',          label: 'DRE',            icon: FileText },
 ] as const;
+
+const TAB_TITLES: Record<string, string> = {
+  overview: 'Visão Geral',
+  transactions: 'Lançamentos',
+  goals: 'Metas',
+  cards: 'Cartões de Crédito',
+  investments: 'Investimentos',
+  dre: 'DRE',
+  charts: 'Gráficos',
+};
 
 type TabKey = typeof TABS[number]['key'] | 'charts';
 
@@ -89,18 +103,32 @@ export default function LiveDemoSection() {
             </button>
           </div>
 
-          {/* App body */}
-          <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] min-h-[600px] md:min-h-[680px]">
-            {/* Sidebar (desktop) */}
-            <aside className="hidden md:flex flex-col bg-gradient-to-b from-[#FAFAFE] to-white border-r border-[rgba(124,58,237,0.08)] p-3">
-              <div className="flex items-center gap-2 px-2 py-3 mb-2">
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#7C3AED] to-[#4C1D95] flex items-center justify-center text-white font-[900] text-[13px]">
-                  K
-                </div>
+          {/* App body — replica fiel do AppLayout */}
+          <div
+            className="grid grid-cols-1 md:grid-cols-[240px_1fr] min-h-[640px] md:min-h-[720px]"
+            style={{ background: 'var(--color-bg-base)' }}
+          >
+            {/* Sidebar (desktop) — espelha AppLayout real */}
+            <aside
+              className="hidden md:flex flex-col"
+              style={{
+                background: 'var(--color-bg-surface)',
+                borderRight: '0.5px solid var(--color-border-weak)',
+                padding: '16px 12px',
+              }}
+            >
+              <div className="flex items-center gap-2 px-2 mb-4">
+                <img src={koraIcon} alt="" className="w-8 h-8 rounded-lg" />
                 <div>
-                  <div className="text-[12.5px] font-[800] text-[#1A0D35] leading-tight">KoraFinance</div>
-                  <div className="text-[9.5px] text-[#7B6A9B] uppercase tracking-wider font-bold">demo</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--color-text-strong)', letterSpacing: '-0.3px' }}>KoraFinance</div>
+                  <div style={{ fontSize: 9.5, color: 'var(--color-text-subtle)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                    demo interativa
+                  </div>
                 </div>
+              </div>
+
+              <div style={{ padding: '0 8px 8px', fontSize: 10, fontWeight: 800, color: 'var(--color-text-subtle)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                Menu principal
               </div>
               <nav className="space-y-0.5 flex-1">
                 {TABS.map((t) => {
@@ -110,73 +138,175 @@ export default function LiveDemoSection() {
                     <button
                       key={t.key}
                       onClick={() => setTab(t.key)}
-                      className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[12.5px] font-semibold transition-all ${
-                        active
-                          ? 'bg-[#7C3AED] text-white shadow-sm'
-                          : 'text-[#4A3A6B] hover:bg-[#F5F3FF] hover:text-[#7C3AED]'
-                      }`}
+                      className="w-full flex items-center gap-2.5"
+                      style={{
+                        padding: '8px 10px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                        fontSize: 13, fontWeight: active ? 700 : 500,
+                        background: active ? 'var(--color-bg-sunken)' : 'transparent',
+                        color: active ? 'var(--color-green-600)' : 'var(--color-text-muted)',
+                        position: 'relative',
+                      }}
                     >
+                      {active && (
+                        <span style={{ position: 'absolute', left: 0, top: 8, bottom: 8, width: 3, background: 'var(--color-green-600)', borderRadius: 99 }} />
+                      )}
                       <Icon className="w-4 h-4" />
-                      {t.label}
+                      <span>{t.label}</span>
                     </button>
                   );
                 })}
               </nav>
 
-              <div className="rounded-xl p-3 bg-gradient-to-br from-[#1A0D35] to-[#4C1D95] text-white">
-                <div className="text-[10px] uppercase tracking-wider font-bold text-white/60 mb-1">curtindo?</div>
-                <p className="text-[11.5px] leading-snug mb-2">Cria sua conta e conecte seus bancos via Open Finance.</p>
+              <div
+                className="rounded-xl p-3 mt-3 text-white"
+                style={{ background: 'linear-gradient(135deg, #1A0D35 0%, #4C1D95 100%)' }}
+              >
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 4 }}>
+                  curtindo?
+                </div>
+                <p style={{ fontSize: 11.5, lineHeight: 1.35, marginBottom: 10 }}>
+                  Crie sua conta grátis e conecte seus bancos via Open Finance.
+                </p>
                 <Link
                   to="/register"
-                  className="block w-full text-center py-1.5 rounded-lg bg-white text-[#1A0D35] text-[11px] font-[800] hover:bg-[#F5F3FF] transition-colors"
+                  className="block w-full text-center py-1.5 rounded-lg"
+                  style={{ background: 'white', color: '#1A0D35', fontSize: 11, fontWeight: 800 }}
                 >
                   Começar grátis →
                 </Link>
               </div>
             </aside>
 
-            {/* Mobile tabs */}
-            <div className="md:hidden flex items-center gap-1 overflow-x-auto px-3 py-2 border-b border-[rgba(124,58,237,0.08)] bg-[#FAFAFE]">
-              {TABS.map((t) => {
-                const active = tab === t.key;
-                const Icon = t.icon;
-                return (
+            {/* Right column = header + (mobile tabs) + content */}
+            <div className="flex flex-col min-w-0">
+              {/* App header — espelha o header do AppLayout */}
+              <div
+                className="hidden md:flex items-center justify-between px-5 h-[52px] flex-shrink-0"
+                style={{
+                  background: 'var(--color-bg-surface)',
+                  borderBottom: '0.5px solid var(--color-border-weak)',
+                }}
+              >
+                <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--color-text-strong)', letterSpacing: '-0.3px' }}>
+                  {TAB_TITLES[tab] ?? 'Visão Geral'}
+                </div>
+                <div className="flex items-center gap-2">
                   <button
-                    key={t.key}
-                    onClick={() => setTab(t.key)}
-                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11.5px] font-bold flex-shrink-0 transition-colors ${
-                      active ? 'bg-[#7C3AED] text-white' : 'text-[#4A3A6B] bg-white border border-[rgba(124,58,237,0.10)]'
-                    }`}
+                    style={{
+                      width: 32, height: 32, borderRadius: 9, background: 'var(--color-bg-sunken)',
+                      border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                    }}
                   >
-                    <Icon className="w-3.5 h-3.5" />
-                    {t.label}
+                    <Search className="w-4 h-4" style={{ color: 'var(--color-text-muted)' }} />
                   </button>
-                );
-              })}
-            </div>
-
-            {/* Content */}
-            <main className="relative overflow-hidden">
-              <div className="p-4 md:p-6 max-h-[680px] md:max-h-[680px] overflow-y-auto">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={tab}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.2 }}
+                  <button
+                    style={{
+                      width: 32, height: 32, borderRadius: 9, background: 'var(--color-bg-sunken)',
+                      border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', position: 'relative',
+                    }}
                   >
-                    {tab === 'overview' && <DemoOverview onGo={(t) => setTab(t as TabKey)} />}
-                    {tab === 'transactions' && <DemoTransactions />}
-                    {tab === 'goals' && <DemoGoals />}
-                    {tab === 'cards' && <DemoCards />}
-                    {tab === 'investments' && <DemoInvestments />}
-                    {tab === 'dre' && <DemoDRE />}
-                    {tab === 'charts' && <DemoOverview onGo={(t) => setTab(t as TabKey)} />}
-                  </motion.div>
-                </AnimatePresence>
+                    <Bell className="w-4 h-4" style={{ color: 'var(--color-text-muted)' }} />
+                    <span style={{ position: 'absolute', top: 6, right: 6, width: 6, height: 6, background: '#ef4444', borderRadius: 99 }} />
+                  </button>
+                  <div className="w-px h-5 mx-1" style={{ background: 'var(--color-border-base)' }} />
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] font-[800]"
+                      style={{ background: 'linear-gradient(135deg, #7C3AED, #4C1D95)' }}
+                    >
+                      L
+                    </div>
+                    <div className="hidden lg:block">
+                      <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text-strong)', lineHeight: 1.1 }}>Lucas</div>
+                      <div style={{ fontSize: 10, color: 'var(--color-text-subtle)', fontWeight: 600 }}>Plano Pro</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </main>
+
+              {/* Mobile header */}
+              <div
+                className="md:hidden flex items-center justify-between px-4 h-[48px] flex-shrink-0"
+                style={{ background: 'var(--color-bg-surface)', borderBottom: '0.5px solid var(--color-border-weak)' }}
+              >
+                <div className="flex items-center gap-2">
+                  <img src={koraIcon} alt="" className="w-6 h-6 rounded-md" />
+                  <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--color-text-strong)' }}>{TAB_TITLES[tab] ?? 'Visão Geral'}</span>
+                </div>
+                <button
+                  style={{
+                    width: 28, height: 28, borderRadius: 8, background: 'var(--color-bg-sunken)',
+                    border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >
+                  <Bell className="w-3.5 h-3.5" style={{ color: 'var(--color-text-muted)' }} />
+                </button>
+              </div>
+
+              {/* Mobile tabs */}
+              <div
+                className="md:hidden flex items-center gap-1 overflow-x-auto px-3 py-2 flex-shrink-0"
+                style={{ background: 'var(--color-bg-surface)', borderBottom: '0.5px solid var(--color-border-weak)' }}
+              >
+                {TABS.map((t) => {
+                  const active = tab === t.key;
+                  const Icon = t.icon;
+                  return (
+                    <button
+                      key={t.key}
+                      onClick={() => setTab(t.key)}
+                      className="flex items-center gap-1.5 flex-shrink-0"
+                      style={{
+                        padding: '6px 10px', borderRadius: 9,
+                        fontSize: 11.5, fontWeight: 700,
+                        background: active ? 'var(--color-green-600)' : 'transparent',
+                        color: active ? 'white' : 'var(--color-text-muted)',
+                        border: active ? 'none' : '0.5px solid var(--color-border-base)',
+                      }}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      {t.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Content */}
+              <main className="relative flex-1 overflow-hidden" style={{ background: 'var(--color-bg-base)' }}>
+                <div
+                  className="p-4 md:p-6 overflow-y-auto"
+                  style={{ height: '100%', maxHeight: 720 }}
+                >
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={tab}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {tab === 'overview' && <DemoOverview onGo={(t) => setTab(t as TabKey)} />}
+                      {tab === 'transactions' && <DemoTransactions />}
+                      {tab === 'goals' && <DemoGoals />}
+                      {tab === 'cards' && <DemoCards />}
+                      {tab === 'investments' && <DemoInvestments />}
+                      {tab === 'dre' && <DemoDRE />}
+                      {tab === 'charts' && <DemoOverview onGo={(t) => setTab(t as TabKey)} />}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                {/* Floating "+" igual ao QuickAddFAB */}
+                <button
+                  onClick={() => setTab('transactions')}
+                  className="md:hidden absolute right-4 bottom-4 w-12 h-12 rounded-full flex items-center justify-center text-white"
+                  style={{ background: '#7C3AED', boxShadow: '0 8px 24px rgba(124,58,237,0.45)' }}
+                  aria-label="Novo lançamento"
+                >
+                  <Plus className="w-5 h-5" />
+                </button>
+              </main>
+            </div>
           </div>
 
           {/* Footer CTA */}
