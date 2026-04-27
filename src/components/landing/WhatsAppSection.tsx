@@ -470,9 +470,51 @@ export default function WhatsAppSection() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease }}
-            className="flex justify-center lg:sticky lg:top-24"
+            className="flex justify-center lg:sticky lg:top-24 relative"
           >
-            <div className="relative w-[320px] md:w-[360px] aspect-[9/19] rounded-[44px] border-[10px] border-[#0a0a0a] bg-[#0a0a0a] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.5)]">
+            {/* Glow halo behind phone */}
+            <div className="absolute -inset-10 bg-gradient-to-br from-[#7C3AED]/30 via-[#8B5CF6]/20 to-[#22c55e]/20 blur-3xl rounded-full pointer-events-none" />
+
+            {/* Floating decorative card — top right */}
+            <motion.div
+              initial={{ opacity: 0, x: 20, y: -10 }}
+              whileInView={{ opacity: 1, x: 0, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4, ease }}
+              className="hidden md:flex absolute -right-6 top-12 z-10 items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white/95 backdrop-blur-md border border-white/40 shadow-[0_20px_60px_-15px_rgba(124,58,237,0.5)] rotate-[6deg]"
+            >
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] flex items-center justify-center">
+                <Receipt className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <div className="text-[10px] font-bold text-[#7B6A9B] uppercase tracking-wide">Despesa</div>
+                <div className="text-[13px] font-[900] text-[#1A0D35] font-mono">-R$ 84,00</div>
+              </div>
+            </motion.div>
+
+            {/* Floating decorative card — bottom left */}
+            <motion.div
+              initial={{ opacity: 0, x: -20, y: 10 }}
+              whileInView={{ opacity: 1, x: 0, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.55, ease }}
+              className="hidden md:flex absolute -left-8 bottom-20 z-10 items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-white/95 backdrop-blur-md border border-white/40 shadow-[0_20px_60px_-15px_rgba(34,197,94,0.5)] -rotate-[5deg]"
+            >
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#16a34a] to-[#15803d] flex items-center justify-center">
+                <Target className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <div className="text-[10px] font-bold text-[#7B6A9B] uppercase tracking-wide">Meta · Viagem</div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-16 h-1.5 bg-[#e2e8f0] rounded-full overflow-hidden">
+                    <div className="h-full w-[68%] bg-gradient-to-r from-[#22c55e] to-[#16a34a] rounded-full" />
+                  </div>
+                  <span className="text-[11px] font-[900] text-[#16a34a] font-mono">68%</span>
+                </div>
+              </div>
+            </motion.div>
+
+            <div className="relative w-[320px] md:w-[360px] aspect-[9/19] rounded-[44px] border-[10px] border-[#0a0a0a] bg-[#0a0a0a] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.7),0_0_0_1px_rgba(167,139,250,0.15)]">
               <div className="absolute -left-[12px] top-[22%] w-[3px] h-8 rounded-l bg-[#1a1a1a]" />
               <div className="absolute -left-[12px] top-[32%] w-[3px] h-14 rounded-l bg-[#1a1a1a]" />
               <div className="absolute -left-[12px] top-[44%] w-[3px] h-14 rounded-l bg-[#1a1a1a]" />
