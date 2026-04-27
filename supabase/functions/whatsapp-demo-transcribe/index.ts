@@ -9,9 +9,9 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const apiKey = Deno.env.get('OPENAI_API_KEY');
+    const apiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'OPENAI_API_KEY not configured' }), {
+      return new Response(JSON.stringify({ error: 'LOVABLE_API_KEY not configured' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -36,24 +36,59 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Decode base64 → Uint8Array
-    const binary = Uint8Array.from(atob(audioBase64), (c) => c.charCodeAt(0));
-    const ext = mime.includes('mp4') ? 'mp4' : mime.includes('ogg') ? 'ogg' : mime.includes('wav') ? 'wav' : 'webm';
-    const blob = new Blob([binary], { type: mime });
+    // Normalize MIME — Gemini accepts audio/webm, audio/mp4, audio/ogg, audio/wav, audio/mp3
+    const normalizedMime = mime.includes('mp4')
+      ? 'audio/mp4'
+      : mime.includes('ogg')
+      ? 'audio/ogg'
+      : mime.includes('wav')
+        ? 'audio/wav'
+        : mime.includes('mp3') || mime.includes('mpeg')
+          ? 'audio/mpeg'
+          : 'audio/webm';
 
-    const form = new FormData();
-    form.append('file', blob, `audio.${ext}`);
-    form.append('model', 'whisper-1');
-    form.append('language', 'pt');
+    const dataUrl = `data:${normalizedMime};base64,${audioBase64}`;
 
-    const resp = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+    const resp = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${apiKey}` },
-      body: form,
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          {
+            role: 'system',
+            content:
+              'Você transcreve áudios em português brasileiro. Retorne APENAS o texto falado, sem comentários, prefixos, aspas ou pontuação extra. Se o áudio estiver vazio ou inaudível, retorne uma string vazia.',
+          },
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: 'Transcreva o áudio abaixo:' },
+              { type: 'input_audio', input_audio: { data: dataUrl, format: normalizedMime.split('/')[1] } },
+            ],
+          },
+        ],
+      }),
     });
 
     if (!resp.ok) {
       const errText = await resp.text();
+      console.error('Lovable AI transcription error:', resp.status, errText);
+      if (resp.status === 429) {
+        return new Response(JSON.stringify({ error: 'Muitas tentativas. Aguarda alguns segundos e tenta de novo.' }), {
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (resp.status === 402) {
+        return new Response(JSON.stringify({ error: 'Créditos da IA esgotados. Tenta digitar a mensagem.' }), {
+          status: 402,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
       return new Response(JSON.stringify({ error: 'Falha na transcrição', detail: errText }), {
         status: 502,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -61,10 +96,12 @@ Deno.serve(async (req) => {
     }
 
     const data = await resp.json();
-    return new Response(JSON.stringify({ text: data.text || '' }), {
+    const text: string = (data?.choices?.[0]?.message?.content || '').trim();
+    return new Response(JSON.stringify({ text }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (err) {
+    console.error('transcribe error:', err);
     return new Response(JSON.stringify({ error: (err as Error).message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
