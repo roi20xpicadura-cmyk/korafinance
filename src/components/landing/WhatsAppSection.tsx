@@ -1,97 +1,227 @@
-import { motion } from 'framer-motion';
-import { Check, CheckCheck, Mic, Plus, Camera, Smile, ArrowRight, Zap, BarChart3, Receipt } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Check, CheckCheck, Mic, Plus, Camera, Smile, Send, ArrowRight, Sparkles, Receipt, BarChart3, Wallet, Target } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 const ease = [0.16, 1, 0.3, 1] as const;
+
+type Persona = 'personal' | 'business';
+
+type CardData =
+  | { type: 'expense'; label: string; value: number; date?: string }
+  | { type: 'chart'; title: string; total: number; change?: string; bars: number[] }
+  | { type: 'goal'; label: string; current: number; target: number; emoji?: string }
+  | { type: 'balance'; label: string; value: number; sub?: string };
 
 type Msg = {
   from: 'user' | 'bot';
   text?: string;
   time: string;
-  card?: 'expense' | 'chart' | 'goal';
+  cards?: CardData[];
+  loading?: boolean;
 };
 
-const conversation: Msg[] = [
-  { from: 'user', text: 'gastei 84 no mercado agora', time: '14:32' },
-  { from: 'bot', text: '✅ Lançado em *Mercado* — R$ 84,00\nSaldo do mês: R$ 3.116', time: '14:32', card: 'expense' },
-  { from: 'user', text: 'quanto torrei em delivery esse mês?', time: '14:35' },
-  { from: 'bot', card: 'chart', time: '14:35' },
-  { from: 'user', text: 'ta longe da meta da viagem?', time: '14:36' },
-  { from: 'bot', card: 'goal', time: '14:36' },
-];
+const INITIAL_MSGS: Record<Persona, Msg[]> = {
+  personal: [
+    {
+      from: 'bot',
+      text: 'Oi! 👋 Sou a *Kora*, sua IA financeira. Você é o *Lucas* nessa demo — saldo de R$ 3.200, meta de viagem ativa.\n\nManda qualquer coisa, tipo: "gastei 50 no mercado" ou "quanto tenho?" 💚',
+      time: '14:30',
+    },
+  ],
+  business: [
+    {
+      from: 'bot',
+      text: 'Oi! 👋 Sou a *Kora*, sua IA financeira do negócio. Você é a *Mariana* nessa demo — loja Hotmart, R$ 18.4k de receita esse mês.\n\nManda qualquer coisa, tipo: "qual meu lucro?" ou "recebi 1200 de venda" 💚',
+      time: '14:30',
+    },
+  ],
+};
 
-const prompts = [
-  { icon: Receipt, label: '"paguei 250 de luz"', desc: 'Lança despesa instantânea' },
-  { icon: BarChart3, label: '"resumo da semana"', desc: 'Gera relatório com gráfico' },
-  { icon: Zap, label: '"quanto posso gastar hoje?"', desc: 'IA analisa orçamento e responde' },
-];
+const STARTER_SUGGESTIONS: Record<Persona, string[]> = {
+  personal: ['gastei 84 no mercado', 'quanto torrei em delivery?', 'ta longe da meta?'],
+  business: ['recebi 1200 de venda', 'qual meu lucro?', 'quanto gastei em tráfego?'],
+};
 
-function ExpenseCard() {
-  return (
-    <div className="mt-2 rounded-xl border border-[#1f3a2a] bg-[#0f1f17] p-3 max-w-[220px]">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] font-bold text-[#86efac] uppercase tracking-wide">Despesa lançada</span>
-        <Check className="w-3 h-3 text-[#4ade80]" />
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-[#7C3AED]/20 flex items-center justify-center">
-          <Receipt className="w-4 h-4 text-[#a78bfa]" />
-        </div>
-        <div className="flex-1">
-          <div className="text-[12px] font-bold text-white leading-tight">Mercado</div>
-          <div className="text-[10px] text-white/50">Hoje · 14:32</div>
-        </div>
-        <div className="text-[13px] font-[900] text-[#f87171]">-R$ 84</div>
-      </div>
-    </div>
+function formatBRL(v: number) {
+  const abs = Math.abs(v);
+  return `${v < 0 ? '-' : ''}R$ ${abs.toLocaleString('pt-BR', { minimumFractionDigits: abs % 1 ? 2 : 0, maximumFractionDigits: 2 })}`;
+}
+
+function renderInlineMarkdown(text: string) {
+  // *bold* → <strong>
+  const parts = text.split(/(\*[^*]+\*)/g);
+  return parts.map((p, i) =>
+    p.startsWith('*') && p.endsWith('*') && p.length > 2 ? (
+      <strong key={i} className="font-bold text-white">{p.slice(1, -1)}</strong>
+    ) : (
+      <span key={i}>{p}</span>
+    )
   );
 }
 
-function ChartCard() {
-  const bars = [40, 70, 55, 90, 45, 65, 80];
-  return (
-    <div className="mt-2 rounded-xl border border-[#1f3a2a] bg-[#0f1f17] p-3 max-w-[240px]">
-      <div className="text-[10px] font-bold text-[#86efac] uppercase tracking-wide mb-1">Delivery · Outubro</div>
-      <div className="text-[18px] font-[900] text-white leading-tight">R$ 412,80</div>
-      <div className="text-[10px] text-[#f87171] font-semibold mb-2">▲ 23% vs mês anterior</div>
-      <div className="flex items-end gap-[3px] h-10">
-        {bars.map((h, i) => (
-          <div
-            key={i}
-            className="flex-1 rounded-sm bg-gradient-to-t from-[#4ade80]/30 to-[#4ade80]"
-            style={{ height: `${h}%` }}
+function CardRenderer({ card }: { card: CardData }) {
+  if (card.type === 'expense') {
+    return (
+      <div className="mt-2 rounded-xl border border-[#1f3a2a] bg-[#0f1f17] p-3 max-w-[240px]">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[10px] font-bold text-[#86efac] uppercase tracking-wide">
+            {card.value < 0 ? 'Despesa lançada' : 'Receita lançada'}
+          </span>
+          <Check className="w-3 h-3 text-[#4ade80]" />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-[#7C3AED]/20 flex items-center justify-center">
+            <Receipt className="w-4 h-4 text-[#a78bfa]" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[12px] font-bold text-white leading-tight truncate">{card.label}</div>
+            <div className="text-[10px] text-white/50">{card.date || 'agora'}</div>
+          </div>
+          <div className={`text-[13px] font-[900] ${card.value < 0 ? 'text-[#f87171]' : 'text-[#4ade80]'}`}>
+            {formatBRL(card.value)}
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (card.type === 'chart') {
+    const max = Math.max(...card.bars, 1);
+    return (
+      <div className="mt-2 rounded-xl border border-[#1f3a2a] bg-[#0f1f17] p-3 max-w-[260px]">
+        <div className="text-[10px] font-bold text-[#86efac] uppercase tracking-wide mb-1">{card.title}</div>
+        <div className="text-[18px] font-[900] text-white leading-tight">{formatBRL(card.total)}</div>
+        {card.change && (
+          <div className={`text-[10px] font-semibold mb-2 ${card.change.startsWith('+') ? 'text-[#f87171]' : 'text-[#4ade80]'}`}>
+            ▲ {card.change} vs período anterior
+          </div>
+        )}
+        <div className="flex items-end gap-[3px] h-12 mt-1">
+          {card.bars.map((h, i) => (
+            <div
+              key={i}
+              className="flex-1 rounded-sm bg-gradient-to-t from-[#4ade80]/30 to-[#4ade80]"
+              style={{ height: `${(h / max) * 100}%`, minHeight: '4px' }}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+  if (card.type === 'goal') {
+    const pct = Math.min(100, Math.round((card.current / card.target) * 100));
+    return (
+      <div className="mt-2 rounded-xl border border-[#1f3a2a] bg-[#0f1f17] p-3 max-w-[250px]">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[10px] font-bold text-[#86efac] uppercase tracking-wide truncate">
+            {card.emoji} Meta: {card.label}
+          </span>
+          <span className="text-[10px] font-bold text-[#4ade80] flex-shrink-0 ml-1">{pct}%</span>
+        </div>
+        <div className="w-full h-2 bg-[#1f3a2a] rounded-full overflow-hidden mb-2">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${pct}%` }}
+            transition={{ duration: 0.8, ease }}
+            className="h-full bg-gradient-to-r from-[#4ade80] to-[#16a34a] rounded-full"
           />
-        ))}
+        </div>
+        <div className="text-[10px] text-white/60">
+          {formatBRL(card.current)} / {formatBRL(card.target)}
+        </div>
       </div>
-      <div className="flex justify-between text-[8px] text-white/40 mt-1">
-        <span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span><span>D</span>
+    );
+  }
+  if (card.type === 'balance') {
+    return (
+      <div className="mt-2 rounded-xl border border-[#1f3a2a] bg-gradient-to-br from-[#16a34a]/30 to-[#0f1f17] p-3 max-w-[220px]">
+        <div className="flex items-center gap-2 mb-1">
+          <Wallet className="w-3 h-3 text-[#86efac]" />
+          <span className="text-[10px] font-bold text-[#86efac] uppercase tracking-wide">{card.label}</span>
+        </div>
+        <div className="text-[20px] font-[900] text-white leading-tight">{formatBRL(card.value)}</div>
+        {card.sub && <div className="text-[10px] text-[#86efac] mt-0.5">{card.sub}</div>}
       </div>
-    </div>
-  );
+    );
+  }
+  return null;
 }
 
-function GoalCard() {
-  return (
-    <div className="mt-2 rounded-xl border border-[#1f3a2a] bg-[#0f1f17] p-3 max-w-[230px]">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] font-bold text-[#86efac] uppercase tracking-wide">Meta: Viagem 🏖️</span>
-        <span className="text-[10px] font-bold text-[#4ade80]">67%</span>
-      </div>
-      <div className="w-full h-2 bg-[#1f3a2a] rounded-full overflow-hidden mb-2">
-        <div className="h-full bg-gradient-to-r from-[#4ade80] to-[#16a34a] rounded-full" style={{ width: '67%' }} />
-      </div>
-      <div className="flex items-center justify-between text-[10px]">
-        <span className="text-white/60">R$ 6.700 / R$ 10.000</span>
-        <span className="text-[#86efac] font-bold">faltam 4 meses</span>
-      </div>
-    </div>
-  );
+function nowTime() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
 export default function WhatsAppSection() {
+  const [persona, setPersona] = useState<Persona>('personal');
+  const [messages, setMessages] = useState<Msg[]>(INITIAL_MSGS.personal);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>(STARTER_SUGGESTIONS.personal);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Switch persona resets conversation
+  const switchPersona = (p: Persona) => {
+    if (p === persona) return;
+    setPersona(p);
+    setMessages(INITIAL_MSGS[p]);
+    setSuggestions(STARTER_SUGGESTIONS[p]);
+    setErrorMsg(null);
+  };
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, loading]);
+
+  const send = async (textOverride?: string) => {
+    const text = (textOverride ?? input).trim();
+    if (!text || loading) return;
+    setErrorMsg(null);
+    setInput('');
+
+    const userMsg: Msg = { from: 'user', text, time: nowTime() };
+    const newMsgs = [...messages, userMsg];
+    setMessages([...newMsgs, { from: 'bot', loading: true, time: nowTime() }]);
+    setLoading(true);
+
+    try {
+      const history = newMsgs
+        .filter(m => m.text)
+        .map(m => ({ role: m.from === 'user' ? 'user' : 'assistant', content: m.text! }));
+
+      const { data, error } = await supabase.functions.invoke('whatsapp-demo', {
+        body: { persona, messages: history },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      setMessages([
+        ...newMsgs,
+        {
+          from: 'bot',
+          text: data.text || '...',
+          cards: data.cards || [],
+          time: nowTime(),
+        },
+      ]);
+      if (Array.isArray(data.suggestions) && data.suggestions.length) {
+        setSuggestions(data.suggestions);
+      }
+    } catch (err: any) {
+      setMessages(newMsgs);
+      setErrorMsg(err?.message || 'Erro ao conversar com a Kora. Tenta de novo?');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section className="relative py-16 md:py-28 px-4 overflow-hidden bg-gradient-to-b from-[#f0fdf4] via-white to-[#f0fdf4]">
-      {/* Glows */}
       <div className="pointer-events-none absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full bg-[#22c55e]/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#4ade80]/10 blur-3xl" />
 
@@ -102,43 +232,68 @@ export default function WhatsAppSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease }}
-          className="text-center mb-10 md:mb-14"
+          className="text-center mb-8 md:mb-12"
         >
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#bbf7d0] bg-[#f0fdf4] mb-5">
-            <span className="w-2 h-2 rounded-full bg-[#22c55e] animate-pulse" />
-            <span className="text-[11px] font-[800] text-[#15803d] uppercase tracking-[1px]">Exclusivo do KoraFinance</span>
+            <Sparkles className="w-3 h-3 text-[#16a34a]" />
+            <span className="text-[11px] font-[800] text-[#15803d] uppercase tracking-[1px]">Demo ao vivo · IA real</span>
           </div>
           <h2 className="text-[28px] md:text-[48px] font-[900] text-[#0f172a] tracking-[-1px] md:tracking-[-2px] leading-[1.1]">
-            Sua vida financeira <br className="hidden md:block" />
-            <span className="text-[#16a34a]">no WhatsApp.</span>
+            Converse com a Kora <br className="hidden md:block" />
+            <span className="text-[#16a34a]">no WhatsApp. Agora.</span>
           </h2>
-          <p className="text-[15px] md:text-[18px] text-[#64748b] mt-4 max-w-[560px] mx-auto leading-[1.6]">
-            Mande uma mensagem como manda pra um amigo. A IA lança, calcula, responde — e tudo aparece no seu dashboard.
+          <p className="text-[15px] md:text-[18px] text-[#64748b] mt-4 max-w-[580px] mx-auto leading-[1.6]">
+            Não é vídeo. Não é gif. É a IA real do KoraFinance respondendo às suas mensagens com uma carteira fictícia. Teste agora 👇
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-10 lg:gap-16 items-center">
-          {/* Phone mockup */}
+        {/* Persona toggle */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex p-1 bg-white border border-[#e2e8f0] rounded-full shadow-sm">
+            {([
+              { id: 'personal' as const, label: '👤 Vida pessoal', sub: 'Lucas' },
+              { id: 'business' as const, label: '💼 Meu negócio', sub: 'Mariana' },
+            ]).map(opt => (
+              <button
+                key={opt.id}
+                onClick={() => switchPersona(opt.id)}
+                className={`relative px-4 md:px-5 py-2 rounded-full text-[13px] md:text-[14px] font-bold transition-colors ${
+                  persona === opt.id ? 'text-white' : 'text-[#64748b] hover:text-[#0f172a]'
+                }`}
+              >
+                {persona === opt.id && (
+                  <motion.div
+                    layoutId="persona-pill"
+                    className="absolute inset-0 bg-[#16a34a] rounded-full"
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <span className="relative">{opt.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-10 lg:gap-16 items-start">
+          {/* Phone */}
           <motion.div
             initial={{ opacity: 0, scale: 0.92 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, ease }}
-            className="flex justify-center"
+            className="flex justify-center lg:sticky lg:top-24"
           >
-            <div className="relative w-[300px] md:w-[340px] aspect-[9/19] rounded-[44px] border-[10px] border-[#0a0a0a] bg-[#0a0a0a] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.5)]">
-              {/* side buttons */}
+            <div className="relative w-[320px] md:w-[360px] aspect-[9/19] rounded-[44px] border-[10px] border-[#0a0a0a] bg-[#0a0a0a] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.5)]">
               <div className="absolute -left-[12px] top-[22%] w-[3px] h-8 rounded-l bg-[#1a1a1a]" />
               <div className="absolute -left-[12px] top-[32%] w-[3px] h-14 rounded-l bg-[#1a1a1a]" />
               <div className="absolute -left-[12px] top-[44%] w-[3px] h-14 rounded-l bg-[#1a1a1a]" />
               <div className="absolute -right-[12px] top-[28%] w-[3px] h-20 rounded-r bg-[#1a1a1a]" />
 
-              {/* Screen */}
               <div className="relative w-full h-full rounded-[34px] overflow-hidden flex flex-col bg-[#0b141a]">
                 {/* Notch */}
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[32%] h-[22px] rounded-full bg-black z-20" />
 
-                {/* WhatsApp header */}
+                {/* Header */}
                 <div className="bg-[#1f2c33] pt-9 pb-2 px-3 flex items-center gap-2.5 border-b border-black/40">
                   <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#22c55e] to-[#15803d] flex items-center justify-center text-white text-[13px] font-[900] shadow-md">
                     K
@@ -149,117 +304,138 @@ export default function WhatsAppSection() {
                       <span className="text-[9px] font-bold text-[#0b141a] bg-[#22c55e] px-1 py-[1px] rounded">✓</span>
                     </div>
                     <div className="text-[10px] text-[#86efac] flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] animate-pulse" /> online
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] animate-pulse" />
+                      {loading ? 'digitando...' : 'online'}
                     </div>
                   </div>
                 </div>
 
                 {/* Messages */}
                 <div
-                  className="flex-1 overflow-hidden px-3 py-3 space-y-2"
+                  ref={scrollRef}
+                  className="flex-1 overflow-y-auto px-3 py-3 space-y-2 scroll-smooth"
                   style={{
                     backgroundImage:
                       'radial-gradient(circle at 20% 30%, rgba(34,197,94,0.05) 0, transparent 50%), radial-gradient(circle at 80% 70%, rgba(34,197,94,0.04) 0, transparent 50%)',
                     backgroundColor: '#0b141a',
                   }}
                 >
-                  {conversation.map((m, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, y: 8 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.15 + i * 0.12, duration: 0.35 }}
-                      className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-[78%] rounded-lg px-2.5 py-1.5 ${
-                          m.from === 'user'
-                            ? 'bg-[#005c4b] rounded-tr-sm'
-                            : 'bg-[#202c33] rounded-tl-sm'
-                        }`}
+                  <AnimatePresence initial={false}>
+                    {messages.map((m, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
-                        {m.text && (
-                          <p className="text-[12px] text-white leading-snug whitespace-pre-line">{m.text}</p>
-                        )}
-                        {m.card === 'expense' && <ExpenseCard />}
-                        {m.card === 'chart' && <ChartCard />}
-                        {m.card === 'goal' && <GoalCard />}
-                        <div className="flex items-center justify-end gap-1 mt-0.5">
-                          <span className="text-[9px] text-white/50">{m.time}</span>
-                          {m.from === 'user' && <CheckCheck className="w-3 h-3 text-[#53bdeb]" />}
+                        <div
+                          className={`max-w-[82%] rounded-lg px-2.5 py-1.5 ${
+                            m.from === 'user' ? 'bg-[#005c4b] rounded-tr-sm' : 'bg-[#202c33] rounded-tl-sm'
+                          }`}
+                        >
+                          {m.loading ? (
+                            <div className="flex items-center gap-1 py-1 px-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-white/60 animate-bounce" style={{ animationDelay: '0ms' }} />
+                              <span className="w-1.5 h-1.5 rounded-full bg-white/60 animate-bounce" style={{ animationDelay: '150ms' }} />
+                              <span className="w-1.5 h-1.5 rounded-full bg-white/60 animate-bounce" style={{ animationDelay: '300ms' }} />
+                            </div>
+                          ) : (
+                            <>
+                              {m.text && (
+                                <p className="text-[12.5px] text-white leading-snug whitespace-pre-line">
+                                  {renderInlineMarkdown(m.text)}
+                                </p>
+                              )}
+                              {m.cards?.map((c, ci) => <CardRenderer key={ci} card={c} />)}
+                              <div className="flex items-center justify-end gap-1 mt-0.5">
+                                <span className="text-[9px] text-white/50">{m.time}</span>
+                                {m.from === 'user' && <CheckCheck className="w-3 h-3 text-[#53bdeb]" />}
+                              </div>
+                            </>
+                          )}
                         </div>
-                      </div>
-                    </motion.div>
-                  ))}
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                  {errorMsg && (
+                    <div className="text-center text-[11px] text-[#fca5a5] bg-[#7f1d1d]/30 rounded-lg py-1.5 px-2">
+                      {errorMsg}
+                    </div>
+                  )}
                 </div>
 
                 {/* Input bar */}
-                <div className="bg-[#1f2c33] px-2 py-2 flex items-center gap-1.5 pb-4">
+                <form
+                  onSubmit={e => {
+                    e.preventDefault();
+                    send();
+                  }}
+                  className="bg-[#1f2c33] px-2 py-2 flex items-center gap-1.5 pb-4"
+                >
                   <div className="flex-1 bg-[#2a3942] rounded-full px-3 py-1.5 flex items-center gap-2">
-                    <Smile className="w-4 h-4 text-white/50" />
-                    <span className="text-[11px] text-white/40 flex-1">Mensagem</span>
-                    <Plus className="w-4 h-4 text-white/50" />
-                    <Camera className="w-4 h-4 text-white/50" />
+                    <Smile className="w-4 h-4 text-white/50 flex-shrink-0" />
+                    <input
+                      value={input}
+                      onChange={e => setInput(e.target.value)}
+                      disabled={loading}
+                      placeholder={loading ? 'Kora pensando...' : 'Mensagem'}
+                      maxLength={300}
+                      className="flex-1 bg-transparent text-[13px] text-white placeholder:text-white/40 outline-none min-w-0"
+                    />
+                    <Plus className="w-4 h-4 text-white/50 flex-shrink-0" />
+                    <Camera className="w-4 h-4 text-white/50 flex-shrink-0" />
                   </div>
-                  <div className="w-9 h-9 rounded-full bg-[#22c55e] flex items-center justify-center">
-                    <Mic className="w-4 h-4 text-white" />
-                  </div>
-                </div>
+                  <button
+                    type="submit"
+                    disabled={loading || !input.trim()}
+                    className="w-9 h-9 rounded-full bg-[#22c55e] flex items-center justify-center disabled:opacity-50 hover:bg-[#16a34a] transition-colors"
+                  >
+                    {input.trim() ? <Send className="w-4 h-4 text-white" /> : <Mic className="w-4 h-4 text-white" />}
+                  </button>
+                </form>
               </div>
             </div>
           </motion.div>
 
-          {/* Right side: prompts + features */}
+          {/* Right side */}
           <div>
             <motion.h3
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-[22px] md:text-[28px] font-[900] text-[#0f172a] tracking-[-0.5px] mb-2"
+              className="text-[20px] md:text-[24px] font-[900] text-[#0f172a] tracking-[-0.5px] mb-2"
             >
-              É só mandar a mensagem.
+              💡 Sugestões pra testar
             </motion.h3>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.05 }}
-              className="text-[14px] md:text-[15px] text-[#64748b] mb-6 leading-[1.7]"
-            >
-              Sem app pra abrir, sem categoria pra escolher, sem formulário. Você fala — a Kora entende, lança e mostra na hora.
-            </motion.p>
+            <p className="text-[13px] md:text-[14px] text-[#64748b] mb-5">
+              Toca em uma das opções abaixo ou digita o que quiser no celular ao lado.
+            </p>
 
             <div className="space-y-2.5 mb-7">
-              {prompts.map((p, i) => (
-                <motion.div
-                  key={p.label}
+              {suggestions.map((s, i) => (
+                <motion.button
+                  key={s + i}
                   initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.1 + i * 0.08, duration: 0.4, ease }}
-                  className="group flex items-center gap-3 p-3.5 rounded-2xl bg-white border border-[#e2e8f0] hover:border-[#86efac] hover:shadow-[0_8px_24px_rgba(34,197,94,0.12)] transition-all duration-200"
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  onClick={() => send(s)}
+                  disabled={loading}
+                  className="w-full group flex items-center gap-3 p-3.5 rounded-2xl bg-white border border-[#e2e8f0] hover:border-[#86efac] hover:shadow-[0_8px_24px_rgba(34,197,94,0.12)] disabled:opacity-50 transition-all duration-200 text-left"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-[#f0fdf4] border border-[#bbf7d0] flex items-center justify-center flex-shrink-0 group-hover:bg-[#22c55e] group-hover:border-[#22c55e] transition-colors">
-                    <p.icon className="w-4 h-4 text-[#16a34a] group-hover:text-white transition-colors" />
+                  <div className="w-9 h-9 rounded-xl bg-[#f0fdf4] border border-[#bbf7d0] flex items-center justify-center flex-shrink-0 group-hover:bg-[#22c55e] group-hover:border-[#22c55e] transition-colors">
+                    {[Receipt, BarChart3, Target, Wallet][i % 4] && (() => {
+                      const Icon = [Receipt, BarChart3, Target, Wallet][i % 4];
+                      return <Icon className="w-4 h-4 text-[#16a34a] group-hover:text-white transition-colors" />;
+                    })()}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[14px] font-bold text-[#0f172a] truncate">{p.label}</div>
-                    <div className="text-[12px] text-[#64748b]">{p.desc}</div>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-[#cbd5e1] group-hover:text-[#16a34a] group-hover:translate-x-0.5 transition-all" />
-                </motion.div>
+                  <span className="flex-1 text-[14px] font-semibold text-[#0f172a] truncate">"{s}"</span>
+                  <ArrowRight className="w-4 h-4 text-[#cbd5e1] group-hover:text-[#16a34a] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                </motion.button>
               ))}
             </div>
 
-            {/* Mini stats */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-              className="grid grid-cols-3 gap-3 mb-6"
-            >
+            <div className="grid grid-cols-3 gap-3 mb-6">
               {[
                 { v: '<2s', l: 'resposta média' },
                 { v: '24/7', l: 'sempre online' },
@@ -270,26 +446,23 @@ export default function WhatsAppSection() {
                   <div className="text-[10px] text-[#64748b] mt-0.5">{s.l}</div>
                 </div>
               ))}
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.5 }}
-              className="flex flex-col sm:flex-row gap-3"
-            >
-              <Link
-                to="/register"
-                className="h-[52px] px-6 rounded-[14px] bg-[#16a34a] text-white text-[15px] font-[800] hover:bg-[#15803d] transition-all duration-200 inline-flex items-center justify-center gap-2 hover:-translate-y-0.5"
-                style={{ boxShadow: '0 8px 30px rgba(22,163,74,0.35)' }}
-              >
-                Ativar WhatsApp IA grátis <ArrowRight className="w-4 h-4" />
-              </Link>
-              <span className="self-center text-[12px] text-[#94a3b8]">
-                ✓ Disponível em todos os planos
-              </span>
-            </motion.div>
+            <div className="rounded-2xl bg-gradient-to-br from-[#16a34a] to-[#15803d] p-5 md:p-6 text-white">
+              <div className="text-[13px] text-white/80 mb-1">Curtiu? 🎉</div>
+              <div className="text-[18px] md:text-[20px] font-[900] mb-3 leading-tight">
+                Conecta a Kora aos seus dados reais.
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+                <Link
+                  to="/register"
+                  className="h-[46px] px-5 rounded-[12px] bg-white text-[#15803d] text-[14px] font-[800] hover:bg-[#f0fdf4] transition-colors inline-flex items-center justify-center gap-2"
+                >
+                  Criar conta grátis <ArrowRight className="w-4 h-4" />
+                </Link>
+                <span className="text-[12px] text-white/80">✓ Disponível em todos os planos</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
