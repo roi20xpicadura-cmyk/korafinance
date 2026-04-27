@@ -2,7 +2,10 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
-const ANTHROPIC_MODEL = "claude-sonnet-4-5";
+// Modelo padrão de texto: Haiku é ~3-4x mais rápido que o Sonnet e mantém
+// ótima qualidade pra respostas curtas de finanças (lançamentos, dúvidas,
+// status). Se precisar voltar pro Sonnet, basta trocar a constante.
+const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 
 const ZAPI_INSTANCE_ID = Deno.env.get("ZAPI_INSTANCE_ID")!;
@@ -347,7 +350,7 @@ PARA CARTÕES — criar novo OU atualizar limite OU marcar fatura paga:
 - Marcar fatura paga: {"action":"card_pay_bill","card_name":"nome aproximado"}
 
 REGRAS DE ACTIONS:
-- Responda APENAS o JSON puro (sem ```json, sem texto antes/depois)
+- Responda APENAS o JSON puro (sem cercas markdown tipo \`\`\`json, sem texto antes/depois)
 - Se faltar dado essencial (ex.: valor sem categoria), pergunte em texto natural
 - Investimentos ainda só pelo app — responda em texto pedindo abrir korafinance.app
 
@@ -817,32 +820,37 @@ serve(async (req) => {
     }
 
     const userId = conn.user_id;
-    const ctx = await loadUserContext(userId);
-
     const inboundLabel = text || (document ? "[documento]" : image ? "[imagem]" : audio ? "[áudio]" : "[mídia]");
-    await supabase.from("whatsapp_messages").insert({
-      user_id: userId,
-      phone,
-      phone_number: phone,
-      direction: "inbound",
-      role: "user",
-      message: inboundLabel,
-      content: inboundLabel,
-      created_at: new Date().toISOString(),
-    });
 
-    const { data: history } = await supabase
-      .from("whatsapp_messages")
-      .select("role, content")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(8);
-
-    const { data: pending } = await supabase
-      .from("whatsapp_context")
-      .select("pending_confirmation, pending_transactions")
-      .eq("user_id", userId)
-      .maybeSingle();
+    // Paraleliza as 4 chamadas independentes ao Supabase (contexto, insert do
+    // inbound, histórico recente e pending). Antes eram serializadas e
+    // somavam 600-1200ms; agora roda no tempo da query mais lenta (~250ms).
+    const [ctx, , historyRes, pendingRes] = await Promise.all([
+      loadUserContext(userId),
+      supabase.from("whatsapp_messages").insert({
+        user_id: userId,
+        phone,
+        phone_number: phone,
+        direction: "inbound",
+        role: "user",
+        message: inboundLabel,
+        content: inboundLabel,
+        created_at: new Date().toISOString(),
+      }),
+      supabase
+        .from("whatsapp_messages")
+        .select("role, content")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(6),
+      supabase
+        .from("whatsapp_context")
+        .select("pending_confirmation, pending_transactions")
+        .eq("user_id", userId)
+        .maybeSingle(),
+    ]);
+    const history = historyRes.data;
+    const pending = pendingRes.data;
 
     // ── CONFIRMATION FLOW ──
     if (pending?.pending_confirmation && text) {
@@ -1026,7 +1034,7 @@ Acesse seu dashboard pra revisar e ajustar categorias se quiser, ${ctx.name}! �
       const systemPrompt = buildSystemPrompt(ctx);
 
       const messages = (history?.reverse() || [])
-        .slice(-6)
+        .slice(-4)
         .filter((m: any) => m.role && m.content)
         .map((m: any) => ({
           role: m.role === "assistant" ? "assistant" : "user",
@@ -1044,7 +1052,7 @@ Acesse seu dashboard pra revisar e ajustar categorias se quiser, ${ctx.name}! �
         },
         body: JSON.stringify({
           model: ANTHROPIC_MODEL,
-          max_tokens: 600,
+          max_tokens: 400,
           system: systemPrompt,
           messages,
         }),
