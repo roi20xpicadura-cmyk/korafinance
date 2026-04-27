@@ -140,20 +140,20 @@ export default function FeaturesSection() {
             <div className="pointer-events-none absolute -top-16 -right-16 w-56 h-56 rounded-full bg-[#7C3AED]/25 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-20 -left-10 w-56 h-56 rounded-full bg-[#A78BFA]/15 blur-3xl" />
 
-            <div className="relative flex md:block items-center gap-3">
+            <div className="relative flex md:block items-center gap-4">
               <div className="flex-1 min-w-0">
                 <span className="inline-flex items-center gap-1 text-[10px] md:text-[11px] font-semibold text-[#C4B5FD] bg-[#7C3AED]/15 border border-[#7C3AED]/30 rounded-full px-2 py-0.5 mb-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#A78BFA] animate-pulse" /> iOS · Android
                 </span>
-                <h3 className="text-[16px] md:text-[20px] font-[900] mb-1 leading-tight">Suas finanças sempre com você</h3>
+                <h3 className="text-[17px] md:text-[20px] font-[900] mb-1 leading-[1.15]">Suas finanças sempre com você</h3>
                 <p className="text-[12px] md:text-[13px] text-white/60 leading-snug">
                   Lance em segundos, receba alertas em tempo real e acesse com biometria — até offline.
                 </p>
               </div>
 
               {/* Phone mockup */}
-              <div className="flex justify-center md:mt-5 shrink-0">
-                <div className="relative w-[92px] md:w-[180px] aspect-[9/19] rounded-[18px] md:rounded-[32px] border-[2px] md:border-[4px] border-[#1a1a1a] bg-[#0a0a0a] p-[2px] md:p-[4px] shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)]">
+              <div className="flex justify-center md:justify-center md:mt-5 shrink-0 self-center">
+                <div className="relative w-[78px] md:w-[180px] aspect-[9/19] rounded-[16px] md:rounded-[32px] border-[2px] md:border-[4px] border-[#1a1a1a] bg-[#0a0a0a] p-[2px] md:p-[4px] shadow-[0_20px_50px_-15px_rgba(0,0,0,0.7)]">
                   {/* side button */}
                   <div className="absolute -left-[5px] md:-left-[6px] top-[38%] w-[3px] md:w-[4px] h-10 md:h-14 rounded-l bg-[#1a1a1a]" />
                   <div className="absolute -right-[5px] md:-right-[6px] top-[28%] w-[3px] md:w-[4px] h-6 md:h-8 rounded-r bg-[#1a1a1a]" />
