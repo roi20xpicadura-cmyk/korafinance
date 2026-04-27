@@ -616,24 +616,24 @@ export default function WhatsAppSection() {
                     e.preventDefault();
                     send();
                   }}
-                  className="bg-[#1f2c33] px-2 py-2 flex items-center gap-1.5 pb-4"
+                  className="bg-[#1f2c33] px-2 py-2 pb-4 flex items-center gap-1.5 min-w-0 w-full"
                 >
                   {recording ? (
                     <>
                       <button
                         type="button"
                         onClick={() => stopRecording(true)}
-                        className="w-9 h-9 rounded-full bg-[#2a3942] flex items-center justify-center text-white/70 hover:text-white"
+                        className="w-9 h-9 flex-shrink-0 rounded-full bg-[#2a3942] flex items-center justify-center text-white/70 hover:text-white"
                         title="Cancelar"
                       >
                         <X className="w-4 h-4" />
                       </button>
-                      <div className="flex-1 bg-[#2a3942] rounded-full px-3 py-1.5 flex items-center gap-2">
+                      <div className="flex-1 min-w-0 bg-[#2a3942] rounded-full px-3 py-1.5 flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-[#ef4444] animate-pulse flex-shrink-0" />
                         <span className="text-[12px] text-white font-mono">
                           {String(Math.floor(recSeconds / 60)).padStart(1, '0')}:{String(recSeconds % 60).padStart(2, '0')}
                         </span>
-                        <div className="flex-1 flex items-center gap-[2px] h-4 overflow-hidden">
+                        <div className="flex-1 min-w-0 flex items-center gap-[2px] h-4 overflow-hidden">
                           {Array.from({ length: 24 }).map((_, i) => (
                             <span
                               key={i}
@@ -650,7 +650,7 @@ export default function WhatsAppSection() {
                       <button
                         type="button"
                         onClick={() => stopRecording(false)}
-                        className="w-9 h-9 rounded-full bg-[#22c55e] flex items-center justify-center hover:bg-[#16a34a] transition-colors"
+                        className="w-9 h-9 flex-shrink-0 rounded-full bg-[#22c55e] flex items-center justify-center hover:bg-[#16a34a] transition-colors"
                         title="Enviar áudio"
                       >
                         <Send className="w-4 h-4 text-white" />
@@ -658,7 +658,7 @@ export default function WhatsAppSection() {
                     </>
                   ) : (
                     <>
-                      <div className="flex-1 bg-[#2a3942] rounded-full px-3 py-1.5 flex items-center gap-2">
+                      <div className="flex-1 min-w-0 bg-[#2a3942] rounded-full px-3 py-1.5 flex items-center gap-2">
                         <Smile className="w-4 h-4 text-white/50 flex-shrink-0" />
                         <input
                           value={input}
@@ -666,16 +666,16 @@ export default function WhatsAppSection() {
                           disabled={loading || transcribing}
                           placeholder={transcribing ? 'Transcrevendo...' : loading ? 'Kora pensando...' : 'Mensagem'}
                           maxLength={300}
-                          className="flex-1 bg-transparent text-[13px] text-white placeholder:text-white/40 outline-none min-w-0"
+                          className="flex-1 min-w-0 w-full bg-transparent text-[13px] text-white placeholder:text-white/40 outline-none"
                         />
-                        <Plus className="w-4 h-4 text-white/50 flex-shrink-0" />
-                        <Camera className="w-4 h-4 text-white/50 flex-shrink-0" />
+                        <Plus className="hidden min-[340px]:block w-4 h-4 text-white/50 flex-shrink-0" />
+                        <Camera className="hidden min-[360px]:block w-4 h-4 text-white/50 flex-shrink-0" />
                       </div>
                       {input.trim() ? (
                         <button
                           type="submit"
                           disabled={loading || transcribing}
-                          className="w-9 h-9 rounded-full bg-[#22c55e] flex items-center justify-center disabled:opacity-50 hover:bg-[#16a34a] transition-colors"
+                          className="w-9 h-9 flex-shrink-0 rounded-full bg-[#22c55e] flex items-center justify-center disabled:opacity-50 hover:bg-[#16a34a] transition-colors"
                         >
                           <Send className="w-4 h-4 text-white" />
                         </button>
@@ -685,7 +685,7 @@ export default function WhatsAppSection() {
                           onClick={startRecording}
                           disabled={loading || transcribing}
                           title="Gravar áudio"
-                          className="w-9 h-9 rounded-full bg-[#22c55e] flex items-center justify-center disabled:opacity-50 hover:bg-[#16a34a] transition-colors"
+                          className="w-9 h-9 flex-shrink-0 rounded-full bg-[#22c55e] flex items-center justify-center disabled:opacity-50 hover:bg-[#16a34a] transition-colors"
                         >
                           {transcribing ? (
                             <Loader2 className="w-4 h-4 text-white animate-spin" />
