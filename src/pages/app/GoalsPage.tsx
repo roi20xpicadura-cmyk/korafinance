@@ -272,14 +272,29 @@ export default function GoalsPage() {
         <EmptyState onAdd={openAddGoal} />
       )}
 
-      {/* Summary bar */}
-      {activeGoals.length >= 2 && (
-        <SummaryBar goals={activeGoals} />
-      )}
-
       {/* Active goals */}
       {activeGoals.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 0' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '4px 0 0' }}>
+          <div style={{
+            padding: '4px 20px 0',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          }}>
+            <div style={{
+              fontSize: 11, fontWeight: 800,
+              color: 'var(--color-text-subtle)',
+              textTransform: 'uppercase', letterSpacing: '0.12em',
+            }}>
+              Suas metas
+            </div>
+            <div style={{
+              fontSize: 11, fontWeight: 700,
+              color: 'var(--color-text-disabled)',
+              fontFamily: 'var(--font-mono)',
+              letterSpacing: '-0.01em',
+            }}>
+              {activeGoals.length} item{activeGoals.length !== 1 ? 's' : ''}
+            </div>
+          </div>
           {activeGoals.map((g, i) => (
             <GoalCard
               key={g.id}
