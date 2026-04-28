@@ -5,7 +5,7 @@ import { formatCurrency } from '@/lib/plans';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { buildPrediction, generateAlerts, DayPrediction, PredictionAlert } from '@/lib/predictionEngine';
 import {
-  TrendingDown, AlertCircle, Activity, Zap
+  AlertCircle, Activity, Zap, Sparkles, ShieldCheck
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format, differenceInDays } from 'date-fns';
@@ -107,43 +107,127 @@ export default function PredictionsPage() {
   }
 
   return (
-    <div className="space-y-4 pb-4">
-      {/* Subtitle only — title comes from AppLayout */}
-      <p style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>Seu futuro financeiro baseado em dados reais</p>
-
-      {/* Period tabs */}
-      <div className="flex gap-2">
-        {([30, 60, 90] as const).map(p => (
-          <button key={p} onClick={() => setPeriod(p)}
-            style={{
-              padding: '6px 16px', borderRadius: 99, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-              background: period === p ? 'var(--color-green-600)' : 'var(--color-bg-surface)',
-              color: period === p ? 'white' : 'var(--color-text-muted)',
-              border: `1px solid ${period === p ? 'transparent' : 'var(--color-border-base)'}`,
+    <div className="space-y-5 pb-6">
+      {/* HERO — Health score + headline metric */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        style={{
+          position: 'relative',
+          overflow: 'hidden',
+          borderRadius: 20,
+          padding: 22,
+          background: 'linear-gradient(135deg, var(--color-green-600) 0%, var(--color-green-700, #5b21b6) 100%)',
+          color: 'white',
+          boxShadow: '0 12px 32px -12px rgba(124,58,237,0.45)',
+        }}
+      >
+        {/* Decorative glow */}
+        <div style={{
+          position: 'absolute', top: -60, right: -60, width: 200, height: 200,
+          borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.18), transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+        <div style={{ position: 'relative' }}>
+          <div className="flex items-center gap-2" style={{ marginBottom: 14 }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '4px 10px', borderRadius: 99,
+              background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(8px)',
+              fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase',
             }}>
-            {p} dias
-          </button>
-        ))}
-      </div>
+              <Sparkles size={11} /> Análise preditiva
+            </div>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              padding: '4px 10px', borderRadius: 99,
+              background: status === 'danger' ? 'rgba(239,68,68,0.95)' : status === 'warning' ? 'rgba(245,158,11,0.95)' : 'rgba(34,197,94,0.95)',
+              fontSize: 10, fontWeight: 800, letterSpacing: 0.3, textTransform: 'uppercase',
+            }}>
+              <ShieldCheck size={11} /> {status === 'danger' ? 'Risco alto' : status === 'warning' ? 'Atenção' : 'Saudável'}
+            </div>
+          </div>
 
-      {/* Risk summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <StatCard icon={<TrendingDown size={18} />} label="Saldo mínimo previsto" value={formatCurrency(lowestBal, 'R$')}
-          sub={lowestBal < 0 ? 'Atenção: saldo negativo' : ''} status={lowestBal < 0 ? 'danger' : lowestBal < 500 ? 'warning' : 'good'} />
-        <StatCard icon={<AlertCircle size={18} />} label="Próximo evento crítico"
-          value={nextCritical ? nextCritical.description : 'Nenhum'}
-          sub={nextCritical ? `${formatCurrency(Math.abs(nextCritical.amount), 'R$')} em ${differenceInDays(new Date(nextCritical.date), new Date())} dias` : ''}
-          status={nextCritical && Math.abs(nextCritical.amount) > 1000 ? 'warning' : 'good'} />
-        <StatCard icon={<Activity size={18} />} label="Probabilidade de problema" value={`${negProb}%`}
-          sub={`de saldo negativo nos próximos ${period} dias`}
-          status={negProb > 50 ? 'danger' : negProb > 20 ? 'warning' : 'good'} />
+          <p style={{ fontSize: 11, fontWeight: 700, opacity: 0.85, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 6 }}>
+            Saldo mínimo previsto · {period} dias
+          </p>
+          <div className="flex items-baseline gap-2" style={{ marginBottom: 4 }}>
+            <span style={{ fontSize: 36, fontWeight: 900, letterSpacing: '-1.2px', lineHeight: 1 }}>
+              {formatCurrency(lowestBal, 'R$')}
+            </span>
+            {firstNeg && (
+              <span style={{ fontSize: 12, fontWeight: 700, opacity: 0.9 }}>
+                em {format(new Date(firstNeg.date), "dd 'de' MMM", { locale: ptBR })}
+              </span>
+            )}
+          </div>
+          <p style={{ fontSize: 13, opacity: 0.9 }}>
+            Seu futuro financeiro com base em dados reais e padrões históricos
+          </p>
+
+          {/* Period segmented control */}
+          <div style={{
+            marginTop: 16, display: 'inline-flex', padding: 4, gap: 4,
+            background: 'rgba(0,0,0,0.18)', borderRadius: 12, backdropFilter: 'blur(8px)',
+          }}>
+            {([30, 60, 90] as const).map(p => (
+              <button key={p} onClick={() => setPeriod(p)}
+                style={{
+                  padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                  background: period === p ? 'white' : 'transparent',
+                  color: period === p ? 'var(--color-green-700, #5b21b6)' : 'rgba(255,255,255,0.85)',
+                  border: 'none', transition: 'all 0.2s',
+                }}>
+                {p} dias
+              </button>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Secondary metrics — refined neutral cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <MetricCard
+          icon={<AlertCircle size={16} />}
+          label="Próximo evento crítico"
+          value={nextCritical ? nextCritical.description : 'Nada à vista'}
+          sub={nextCritical
+            ? `${formatCurrency(Math.abs(nextCritical.amount), 'R$')} · em ${differenceInDays(new Date(nextCritical.date), new Date())} ${differenceInDays(new Date(nextCritical.date), new Date()) === 1 ? 'dia' : 'dias'}`
+            : 'Nenhum gasto relevante previsto'}
+          tone={nextCritical && Math.abs(nextCritical.amount) > 1000 ? 'warning' : 'neutral'}
+        />
+        <MetricCard
+          icon={<Activity size={16} />}
+          label="Probabilidade de saldo negativo"
+          value={`${negProb}%`}
+          sub={`nos próximos ${period} dias`}
+          tone={negProb > 50 ? 'danger' : negProb > 20 ? 'warning' : 'success'}
+          progress={negProb}
+        />
       </div>
 
       {/* Main chart */}
-      <div style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-base)', borderRadius: 16, padding: 20 }}>
-        <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-strong)', marginBottom: 16 }}>
-          Projeção de saldo — próximos {period} dias
-        </p>
+      <div style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-base)', borderRadius: 18, padding: 20 }}>
+        <div className="flex items-start justify-between mb-4 gap-3 flex-wrap">
+          <div>
+            <p style={{ fontSize: 15, fontWeight: 800, color: 'var(--color-text-strong)', letterSpacing: '-0.2px' }}>
+              Projeção de saldo
+            </p>
+            <p style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 2 }}>
+              Próximos {period} dias · faixa de confiança sombreada
+            </p>
+          </div>
+          <div className="flex items-center gap-3" style={{ fontSize: 11 }}>
+            <span className="flex items-center gap-1.5" style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>
+              <span style={{ width: 10, height: 2, borderRadius: 99, background: status === 'danger' ? '#ef4444' : '#22c55e' }} />
+              Saldo
+            </span>
+            <span className="flex items-center gap-1.5" style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>
+              <span style={{ width: 10, height: 8, borderRadius: 2, background: status === 'danger' ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)' }} />
+              Variação
+            </span>
+          </div>
+        </div>
         <div style={{ height: isMobile ? 220 : 320 }}>
           <Suspense fallback={<div className="skeleton-shimmer w-full h-full" style={{ borderRadius: 12 }} />}>
             <LazyPredChart predictions={visiblePreds} status={status} />
@@ -191,19 +275,23 @@ export default function PredictionsPage() {
       )}
 
       {/* Event timeline */}
-      <div style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-base)', borderRadius: 16, padding: 20 }}>
-        <div className="flex items-center justify-between mb-3">
-          <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-strong)' }}>Eventos previstos</p>
+      <div style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-base)', borderRadius: 18, padding: 20 }}>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p style={{ fontSize: 15, fontWeight: 800, color: 'var(--color-text-strong)', letterSpacing: '-0.2px' }}>Eventos previstos</p>
+            <p style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 2 }}>{filteredEvents.length} {filteredEvents.length === 1 ? 'evento' : 'eventos'} no período</p>
+          </div>
         </div>
 
         <div className="flex gap-2 mb-3 overflow-x-auto pb-1 scrollbar-hide">
           {(['all', 'confirmed', 'estimated', 'income', 'expense'] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)}
               style={{
-                padding: '4px 12px', borderRadius: 99, fontSize: 11, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
-                background: filter === f ? 'var(--color-green-600)' : 'var(--color-bg-sunken)',
+                padding: '5px 12px', borderRadius: 99, fontSize: 11, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
+                background: filter === f ? 'var(--color-green-600)' : 'transparent',
                 color: filter === f ? 'white' : 'var(--color-text-muted)',
-                border: 'none',
+                border: `1px solid ${filter === f ? 'transparent' : 'var(--color-border-base)'}`,
+                transition: 'all 0.15s',
               }}>
               {{ all: 'Todos', confirmed: 'Confirmados', estimated: 'Estimados', income: 'Receitas', expense: 'Despesas' }[f]}
             </button>
@@ -244,21 +332,57 @@ export default function PredictionsPage() {
   );
 }
 
-function StatCard({ icon, label, value, sub, status }: { icon: React.ReactNode; label: string; value: string; sub: string; status: 'danger' | 'warning' | 'good' }) {
-  const colors = {
-    danger: { bg: 'var(--color-danger-bg)', border: 'var(--color-danger-border)', text: 'var(--color-danger-text)' },
-    warning: { bg: '#fffbeb', border: '#fde68a', text: '#92400e' },
-    good: { bg: 'var(--color-success-bg)', border: 'var(--color-success-border)', text: 'var(--color-success-text)' },
-  }[status];
+function MetricCard({ icon, label, value, sub, tone, progress }: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  sub: string;
+  tone: 'danger' | 'warning' | 'success' | 'neutral';
+  progress?: number;
+}) {
+  const accent = {
+    danger: 'var(--color-danger-solid)',
+    warning: '#f59e0b',
+    success: 'var(--color-success-solid)',
+    neutral: 'var(--color-green-600)',
+  }[tone];
 
   return (
-    <div style={{ background: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 14, padding: 16 }}>
-      <div className="flex items-center gap-2 mb-2">
-        <div style={{ color: colors.text }}>{icon}</div>
-        <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>{label}</span>
+    <div style={{
+      position: 'relative',
+      background: 'var(--color-bg-surface)',
+      border: '1px solid var(--color-border-base)',
+      borderRadius: 16,
+      padding: 16,
+      overflow: 'hidden',
+    }}>
+      {/* Accent bar */}
+      <div style={{
+        position: 'absolute', left: 0, top: 0, bottom: 0, width: 3,
+        background: accent, opacity: 0.9,
+      }} />
+      <div className="flex items-center gap-2 mb-2" style={{ paddingLeft: 6 }}>
+        <div style={{
+          width: 28, height: 28, borderRadius: 8, display: 'flex',
+          alignItems: 'center', justifyContent: 'center',
+          background: `color-mix(in srgb, ${accent} 12%, transparent)`,
+          color: accent,
+        }}>{icon}</div>
+        <span style={{ fontSize: 10, fontWeight: 800, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</span>
       </div>
-      <p style={{ fontSize: 18, fontWeight: 900, color: colors.text, letterSpacing: '-0.5px' }}>{value}</p>
-      {sub && <p style={{ fontSize: 11, color: colors.text, opacity: 0.8, marginTop: 2 }}>{sub}</p>}
+      <p style={{ fontSize: 18, fontWeight: 900, color: 'var(--color-text-strong)', letterSpacing: '-0.5px', paddingLeft: 6 }}>{value}</p>
+      {sub && <p style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 4, paddingLeft: 6 }}>{sub}</p>}
+      {typeof progress === 'number' && (
+        <div style={{
+          marginTop: 10, marginLeft: 6, height: 4, borderRadius: 99,
+          background: 'var(--color-bg-sunken)', overflow: 'hidden',
+        }}>
+          <div style={{
+            width: `${Math.min(100, progress)}%`, height: '100%',
+            background: accent, borderRadius: 99, transition: 'width 0.6s ease',
+          }} />
+        </div>
+      )}
     </div>
   );
 }
