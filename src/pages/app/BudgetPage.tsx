@@ -636,9 +636,15 @@ export default function BudgetPage() {
                           ) : (
                             <button
                               onClick={() => { setBudgetInputs(prev => ({ ...prev, [row.category]: '' })); setShowSetup(true); }}
-                              style={{ background: 'rgba(124,58,237,0.08)', border: '1px dashed rgba(124,58,237,0.35)', borderRadius: 10, padding: '9px 12px', color: C.violet, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', width: '100%' }}
+                              style={{
+                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                                background: 'transparent',
+                                border: '1px dashed rgba(124,58,237,0.35)', borderRadius: 10,
+                                padding: '8px 12px', color: C.violet, fontSize: 12, fontWeight: 700,
+                                cursor: 'pointer', whiteSpace: 'nowrap', width: '100%',
+                              }}
                             >
-                              + Definir limite
+                              <Plus style={{ width: 13, height: 13, strokeWidth: 2.5 }} /> Definir limite
                             </button>
                           )}
                         </div>
