@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { formatCurrency, PLAN_LIMITS, type PlanType } from '@/lib/plans';
-import { DollarSign, TrendingUp, AlertCircle, PieChart } from 'lucide-react';
+import { Wallet, TrendingDown, AlertTriangle, PiggyBank, ChevronLeft, ChevronRight, Sparkles, Plus, Settings2 } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, subMonths, addMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
