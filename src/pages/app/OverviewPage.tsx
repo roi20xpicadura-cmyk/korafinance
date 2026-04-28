@@ -191,7 +191,9 @@ export default function OverviewPage() {
   const { profile, config } = useProfile();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [aiChatOpen, setAiChatOpen] = useState(false);
+  // Chat global vive no AppLayout (evita drawer duplicado e bug de "não abre").
+  const layoutCtx = useOutletContext<{ openChat?: () => void } | undefined>();
+  const openChat = layoutCtx?.openChat ?? (() => {});
   const [transactions, setTransactions] = useState<TransactionRow[]>([]);
   const [allTransactions, setAllTransactions] = useState<TransactionRow[]>([]);
   const [investments, setInvestments] = useState<InvestmentRow[]>([]);
@@ -478,7 +480,7 @@ export default function OverviewPage() {
 
       {/* AI INSIGHTS */}
       <motion.div {...stagger(6)}>
-        <Suspense fallback={null}><AIInsightsWidget onOpenChat={() => setAiChatOpen(true)} /></Suspense>
+        <Suspense fallback={null}><AIInsightsWidget onOpenChat={openChat} /></Suspense>
       </motion.div>
 
       {/* PREDICTIVE AI */}
@@ -649,7 +651,6 @@ export default function OverviewPage() {
           )}
         </div>
       </motion.div>
-      {aiChatOpen && <Suspense fallback={null}><AIChatDrawer open={aiChatOpen} onClose={() => setAiChatOpen(false)} /></Suspense>}
     </div>
   );
 }
