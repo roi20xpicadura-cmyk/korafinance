@@ -13,9 +13,9 @@ export default function ExcluirContaPage() {
   return (
     <>
       <SEO
-        title="Excluir conta — Kora Finance"
+        title="Excluir conta"
         description="Como solicitar a exclusão da sua conta Kora Finance e de todos os seus dados financeiros."
-        canonical="https://korafinance.app/excluir-conta"
+        url="https://korafinance.app/excluir-conta"
       />
       <LegalPageLayout
         label="CONTA E DADOS"
