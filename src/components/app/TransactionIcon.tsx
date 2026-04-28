@@ -1,6 +1,115 @@
 import { useMemo, useState } from 'react';
 import { KNOWN_SERVICES } from '@/lib/subscriptionDetector';
 import { getCategoryStyle } from '@/lib/categoryIcons';
+import {
+  ArrowDownLeft, ArrowUpRight, Banknote, Coins, Wallet, Gift, TrendingUp,
+  PiggyBank, Briefcase, Building2, Receipt, ShoppingBag, Ticket, Plane,
+  Coffee, Pizza, Bus, Bike, Smartphone, Wifi, Zap, Droplet, Flame,
+  Stethoscope, Baby, Cat, Dog, Music, Camera, Gamepad2, Sparkles,
+  Hammer, GraduationCap, ShieldCheck, MapPin, Heart, type LucideIcon,
+} from 'lucide-react';
+// Heurística por palavra-chave na descrição (vence sobre categoria)
+const KEYWORD_ICONS: Array<[RegExp, { Icon: LucideIcon; bg: string; fg: string }]> = [
+  // receitas
+  [/\bpix\b.*(receb|in)|receb.*pix|transf.*receb|deposito|depósito|credito\s*recebido/i,
+    { Icon: ArrowDownLeft, bg: 'rgba(16,185,129,0.12)', fg: '#059669' }],
+  [/\bsalario|salário|holerite|folha/i,
+    { Icon: Banknote, bg: 'rgba(34,197,94,0.12)', fg: '#16A34A' }],
+  [/freela|freelance|projeto|servic[oó]/i,
+    { Icon: Briefcase, bg: 'rgba(16,185,129,0.12)', fg: '#059669' }],
+  [/dividend|rendiment|juros|aplica/i,
+    { Icon: PiggyBank, bg: 'rgba(20,184,166,0.12)', fg: '#0D9488' }],
+  [/cashback|estorno|reembolso/i,
+    { Icon: Coins, bg: 'rgba(245,158,11,0.14)', fg: '#D97706' }],
+  [/presente|premio|prêmio|bônus|bonus/i,
+    { Icon: Gift, bg: 'rgba(236,72,153,0.12)', fg: '#DB2777' }],
+  [/aluguel\s*receb|locac/i,
+    { Icon: Building2, bg: 'rgba(20,184,166,0.12)', fg: '#0D9488' }],
+  [/venda|vendas/i,
+    { Icon: TrendingUp, bg: 'rgba(34,197,94,0.12)', fg: '#16A34A' }],
+
+  // despesas / contexto
+  [/\bpix\b.*env|envio.*pix|transf.*env/i,
+    { Icon: ArrowUpRight, bg: 'rgba(99,102,241,0.12)', fg: '#4F46E5' }],
+  [/cafe|café|coffee|starbucks/i,
+    { Icon: Coffee, bg: 'rgba(180,83,9,0.14)', fg: '#92400E' }],
+  [/pizza|hambur|burger|lanch/i,
+    { Icon: Pizza, bg: 'rgba(249,115,22,0.12)', fg: '#EA580C' }],
+  [/onibus|ônibus|metro|metrô|bilhet/i,
+    { Icon: Bus, bg: 'rgba(59,130,246,0.12)', fg: '#2563EB' }],
+  [/bike|bicicl/i,
+    { Icon: Bike, bg: 'rgba(20,184,166,0.12)', fg: '#0D9488' }],
+  [/passag|voo|aere|aéreo|latam|gol|azul/i,
+    { Icon: Plane, bg: 'rgba(99,102,241,0.12)', fg: '#4F46E5' }],
+  [/celular|tim|vivo|claro|oi\s|operadora|recarg/i,
+    { Icon: Smartphone, bg: 'rgba(139,92,246,0.14)', fg: '#7C3AED' }],
+  [/internet|wifi|banda\s*larga|net\s/i,
+    { Icon: Wifi, bg: 'rgba(59,130,246,0.12)', fg: '#2563EB' }],
+  [/luz|energia|eletric/i,
+    { Icon: Zap, bg: 'rgba(234,179,8,0.14)', fg: '#CA8A04' }],
+  [/agua|água|saneam/i,
+    { Icon: Droplet, bg: 'rgba(6,182,212,0.12)', fg: '#0891B2' }],
+  [/gas\s|\bgás\b|botij/i,
+    { Icon: Flame, bg: 'rgba(249,115,22,0.12)', fg: '#EA580C' }],
+  [/medic|m[eé]dico|consulta|hospital|clinic/i,
+    { Icon: Stethoscope, bg: 'rgba(244,63,94,0.12)', fg: '#E11D48' }],
+  [/escola|colegio|colégio|matric|mensalid/i,
+    { Icon: GraduationCap, bg: 'rgba(99,102,241,0.12)', fg: '#4F46E5' }],
+  [/seguro/i,
+    { Icon: ShieldCheck, bg: 'rgba(100,116,139,0.14)', fg: '#475569' }],
+  [/cinema|show|ingress|teatro|evento/i,
+    { Icon: Ticket, bg: 'rgba(168,85,247,0.12)', fg: '#9333EA' }],
+  [/jogo|game|steam|playstation|xbox/i,
+    { Icon: Gamepad2, bg: 'rgba(139,92,246,0.14)', fg: '#7C3AED' }],
+  [/musica|música|spotify|deezer/i,
+    { Icon: Music, bg: 'rgba(34,197,94,0.12)', fg: '#16A34A' }],
+  [/foto|photo|camera/i,
+    { Icon: Camera, bg: 'rgba(168,85,247,0.12)', fg: '#9333EA' }],
+  [/manuten|reparo|conserto|reforma/i,
+    { Icon: Hammer, bg: 'rgba(180,83,9,0.14)', fg: '#92400E' }],
+  [/pet|veterin|racao|ração/i,
+    { Icon: Dog, bg: 'rgba(245,158,11,0.14)', fg: '#D97706' }],
+  [/bebe|bebê|fralda|crianc/i,
+    { Icon: Baby, bg: 'rgba(236,72,153,0.12)', fg: '#DB2777' }],
+  [/doac|doaç|caridade/i,
+    { Icon: Heart, bg: 'rgba(244,63,94,0.12)', fg: '#E11D48' }],
+  [/viagem|hotel|airbnb|booking/i,
+    { Icon: MapPin, bg: 'rgba(20,184,166,0.12)', fg: '#0D9488' }],
+  [/compra|loja|store|shop/i,
+    { Icon: ShoppingBag, bg: 'rgba(168,85,247,0.12)', fg: '#9333EA' }],
+  [/boleto|fatura|conta\b/i,
+    { Icon: Receipt, bg: 'rgba(100,116,139,0.14)', fg: '#475569' }],
+];
+
+// Paleta determinística para "Outros" (varia por nome → evita 4 cinzas iguais)
+const FALLBACK_PALETTE = [
+  { bg: 'rgba(139,92,246,0.14)', fg: '#7C3AED' },
+  { bg: 'rgba(59,130,246,0.12)',  fg: '#2563EB' },
+  { bg: 'rgba(20,184,166,0.12)',  fg: '#0D9488' },
+  { bg: 'rgba(245,158,11,0.14)',  fg: '#D97706' },
+  { bg: 'rgba(236,72,153,0.12)',  fg: '#DB2777' },
+  { bg: 'rgba(99,102,241,0.12)',  fg: '#4F46E5' },
+  { bg: 'rgba(6,182,212,0.12)',   fg: '#0891B2' },
+];
+const FALLBACK_ICONS: LucideIcon[] = [Sparkles, Wallet, Coins, Receipt, ShoppingBag, Briefcase, Ticket];
+
+function hashIdx(s: string, mod: number) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return Math.abs(h) % mod;
+}
+
+function matchKeyword(desc: string) {
+  if (!desc) return null;
+  for (const [re, style] of KEYWORD_ICONS) if (re.test(desc)) return style;
+  return null;
+}
+
+function isGenericCategory(cat?: string | null) {
+  if (!cat) return true;
+  const c = cat.trim().toLowerCase();
+  return c === 'outros' || c === 'outro' || c === 'sem categoria';
+}
 
 interface Props {
   description: string;
