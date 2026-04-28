@@ -239,6 +239,7 @@ export default function GoalsPage() {
   return (
     <div style={{
       background: 'var(--color-bg-base)',
+      paddingBottom: 24,
     }}>
       {usingCache && (
         <div
@@ -257,60 +258,65 @@ export default function GoalsPage() {
           📡 Sem conexão — exibindo valores salvos no dispositivo. Vão sincronizar ao voltar online.
         </div>
       )}
-      {/* Header */}
-      <div style={{
-        padding: '14px 20px 0',
-        display: 'flex',
-        alignItems: 'flex-end',
-        justifyContent: 'space-between',
-        gap: 12,
-      }}>
-        <div style={{ minWidth: 0 }}>
-          {goals.length > 0 ? (
-            <p style={{
-              fontSize: 13,
-              color: 'var(--color-text-subtle)',
-              fontWeight: 500,
-              lineHeight: 1.3,
+      {/* Header — Premium */}
+      {goals.length > 0 && (
+        <div style={{
+          padding: '8px 20px 4px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+        }}>
+          <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              padding: '5px 10px',
+              borderRadius: 99,
+              background: 'hsl(var(--primary) / 0.10)',
+              border: '0.5px solid hsl(var(--primary) / 0.18)',
+              fontSize: 11.5, fontWeight: 800,
+              color: 'hsl(var(--primary))',
+              letterSpacing: '-0.01em',
+              fontFeatureSettings: '"tnum"',
             }}>
-              <span style={{ color: 'var(--color-text-strong)', fontWeight: 700 }}>
-                {activeGoals.length}
-              </span>
-              {' '}meta{activeGoals.length !== 1 ? 's' : ''} ativa{activeGoals.length !== 1 ? 's' : ''}
-              {completedGoals.length > 0 && (
-                <>
-                  {' · '}
-                  <span style={{ color: 'hsl(var(--primary))', fontWeight: 700 }}>
-                    {completedGoals.length}
-                  </span>
-                  {' '}concluída{completedGoals.length !== 1 ? 's' : ''}
-                </>
-              )}
-            </p>
-          ) : (
-            <p style={{ fontSize: 13, color: 'var(--color-text-subtle)' }}>
-              Defina onde você quer chegar
-            </p>
-          )}
+              <span style={{
+                width: 6, height: 6, borderRadius: '50%',
+                background: 'hsl(var(--primary))',
+                boxShadow: '0 0 0 3px hsl(var(--primary) / 0.18)',
+              }} />
+              {activeGoals.length} ativa{activeGoals.length !== 1 ? 's' : ''}
+            </div>
+            {completedGoals.length > 0 && (
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                fontSize: 11.5, fontWeight: 700,
+                color: 'var(--color-text-subtle)',
+              }}>
+                <Trophy size={11} color="#d97706" />
+                {completedGoals.length} concluída{completedGoals.length !== 1 ? 's' : ''}
+              </div>
+            )}
+          </div>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={() => openAddGoal()}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              height: 36, padding: '0 14px',
+              background: 'hsl(var(--primary))',
+              border: 'none', borderRadius: 11,
+              color: 'white', fontSize: 13, fontWeight: 800,
+              letterSpacing: '-0.01em',
+              cursor: 'pointer',
+              boxShadow: '0 6px 18px hsl(var(--primary) / 0.32), inset 0 1px 0 rgba(255,255,255,0.18)',
+              flexShrink: 0,
+            }}
+          >
+            <Plus size={14} strokeWidth={2.75} />
+            Nova meta
+          </motion.button>
         </div>
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          onClick={() => openAddGoal()}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            height: 34, padding: '0 12px',
-            background: 'hsl(var(--primary))',
-            border: 'none', borderRadius: 10,
-            color: 'white', fontSize: 12.5, fontWeight: 700,
-            cursor: 'pointer',
-            boxShadow: '0 2px 8px hsl(var(--primary) / 0.28)',
-            flexShrink: 0,
-          }}
-        >
-          <Plus size={14} strokeWidth={2.5} />
-          Nova meta
-        </motion.button>
-      </div>
+      )}
 
       {/* Empty state */}
       {goals.length === 0 && (
@@ -694,11 +700,22 @@ function GoalCard({ goal, index, onDeposit, onEdit, onDelete, onComplete }: {
   const daysLeft = goal.deadline ? differenceInDays(parseISO(goal.deadline), new Date()) : null;
   const isLate = daysLeft !== null && daysLeft < 0 && !isCompleted;
 
-  const barColor = isCompleted ? '#7C3AED'
-    : isLate ? '#ef4444'
-    : pct >= 60 ? '#7C3AED'
-    : pct >= 30 ? '#f59e0b'
-    : '#ef4444';
+  // Premium status palette — never harsh red. Brand-led with amber for warning.
+  const barColor = isCompleted
+    ? 'linear-gradient(90deg, hsl(var(--primary)), #a78bfa)'
+    : isLate
+      ? 'linear-gradient(90deg, #f59e0b, #d97706)'
+      : pct >= 60
+        ? 'linear-gradient(90deg, hsl(var(--primary)), #a78bfa)'
+        : pct >= 25
+          ? 'linear-gradient(90deg, hsl(var(--primary)), #c4b5fd)'
+          : 'linear-gradient(90deg, hsl(var(--primary) / 0.85), hsl(var(--primary) / 0.55))';
+
+  const pctTextColor = isCompleted
+    ? 'hsl(var(--primary))'
+    : isLate
+      ? '#b45309'
+      : 'hsl(var(--primary))';
 
   const handleDepositSubmit = () => {
     const val = parseFloat(depositAmount);
@@ -720,7 +737,7 @@ function GoalCard({ goal, index, onDeposit, onEdit, onDelete, onComplete }: {
         margin: '0 16px',
         background: 'var(--color-bg-surface)',
         borderRadius: 18, overflow: 'hidden',
-        boxShadow: 'var(--shadow-sm)',
+        boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 4px 16px rgba(15,23,42,0.04)',
         border: isCompleted
           ? '1.5px solid hsl(var(--primary))'
           : '0.5px solid var(--color-border-weak)',
@@ -729,9 +746,10 @@ function GoalCard({ goal, index, onDeposit, onEdit, onDelete, onComplete }: {
       {/* Completed banner */}
       {isCompleted && (
         <div style={{
-          background: 'hsl(var(--primary))', padding: '5px 16px',
-          fontSize: 10, fontWeight: 800, color: 'white',
-          letterSpacing: '0.1em', textTransform: 'uppercase',
+          background: 'linear-gradient(90deg, hsl(var(--primary)), #a78bfa)',
+          padding: '6px 16px',
+          fontSize: 10.5, fontWeight: 800, color: 'white',
+          letterSpacing: '0.12em', textTransform: 'uppercase',
           display: 'flex', alignItems: 'center', gap: 5,
         }}>
           🏆 Meta concluída! Parabéns!
@@ -741,11 +759,14 @@ function GoalCard({ goal, index, onDeposit, onEdit, onDelete, onComplete }: {
       {/* Late warning */}
       {isLate && (
         <div style={{
-          background: 'var(--color-danger-bg)', padding: '5px 16px',
-          fontSize: 10, fontWeight: 700, color: 'var(--color-danger-text)',
-          letterSpacing: '0.06em', textTransform: 'uppercase',
+          background: 'linear-gradient(90deg, rgba(245,158,11,0.14), rgba(245,158,11,0.06))',
+          padding: '6px 16px',
+          fontSize: 10.5, fontWeight: 800, color: '#b45309',
+          letterSpacing: '0.08em', textTransform: 'uppercase',
+          borderBottom: '0.5px solid rgba(245,158,11,0.20)',
+          display: 'flex', alignItems: 'center', gap: 6,
         }}>
-          ⚠️ Prazo vencido — ajuste seu plano
+          <span>⏰</span> Prazo vencido — ajuste seu plano
         </div>
       )}
 
@@ -835,10 +856,11 @@ function GoalCard({ goal, index, onDeposit, onEdit, onDelete, onComplete }: {
               Meta
             </div>
             <div style={{
-              fontSize: 16, fontWeight: 700,
+              fontSize: 15, fontWeight: 700,
               fontFamily: 'var(--font-mono)',
               letterSpacing: '-0.02em',
               color: 'var(--color-text-muted)',
+              whiteSpace: 'nowrap',
             }}>
               R$ {formatMoney(target)}
             </div>
@@ -850,19 +872,21 @@ function GoalCard({ goal, index, onDeposit, onEdit, onDelete, onComplete }: {
           <div style={{
             height: 10, background: 'var(--color-bg-sunken)',
             borderRadius: 99, overflow: 'hidden', position: 'relative',
+            boxShadow: 'inset 0 1px 2px rgba(15,23,42,0.05)',
           }}>
             <motion.div
               initial={{ width: 0 }}
-              animate={{ width: `${pct}%` }}
+              animate={{ width: `${Math.max(pct, pct > 0 ? 2 : 0)}%` }}
               transition={{ duration: 1.2, ease: 'easeOut', delay: index * 0.1 }}
               style={{
                 height: '100%', borderRadius: 99,
                 background: barColor, position: 'relative',
+                boxShadow: '0 1px 4px hsl(var(--primary) / 0.28)',
               }}
             >
               <div style={{
                 position: 'absolute', top: 1, left: 4, right: 4,
-                height: 3, background: 'rgba(255,255,255,0.3)',
+                height: 3, background: 'rgba(255,255,255,0.32)',
                 borderRadius: 99,
               }} />
             </motion.div>
@@ -872,7 +896,8 @@ function GoalCard({ goal, index, onDeposit, onEdit, onDelete, onComplete }: {
           }}>
             <div style={{
               fontSize: 12, fontWeight: 800,
-              color: barColor, fontFamily: 'var(--font-mono)',
+              color: pctTextColor, fontFamily: 'var(--font-mono)',
+              letterSpacing: '-0.02em',
             }}>
               {pct.toFixed(0)}% completo
             </div>
