@@ -127,9 +127,8 @@ export default function IntegrationsPage() {
   return (
     <div className="scroll-container hide-scrollbar" style={{ padding: isMobile ? 16 : 28, maxWidth: 1280 }}>
       {/* Header */}
-      <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: isMobile ? 22 : 28, fontWeight: 900, color: 'var(--color-text-strong)', letterSpacing: '-0.5px' }}>Integrações</h2>
-        <p style={{ fontSize: 13, color: 'var(--color-text-muted)', marginTop: 4 }}>Conecte suas plataformas e importe dados automaticamente</p>
+      <div style={{ marginBottom: 20 }}>
+        <p style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>Conecte suas plataformas e importe dados automaticamente</p>
       </div>
 
       {/* Stats strip */}
@@ -141,13 +140,14 @@ export default function IntegrationsPage() {
         ].map(s => (
           <div key={s.label} style={{
             background: s.bg, border: '1px solid var(--color-border-weak)',
-            borderRadius: 'var(--radius-xl)', padding: isMobile ? '12px' : '16px 20px',
+            borderRadius: 'var(--radius-xl)', padding: isMobile ? '10px' : '16px 20px',
+            minWidth: 0, overflow: 'hidden',
           }}>
-            <div className="flex items-center" style={{ gap: 6, marginBottom: 6 }}>
-              <s.icon style={{ width: 15, height: 15, color: s.iconColor }} />
-              <span style={{ fontSize: 11, color: 'var(--color-text-muted)', fontWeight: 600 }}>{s.label}</span>
+            <div className="flex items-center" style={{ gap: 6, marginBottom: 6, minWidth: 0 }}>
+              <s.icon style={{ width: 14, height: 14, color: s.iconColor, flexShrink: 0 }} />
+              <span style={{ fontSize: 10.5, color: 'var(--color-text-muted)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.label}</span>
             </div>
-            <span style={{ fontSize: isMobile ? 20 : 24, fontWeight: 900, color: s.valueColor }}>{s.value}</span>
+            <span style={{ fontSize: isMobile ? 18 : 24, fontWeight: 900, color: s.valueColor, whiteSpace: 'nowrap' }}>{s.value}</span>
           </div>
         ))}
       </div>
