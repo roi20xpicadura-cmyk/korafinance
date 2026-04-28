@@ -436,12 +436,17 @@ export default function OverviewPage() {
         <div style={{ position: 'relative', marginBottom: 18 }}>
           {showValues ? (
             <div>
-              <div className="text-[30px] md:text-[42px]" style={{
+              <div style={{
                 fontWeight: 900, color: 'white',
-                letterSpacing: '-0.04em', lineHeight: 1,
+                letterSpacing: '-0.035em', lineHeight: 1,
                 fontVariantNumeric: 'tabular-nums',
                 fontFeatureSettings: '"tnum"',
                 textShadow: '0 2px 18px rgba(0,0,0,0.30)',
+                fontSize: 'clamp(26px, 8.4vw, 42px)',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '100%',
               }}>
                 <AnimatedCurrency value={heroBalance} currency={currency} />
               </div>
@@ -496,7 +501,8 @@ export default function OverviewPage() {
               Receitas
             </div>
             <div style={{
-              fontSize: 16, fontWeight: 800, color: '#E9D5FF',
+              fontSize: 'clamp(13px, 4.2vw, 16px)',
+              fontWeight: 800, color: '#E9D5FF',
               fontVariantNumeric: 'tabular-nums',
               fontFeatureSettings: '"tnum"',
               letterSpacing: '-0.02em',
@@ -517,7 +523,8 @@ export default function OverviewPage() {
               Despesas
             </div>
             <div style={{
-              fontSize: 16, fontWeight: 800, color: '#fca5a5',
+              fontSize: 'clamp(13px, 4.2vw, 16px)',
+              fontWeight: 800, color: '#fca5a5',
               fontVariantNumeric: 'tabular-nums',
               fontFeatureSettings: '"tnum"',
               letterSpacing: '-0.02em',
@@ -548,7 +555,8 @@ export default function OverviewPage() {
                 Pessoal
               </div>
               <div style={{
-                fontSize: 15, fontWeight: 800, color: 'white', marginTop: 4,
+                fontSize: 'clamp(12px, 4vw, 15px)',
+                fontWeight: 800, color: 'white', marginTop: 4,
                 letterSpacing: '-0.02em',
                 fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum"',
                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
@@ -573,7 +581,8 @@ export default function OverviewPage() {
                 Negócio
               </div>
               <div style={{
-                fontSize: 15, fontWeight: 800, color: 'white', marginTop: 4,
+                fontSize: 'clamp(12px, 4vw, 15px)',
+                fontWeight: 800, color: 'white', marginTop: 4,
                 letterSpacing: '-0.02em',
                 fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum"',
                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
@@ -644,7 +653,7 @@ export default function OverviewPage() {
             </div>
 
             {/* Content */}
-            <div style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{ position: 'relative', zIndex: 1, minWidth: 0 }}>
               <div
                 style={{
                   fontSize: 10.5,
@@ -653,18 +662,26 @@ export default function OverviewPage() {
                   textTransform: 'uppercase',
                   letterSpacing: '0.7px',
                   marginBottom: 6,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
                 }}
               >
                 {s.label}
               </div>
               <div
                 style={{
-                  fontSize: 22,
+                  fontSize: s.isCurrency ? 'clamp(15px, 5vw, 22px)' : 'clamp(17px, 5.6vw, 22px)',
                   fontWeight: 900,
                   color: 'var(--color-text-strong)',
-                  letterSpacing: '-0.7px',
+                  letterSpacing: '-0.03em',
                   fontVariantNumeric: 'tabular-nums',
+                  fontFeatureSettings: '"tnum"',
                   lineHeight: 1.05,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '100%',
                 }}
               >
                 {showValues ? (
@@ -1114,7 +1131,10 @@ export default function OverviewPage() {
                   </div>
                 </div>
                 <div style={{
-                  fontSize: 15, fontWeight: 900, letterSpacing: '-0.3px', fontVariantNumeric: 'tabular-nums', flexShrink: 0,
+                  fontSize: 'clamp(13px, 4vw, 15px)',
+                  fontWeight: 900, letterSpacing: '-0.02em',
+                  fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum"',
+                  flexShrink: 0, whiteSpace: 'nowrap',
                   color: tx.type === 'income' ? 'var(--color-success-text)' : 'var(--color-danger-text)',
                 }}>
                   {showValues
