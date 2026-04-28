@@ -37,7 +37,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr_1fr_1fr] gap-10 md:gap-8 mb-12">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src={koraIcon} alt="KoraFinance" className="w-7 h-7 rounded-lg object-cover" />
+              <img src={koraIcon} alt="KoraFinance" loading="lazy" decoding="async" width={28} height={28} className="w-7 h-7 rounded-lg object-cover" />
               <span className="text-[15px] font-[900] text-white">KoraFinance</span>
             </div>
             <p className="text-[12px] text-white/40 leading-[1.8] max-w-[240px] mb-5">

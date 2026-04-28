@@ -23,7 +23,7 @@ export default function HeroMockup() {
         {/* Sidebar */}
         <div className="hidden sm:flex w-[140px] md:w-[160px] bg-primary flex-col p-3 gap-1">
           <div className="flex items-center gap-2 mb-4">
-            <img src={icon} alt="KoraFinance" className="w-6 h-6 rounded-md object-cover" />
+            <img src={icon} alt="KoraFinance" loading="lazy" decoding="async" width={24} height={24} className="w-6 h-6 rounded-md object-cover" />
             <span className="text-[11px] font-bold text-primary-foreground">KoraFinance</span>
           </div>
           {[
