@@ -501,7 +501,8 @@ export default function OverviewPage() {
               Receitas
             </div>
             <div style={{
-              fontSize: 16, fontWeight: 800, color: '#E9D5FF',
+              fontSize: 'clamp(13px, 4.2vw, 16px)',
+              fontWeight: 800, color: '#E9D5FF',
               fontVariantNumeric: 'tabular-nums',
               fontFeatureSettings: '"tnum"',
               letterSpacing: '-0.02em',
@@ -522,7 +523,8 @@ export default function OverviewPage() {
               Despesas
             </div>
             <div style={{
-              fontSize: 16, fontWeight: 800, color: '#fca5a5',
+              fontSize: 'clamp(13px, 4.2vw, 16px)',
+              fontWeight: 800, color: '#fca5a5',
               fontVariantNumeric: 'tabular-nums',
               fontFeatureSettings: '"tnum"',
               letterSpacing: '-0.02em',
@@ -553,7 +555,8 @@ export default function OverviewPage() {
                 Pessoal
               </div>
               <div style={{
-                fontSize: 15, fontWeight: 800, color: 'white', marginTop: 4,
+                fontSize: 'clamp(12px, 4vw, 15px)',
+                fontWeight: 800, color: 'white', marginTop: 4,
                 letterSpacing: '-0.02em',
                 fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum"',
                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
@@ -578,7 +581,8 @@ export default function OverviewPage() {
                 Negócio
               </div>
               <div style={{
-                fontSize: 15, fontWeight: 800, color: 'white', marginTop: 4,
+                fontSize: 'clamp(12px, 4vw, 15px)',
+                fontWeight: 800, color: 'white', marginTop: 4,
                 letterSpacing: '-0.02em',
                 fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum"',
                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
