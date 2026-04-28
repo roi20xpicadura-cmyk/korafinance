@@ -311,21 +311,57 @@ export default function PredictionsPage() {
   );
 }
 
-function StatCard({ icon, label, value, sub, status }: { icon: React.ReactNode; label: string; value: string; sub: string; status: 'danger' | 'warning' | 'good' }) {
-  const colors = {
-    danger: { bg: 'var(--color-danger-bg)', border: 'var(--color-danger-border)', text: 'var(--color-danger-text)' },
-    warning: { bg: '#fffbeb', border: '#fde68a', text: '#92400e' },
-    good: { bg: 'var(--color-success-bg)', border: 'var(--color-success-border)', text: 'var(--color-success-text)' },
-  }[status];
+function MetricCard({ icon, label, value, sub, tone, progress }: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  sub: string;
+  tone: 'danger' | 'warning' | 'success' | 'neutral';
+  progress?: number;
+}) {
+  const accent = {
+    danger: 'var(--color-danger-solid)',
+    warning: '#f59e0b',
+    success: 'var(--color-success-solid)',
+    neutral: 'var(--color-green-600)',
+  }[tone];
 
   return (
-    <div style={{ background: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 14, padding: 16 }}>
-      <div className="flex items-center gap-2 mb-2">
-        <div style={{ color: colors.text }}>{icon}</div>
-        <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>{label}</span>
+    <div style={{
+      position: 'relative',
+      background: 'var(--color-bg-surface)',
+      border: '1px solid var(--color-border-base)',
+      borderRadius: 16,
+      padding: 16,
+      overflow: 'hidden',
+    }}>
+      {/* Accent bar */}
+      <div style={{
+        position: 'absolute', left: 0, top: 0, bottom: 0, width: 3,
+        background: accent, opacity: 0.9,
+      }} />
+      <div className="flex items-center gap-2 mb-2" style={{ paddingLeft: 6 }}>
+        <div style={{
+          width: 28, height: 28, borderRadius: 8, display: 'flex',
+          alignItems: 'center', justifyContent: 'center',
+          background: `color-mix(in srgb, ${accent} 12%, transparent)`,
+          color: accent,
+        }}>{icon}</div>
+        <span style={{ fontSize: 10, fontWeight: 800, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</span>
       </div>
-      <p style={{ fontSize: 18, fontWeight: 900, color: colors.text, letterSpacing: '-0.5px' }}>{value}</p>
-      {sub && <p style={{ fontSize: 11, color: colors.text, opacity: 0.8, marginTop: 2 }}>{sub}</p>}
+      <p style={{ fontSize: 18, fontWeight: 900, color: 'var(--color-text-strong)', letterSpacing: '-0.5px', paddingLeft: 6 }}>{value}</p>
+      {sub && <p style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 4, paddingLeft: 6 }}>{sub}</p>}
+      {typeof progress === 'number' && (
+        <div style={{
+          marginTop: 10, marginLeft: 6, height: 4, borderRadius: 99,
+          background: 'var(--color-bg-sunken)', overflow: 'hidden',
+        }}>
+          <div style={{
+            width: `${Math.min(100, progress)}%`, height: '100%',
+            background: accent, borderRadius: 99, transition: 'width 0.6s ease',
+          }} />
+        </div>
+      )}
     </div>
   );
 }
