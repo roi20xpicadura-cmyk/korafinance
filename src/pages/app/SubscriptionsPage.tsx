@@ -35,8 +35,9 @@ const fmt = (v: number) => `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigi
 // Design tokens (light theme, violet accent)
 const C = {
   violet: '#7C3AED',
-  violetDeep: '#5B21B6',
-  violetGlow: '#A78BFA',
+  violetDeep: '#2E1065',
+  violetMid: '#4C1D95',
+  violetGlow: '#6D28D9',
   violetSoft: '#EDE9FE',
   violetSofter: '#F5F3FF',
   borderSoft: '#F0EEF8',
@@ -192,8 +193,8 @@ export default function SubscriptionsPage() {
         style={{
           borderRadius: 24,
           padding: '22px 20px 24px',
-          background: `linear-gradient(135deg, ${C.violetDeep} 0%, ${C.violet} 55%, ${C.violetGlow} 130%)`,
-          boxShadow: '0 20px 40px -18px rgba(124,58,237,0.55), 0 4px 12px -4px rgba(91,33,182,0.35)',
+          background: `linear-gradient(135deg, ${C.violetDeep} 0%, ${C.violetMid} 50%, ${C.violetGlow} 100%)`,
+          boxShadow: '0 20px 40px -18px rgba(46,16,101,0.6), 0 4px 12px -4px rgba(46,16,101,0.4)',
         }}
       >
         {/* decorative orbs */}
@@ -203,7 +204,7 @@ export default function SubscriptionsPage() {
           style={{
             width: 220, height: 220, right: -70, top: -90,
             borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 70%)',
+            background: 'radial-gradient(circle, rgba(167,139,250,0.18) 0%, rgba(167,139,250,0) 70%)',
           }}
         />
         <div
@@ -212,7 +213,7 @@ export default function SubscriptionsPage() {
           style={{
             width: 160, height: 160, left: -50, bottom: -70,
             borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(167,139,250,0.45) 0%, rgba(167,139,250,0) 70%)',
+            background: 'radial-gradient(circle, rgba(124,58,237,0.28) 0%, rgba(124,58,237,0) 70%)',
           }}
         />
 
