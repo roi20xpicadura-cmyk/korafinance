@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ChevronDown, ArrowRight, ReceiptText, Target, CreditCard, Landmark, Settings } from 'lucide-react';
+import { Check, ChevronDown, ArrowRight, ReceiptText, Target, Landmark, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,7 +17,6 @@ interface Step {
 const STEPS: Step[] = [
   { key: 'transaction', icon: ReceiptText, title: 'Adicione seu primeiro lançamento', desc: 'Registre uma receita ou despesa.', route: '/app/transactions', color: '#7C3AED' },
   { key: 'goal', icon: Target, title: 'Crie uma meta financeira', desc: 'Defina quanto quer economizar.', route: '/app/goals', color: '#7c3aed' },
-  { key: 'card', icon: CreditCard, title: 'Cadastre um cartão de crédito', desc: 'Controle limites e faturas.', route: '/app/cards', color: '#0891b2' },
   { key: 'budget', icon: Landmark, title: 'Defina um orçamento mensal', desc: 'Limite gastos por categoria.', route: '/app/budget', color: '#ea580c' },
   { key: 'settings', icon: Settings, title: 'Personalize seu perfil', desc: 'Foto, moeda e preferências.', route: '/app/settings', color: '#6366f1' },
 ];
@@ -37,14 +36,12 @@ export default function WelcomeChecklist() {
     Promise.all([
       supabase.from('transactions').select('id', { count: 'exact', head: true }).eq('user_id', user.id).is('deleted_at', null),
       supabase.from('goals').select('id', { count: 'exact', head: true }).eq('user_id', user.id).is('deleted_at', null),
-      supabase.from('credit_cards').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
       supabase.from('budgets').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
       supabase.from('profiles').select('avatar_url').eq('id', user.id).single(),
-    ]).then(([txRes, goalRes, cardRes, budgetRes, profileRes]) => {
+    ]).then(([txRes, goalRes, budgetRes, profileRes]) => {
       setCompleted({
         transaction: (txRes.count || 0) > 0,
         goal: (goalRes.count || 0) > 0,
-        card: (cardRes.count || 0) > 0,
         budget: (budgetRes.count || 0) > 0,
         settings: !!profileRes.data?.avatar_url,
       });
