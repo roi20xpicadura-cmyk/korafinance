@@ -257,8 +257,8 @@ export default function TransactionIcon({
     justifyContent: 'center',
     overflow: 'hidden',
     flexShrink: 0,
-    border: '1px solid rgba(0,0,0,0.04)',
-    boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.03)',
+    border: '1px solid var(--color-border-weak)',
+    boxShadow: 'inset 0 -1px 0 hsl(var(--foreground) / 0.03)',
   };
 
   if (useFavicon) {
@@ -266,8 +266,8 @@ export default function TransactionIcon({
     return (
       <div style={{
         ...container,
-        background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
-        boxShadow: 'inset 0 0 0 1px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04)',
+        background: 'var(--color-bg-surface)',
+        boxShadow: 'inset 0 0 0 1px var(--color-border-weak), var(--shadow-xs)',
       }}>
         <img
           src={url}
