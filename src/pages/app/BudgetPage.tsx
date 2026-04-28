@@ -228,12 +228,19 @@ export default function BudgetPage() {
 
   if (loading) return <div className="p-7"><div className="h-96 rounded-2xl skeleton-shimmer" /></div>;
 
+  const globalPct = totalBudget > 0 ? Math.min(100, (totalSpent / totalBudget) * 100) : 0;
   const kpis = [
-    { label: 'Orçamento', value: formatCompact(totalBudget), Icon: DollarSign, iconBg: C.violetSoft, iconColor: C.violet, valColor: C.violet },
-    { label: 'Gasto', value: formatCompact(totalSpent), Icon: TrendingUp, iconBg: C.redSoft, iconColor: C.red, valColor: C.red },
-    { label: 'Disponível', value: formatCompact(Math.max(0, totalBudget - totalSpent)), Icon: PieChart, iconBg: C.greenSoft, iconColor: C.green, valColor: C.green },
-    { label: 'No limite', value: String(overBudgetCount), Icon: AlertCircle, iconBg: C.amberSoft, iconColor: C.amber, valColor: C.amber },
+    { label: 'Orçamento', value: formatCompact(totalBudget), Icon: Wallet, tint: 'violet' as const },
+    { label: 'Gasto', value: formatCompact(totalSpent), Icon: TrendingDown, tint: 'red' as const },
+    { label: 'Disponível', value: formatCompact(Math.max(0, totalBudget - totalSpent)), Icon: PiggyBank, tint: 'green' as const },
+    { label: 'Em alerta', value: String(overBudgetCount), Icon: AlertTriangle, tint: 'amber' as const },
   ];
+  const tintMap = {
+    violet: { bg: 'rgba(124,58,237,0.10)', border: 'rgba(124,58,237,0.22)', icon: '#7C3AED', val: C.textStrong },
+    red:    { bg: 'rgba(220,38,38,0.10)',  border: 'rgba(220,38,38,0.22)',  icon: '#DC2626', val: '#DC2626' },
+    green:  { bg: 'rgba(22,163,74,0.10)',  border: 'rgba(22,163,74,0.22)',  icon: '#16A34A', val: '#16A34A' },
+    amber:  { bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.25)', icon: '#D97706', val: '#D97706' },
+  };
 
   // Combine budgeted + unbudgeted into one unified category list
   const allCategoryRows = [
