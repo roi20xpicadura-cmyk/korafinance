@@ -87,7 +87,7 @@ const SplashScreen = forwardRef<HTMLDivElement>(function SplashScreen(_, ref) {
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3, duration: 0.4 }}
-            style={{ fontSize: 24, fontWeight: 900, color: 'var(--color-text-strong)' }}
+            style={{ fontSize: 25, fontWeight: 900, color: 'var(--color-text-strong)', letterSpacing: 0 }}
           >
             Kora
           </motion.span>
@@ -95,7 +95,7 @@ const SplashScreen = forwardRef<HTMLDivElement>(function SplashScreen(_, ref) {
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4, duration: 0.4 }}
-            style={{ fontSize: 24, fontWeight: 900, color: 'var(--color-green-600)' }}
+            style={{ fontSize: 25, fontWeight: 900, color: 'var(--color-green-600)', letterSpacing: 0 }}
           >
             Finance
           </motion.span>
@@ -105,34 +105,33 @@ const SplashScreen = forwardRef<HTMLDivElement>(function SplashScreen(_, ref) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.4 }}
-          style={{ fontSize: 13, color: 'var(--color-text-subtle)', fontWeight: 500 }}
+          style={{ fontSize: 13, color: 'var(--color-text-subtle)', fontWeight: 600, letterSpacing: 0 }}
         >
-          Controle total das suas finanças
+          Preparando sua inteligência financeira
         </motion.p>
       </motion.div>
 
-      {/* Loading dots */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
-        className="absolute flex"
-        style={{ bottom: 'calc(env(safe-area-inset-bottom, 20px) + 48px)', gap: 6 }}
+      <div
+        className="absolute overflow-hidden"
+        style={{
+          bottom: 'calc(env(safe-area-inset-bottom, 20px) + 48px)',
+          width: 168,
+          height: 3,
+          borderRadius: 999,
+          background: 'var(--color-border-weak)',
+        }}
       >
-        {[0, 1, 2].map(i => (
-          <motion.div
-            key={i}
-            animate={reduceMotion ? { opacity: 0.65 } : { scale: [1, 1.3, 1], opacity: [0.3, 1, 0.3] }}
-            transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: 'var(--color-green-500)',
-            }}
-          />
-        ))}
-      </motion.div>
+        <motion.div
+          className="absolute inset-y-0"
+          style={{
+            width: '45%',
+            borderRadius: 999,
+            background: 'linear-gradient(90deg, transparent, var(--color-green-400) 40%, var(--color-green-300) 70%, transparent)',
+          }}
+          animate={performanceMode ? { x: '78%' } : { x: ['-110%', '245%'] }}
+          transition={{ duration: 1.55, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      </div>
     </div>
   );
 });
