@@ -400,18 +400,30 @@ export default function TransactionsPage({ profile }: TransactionsPageProps = {}
             else label = formatDayLabelPt(d);
 
             const groups = aggregateSameDay(list);
+            const dayInc = list.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
+            const dayExp = list.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
+            const dayNet = dayInc - dayExp;
 
             return (
               <div key={date}>
                 <div style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  padding: '18px 20px 6px',
+                  padding: '18px 20px 8px',
                 }}>
                   <span style={{
                     fontSize: 11, fontWeight: 600, color: 'var(--color-text-muted)',
                     textTransform: 'uppercase', letterSpacing: '0.06em',
                   }}>
                     {label}
+                  </span>
+                  <span style={{
+                    fontSize: 11, fontWeight: 700, fontFamily: 'var(--font-mono)',
+                    letterSpacing: '-0.01em',
+                    color: dayNet === 0
+                      ? 'var(--color-text-muted)'
+                      : dayNet > 0 ? 'var(--color-success-text, #047857)' : 'var(--color-danger-text)',
+                  }}>
+                    {dayNet > 0 ? '+' : dayNet < 0 ? '−' : ''}R$ {formatBRL(Math.abs(dayNet))}
                   </span>
                 </div>
                 <div style={{
