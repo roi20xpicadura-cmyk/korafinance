@@ -1,19 +1,25 @@
 import { motion } from 'framer-motion';
 import { useCountUp } from '@/hooks/useCountUp';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 function StatItem({ value, displayValue, suffix, label, index }: { value: number; displayValue?: string; suffix: string; label: string; index: number }) {
   const [visible, setVisible] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const count = useCountUp(visible ? value : 0, 2000, 0);
-
-  useEffect(() => {
-    const el = ref.current;
+  // Callback ref evita o warning "Function components cannot be given refs":
+  // não usamos `useRef` em conjunto com `motion.div` ref forwarding (que em
+  // alguns paths do framer-motion gera o warning).
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const setRef = useCallback((el: HTMLDivElement | null) => {
+    observerRef.current?.disconnect();
+    observerRef.current = null;
     if (!el) return;
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.3 });
-    obs.observe(el);
-    return () => obs.disconnect();
+    observerRef.current = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setVisible(true); },
+      { threshold: 0.3 },
+    );
+    observerRef.current.observe(el);
   }, []);
+  useEffect(() => () => observerRef.current?.disconnect(), []);
+  const count = useCountUp(visible ? value : 0, 2000, 0);
 
   const formatted = displayValue
     ? (visible && count >= value ? displayValue : String(count > 100 ? count.toLocaleString('pt-BR') : count))
@@ -21,7 +27,7 @@ function StatItem({ value, displayValue, suffix, label, index }: { value: number
 
   return (
     <motion.div
-      ref={ref}
+      ref={setRef}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
