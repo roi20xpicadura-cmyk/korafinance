@@ -439,7 +439,6 @@ export default function TransactionsPage({ profile }: TransactionsPageProps = {}
                     const isExpanded = expandedGroups.has(group.key);
                     const displayName = normalizeTransactionName(tx.description) || tx.description;
                     const isIncome = tx.type === 'income';
-                    const style = getCategoryStyle(tx.category, isIncome);
                     const amountAbs = Math.abs(group.total);
                     const isLarge = amountAbs >= 500;
                     const isSmall = amountAbs < 100;
