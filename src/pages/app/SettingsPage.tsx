@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { OBJECTIVES } from '@/lib/objectives';
 import { PROFILE_TYPES } from '@/components/onboarding/OnboardingFlow';
-import { Check, Download, Trash2, FileText, Camera, Bell, BellOff, Shield, ChevronRight, User, Target as TargetIcon, Sliders, Lock, MessageCircle, AlertTriangle, type LucideIcon } from 'lucide-react';
+import { Check, Download, Trash2, FileText, Camera, Bell, BellOff, Shield, ChevronRight, User, Target as TargetIcon, Sliders, Lock, MessageCircle, AlertTriangle, Sparkles, type LucideIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { requestPushPermission, checkNotificationSupport, sendLocalNotification } from '@/lib/pushNotifications';
