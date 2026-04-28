@@ -316,22 +316,28 @@ export default function OverviewPage() {
   const savedAmount = Math.max(0, stats.netBalance);
   const streak = config?.streak_days || 0;
 
-  // Profile-aware stat cards
+  // Profile-aware stat cards — unified purple palette w/ accent variations
+  const ACCENT_PRIMARY = '#7c3aed';
+  const ACCENT_VIOLET = '#a855f7';
+  const ACCENT_INDIGO = '#6366f1';
+  const ACCENT_FUCHSIA = '#d946ef';
+  const ACCENT_AMBER = '#f59e0b';
+
   const statCards = showPersonal && !showBusiness ? [
-    { label: 'Score', value: scoreResult.total, suffix: '/1000', icon: Shield, color: 'var(--color-green-600)', bg: 'var(--color-success-bg)' },
-    { label: 'Metas ativas', value: activeGoals.length, suffix: '', icon: Target, color: '#7c3aed', bg: 'hsl(263 90% 51% / 0.12)' },
-    { label: 'Streak', value: streak, suffix: ' dias', icon: Flame, color: '#ea580c', bg: 'hsl(21 90% 48% / 0.12)' },
-    { label: 'Economizado', value: savedAmount, prefix: 'R$ ', icon: PiggyBank, color: '#0891b2', bg: 'hsl(189 94% 43% / 0.12)', isCurrency: true },
+    { label: 'Score', value: scoreResult.total, suffix: '/1000', icon: Shield, color: ACCENT_PRIMARY },
+    { label: 'Metas ativas', value: activeGoals.length, suffix: '', icon: Target, color: ACCENT_VIOLET },
+    { label: 'Streak', value: streak, suffix: ' dias', icon: Flame, color: ACCENT_AMBER },
+    { label: 'Economizado', value: savedAmount, prefix: 'R$ ', icon: PiggyBank, color: ACCENT_INDIGO, isCurrency: true },
   ] : showBusiness && !showPersonal ? [
-    { label: 'Receita', value: stats.bizIncome, prefix: 'R$ ', icon: TrendingUp, color: 'var(--color-green-600)', bg: 'var(--color-success-bg)', isCurrency: true },
-    { label: 'Lucro', value: stats.bizProfit, prefix: 'R$ ', icon: DollarSign, color: 'var(--color-green-600)', bg: 'var(--color-success-bg)', isCurrency: true },
-    { label: 'ROI', value: stats.roiBiz, suffix: '%', icon: Percent, color: '#7c3aed', bg: 'hsl(263 90% 51% / 0.12)' },
-    { label: 'Lançamentos', value: stats.txCount, suffix: '', icon: Hash, color: 'var(--color-text-muted)', bg: 'var(--color-bg-sunken)' },
+    { label: 'Receita', value: stats.bizIncome, prefix: 'R$ ', icon: TrendingUp, color: ACCENT_PRIMARY, isCurrency: true },
+    { label: 'Lucro', value: stats.bizProfit, prefix: 'R$ ', icon: DollarSign, color: ACCENT_VIOLET, isCurrency: true },
+    { label: 'ROI', value: stats.roiBiz, suffix: '%', icon: Percent, color: ACCENT_FUCHSIA },
+    { label: 'Lançamentos', value: stats.txCount, suffix: '', icon: Hash, color: ACCENT_INDIGO },
   ] : [
-    { label: 'Score', value: scoreResult.total, suffix: '/1000', icon: Shield, color: 'var(--color-green-600)', bg: 'var(--color-success-bg)' },
-    { label: 'Lucro Neg.', value: stats.bizProfit, prefix: 'R$ ', icon: DollarSign, color: 'var(--color-green-600)', bg: 'var(--color-success-bg)', isCurrency: true },
-    { label: 'Metas ativas', value: activeGoals.length, suffix: '', icon: Target, color: '#7c3aed', bg: 'hsl(263 90% 51% / 0.12)' },
-    { label: 'Economizado', value: savedAmount, prefix: 'R$ ', icon: PiggyBank, color: '#0891b2', bg: 'hsl(189 94% 43% / 0.12)', isCurrency: true },
+    { label: 'Score', value: scoreResult.total, suffix: '/1000', icon: Shield, color: ACCENT_PRIMARY },
+    { label: 'Lucro Neg.', value: stats.bizProfit, prefix: 'R$ ', icon: DollarSign, color: ACCENT_VIOLET, isCurrency: true },
+    { label: 'Metas ativas', value: activeGoals.length, suffix: '', icon: Target, color: ACCENT_FUCHSIA },
+    { label: 'Economizado', value: savedAmount, prefix: 'R$ ', icon: PiggyBank, color: ACCENT_INDIGO, isCurrency: true },
   ];
 
   const recent = transactions.slice(0, 5);
@@ -438,18 +444,100 @@ export default function OverviewPage() {
       {/* SMART ALERTS */}
       <Suspense fallback={null}><SmartAlertsWidget /></Suspense>
 
-      {/* 3. QUICK STATS — 2x2 */}
-      <div className="grid grid-cols-2 gap-2.5">
+      {/* 3. QUICK STATS — premium 2x2 */}
+      <div className="grid grid-cols-2 gap-3">
         {statCards.map((s, i) => (
-          <motion.div key={s.label} {...stagger(i + 2)}
-            className="card-glow"
-            style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 9, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <s.icon size={16} color={s.color} />
+          <motion.div
+            key={s.label}
+            {...stagger(i + 2)}
+            whileHover={{ y: -2 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+            style={{
+              position: 'relative',
+              padding: '16px 16px 18px',
+              borderRadius: 18,
+              background: 'var(--color-bg-surface)',
+              border: '1px solid var(--color-border-weak)',
+              boxShadow: '0 1px 2px rgba(15,23,42,0.04), 0 8px 24px -16px rgba(124,58,237,0.18)',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 14,
+              minHeight: 128,
+            }}
+          >
+            {/* Accent corner glow */}
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                top: -40,
+                right: -40,
+                width: 110,
+                height: 110,
+                borderRadius: '50%',
+                background: `radial-gradient(circle, ${s.color}26, transparent 70%)`,
+                filter: 'blur(8px)',
+                pointerEvents: 'none',
+              }}
+            />
+            {/* Top accent bar */}
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: `linear-gradient(90deg, ${s.color}, ${s.color}55)`,
+                opacity: 0.85,
+              }}
+            />
+
+            {/* Icon */}
+            <div
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 12,
+                background: `linear-gradient(135deg, ${s.color}1f, ${s.color}0a)`,
+                border: `1px solid ${s.color}33`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: `0 6px 14px -8px ${s.color}80`,
+                position: 'relative',
+                zIndex: 1,
+              }}
+            >
+              <s.icon size={18} color={s.color} strokeWidth={2.4} />
             </div>
-            <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-text-subtle)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 3 }}>{s.label}</div>
-              <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--color-text-strong)', letterSpacing: '-0.5px', fontVariantNumeric: 'tabular-nums' }}>
+
+            {/* Content */}
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  color: 'var(--color-text-subtle)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.7px',
+                  marginBottom: 6,
+                }}
+              >
+                {s.label}
+              </div>
+              <div
+                style={{
+                  fontSize: 22,
+                  fontWeight: 900,
+                  color: 'var(--color-text-strong)',
+                  letterSpacing: '-0.7px',
+                  fontVariantNumeric: 'tabular-nums',
+                  lineHeight: 1.05,
+                }}
+              >
                 {showValues ? (
                   s.isCurrency
                     ? <AnimatedCurrency value={s.value} currency={currency} />
