@@ -34,7 +34,7 @@ export default function Navbar() {
     >
       <div className="max-w-[1200px] mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <img src={icon} alt="KoraFinance" className="w-7 h-7 rounded-lg object-cover" />
+          <img src={icon} alt="KoraFinance" decoding="async" fetchPriority="high" width={28} height={28} className="w-7 h-7 rounded-lg object-cover" />
           <span className="text-[15px] font-[900] text-[#0f172a]">
             KoraFinance
           </span>
