@@ -181,7 +181,7 @@ export default function TransactionsPage({ profile }: TransactionsPageProps = {}
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--color-bg-base)', paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
+    <div style={{ background: 'var(--color-bg-base)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
       {/* HERO — gradiente roxo com saldo + KPIs */}
       <div style={{ padding: '12px 16px 0' }}>
         <div
