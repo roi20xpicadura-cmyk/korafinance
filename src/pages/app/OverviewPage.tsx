@@ -13,7 +13,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, parseISO, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
 // Heavy below-the-fold widgets are lazy-loaded so the dashboard hero paints fast.
 // lazyWithRetry: se o chunk falhar (deploy novo, glitch de rede), tenta de novo
@@ -22,7 +22,6 @@ const PredictiveWidget = lazyWithRetry(() => import('@/components/dashboard/Pred
 const AIInsightsWidget = lazyWithRetry(() => import('@/components/dashboard/AIInsightsWidget'));
 const WelcomeChecklist = lazyWithRetry(() => import('@/components/app/WelcomeChecklist'));
 const PushNotificationOptIn = lazyWithRetry(() => import('@/components/app/PushNotificationOptIn'));
-const AIChatDrawer = lazyWithRetry(() => import('@/components/app/AIChatDrawer'));
 const WhatsAppPromoWidget = lazyWithRetry(() => import('@/components/app/WhatsAppPromoWidget'));
 const SmartAlertsWidget = lazyWithRetry(() => import('@/components/dashboard/SmartAlertsWidget'));
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -192,7 +191,9 @@ export default function OverviewPage() {
   const { profile, config } = useProfile();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [aiChatOpen, setAiChatOpen] = useState(false);
+  // Chat global vive no AppLayout (evita drawer duplicado e bug de "não abre").
+  const layoutCtx = useOutletContext<{ openChat?: () => void } | undefined>();
+  const openChat = layoutCtx?.openChat ?? (() => {});
   const [transactions, setTransactions] = useState<TransactionRow[]>([]);
   const [allTransactions, setAllTransactions] = useState<TransactionRow[]>([]);
   const [investments, setInvestments] = useState<InvestmentRow[]>([]);
@@ -479,7 +480,7 @@ export default function OverviewPage() {
 
       {/* AI INSIGHTS */}
       <motion.div {...stagger(6)}>
-        <Suspense fallback={null}><AIInsightsWidget onOpenChat={() => setAiChatOpen(true)} /></Suspense>
+        <Suspense fallback={null}><AIInsightsWidget onOpenChat={openChat} /></Suspense>
       </motion.div>
 
       {/* PREDICTIVE AI */}
@@ -650,7 +651,6 @@ export default function OverviewPage() {
           )}
         </div>
       </motion.div>
-      {aiChatOpen && <Suspense fallback={null}><AIChatDrawer open={aiChatOpen} onClose={() => setAiChatOpen(false)} /></Suspense>}
     </div>
   );
 }
