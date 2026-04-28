@@ -510,3 +510,30 @@ function Kpi({ label, value, icon }: { label: string; value: string; icon: React
     </div>
   );
 }
+
+function MiniKpi({ label, value, small = false }: { label: string; value: string; small?: boolean }) {
+  return (
+    <div
+      style={{
+        background: 'rgba(255,255,255,0.14)',
+        border: '1px solid rgba(255,255,255,0.22)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: 14,
+        padding: '10px 12px',
+      }}
+    >
+      <p
+        className="font-semibold uppercase tracking-wider"
+        style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.78)' }}
+      >
+        {label}
+      </p>
+      <p
+        className="font-black leading-none mt-1.5"
+        style={{ fontSize: small ? 14 : 18, color: '#fff' }}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
