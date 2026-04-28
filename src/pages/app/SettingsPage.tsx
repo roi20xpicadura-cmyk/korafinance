@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { OBJECTIVES } from '@/lib/objectives';
 import { PROFILE_TYPES } from '@/components/onboarding/OnboardingFlow';
-import { Check, Download, Trash2, FileText, Camera, Bell, BellOff, Shield, ChevronRight, User, Target as TargetIcon, Sliders, Lock, MessageCircle, AlertTriangle, type LucideIcon } from 'lucide-react';
+import { Check, Download, Trash2, FileText, Camera, Bell, BellOff, Shield, ChevronRight, User, Target as TargetIcon, Sliders, Lock, MessageCircle, AlertTriangle, Sparkles, type LucideIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { requestPushPermission, checkNotificationSupport, sendLocalNotification } from '@/lib/pushNotifications';
@@ -180,64 +181,131 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 md:px-0 py-6 md:py-10 pb-12">
-      {/* ═══ HERO: Perfil ═══ */}
-      <header className="mb-10">
-        <div className="flex flex-col items-center text-center">
-          <div className="relative mb-4">
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt="Foto de perfil"
-                className="w-24 h-24 md:w-28 md:h-28 rounded-full object-cover"
-                style={{ border: '1px solid var(--color-border-weak)' }}
-              />
-            ) : (
-              <div
-                className="w-24 h-24 md:w-28 md:h-28 rounded-full flex items-center justify-center text-3xl font-semibold"
-                style={{
-                  background: 'linear-gradient(135deg, var(--color-green-100), var(--color-green-50))',
-                  color: 'var(--color-green-800)',
-                  border: '1px solid var(--color-border-weak)',
-                }}
-              >
-                {(fullName || user?.email || '?').charAt(0).toUpperCase()}
-              </div>
-            )}
+    <div className="max-w-2xl mx-auto px-4 md:px-0 py-2 md:py-6 pb-12">
+      {/* ═══ HERO PERFIL CINEMATOGRÁFICO ═══ */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        style={{
+          position: 'relative',
+          borderRadius: 24,
+          padding: '28px 22px 24px',
+          marginBottom: 32,
+          overflow: 'hidden',
+          background: 'linear-gradient(135deg, #1a0b3d 0%, #3b1080 45%, #7c3aed 100%)',
+          boxShadow: '0 24px 60px -20px rgba(124,58,237,0.55), 0 0 0 1px rgba(255,255,255,0.06) inset',
+        }}
+      >
+        <motion.div
+          animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ position: 'absolute', top: -60, right: -40, width: 220, height: 220, borderRadius: '50%', background: 'radial-gradient(circle, rgba(236,72,153,0.4), transparent 70%)', filter: 'blur(20px)' }}
+        />
+        <motion.div
+          animate={{ x: [0, -20, 0], y: [0, 25, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ position: 'absolute', bottom: -80, left: -30, width: 240, height: 240, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,0.5), transparent 70%)', filter: 'blur(24px)' }}
+        />
+        <div style={{
+          position: 'absolute', inset: 0, opacity: 0.16, pointerEvents: 'none',
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+          maskImage: 'radial-gradient(ellipse at top right, black 20%, transparent 70%)',
+        }} />
+
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 16 }}>
+          {/* Avatar with ring + camera */}
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <div style={{
+              padding: 3, borderRadius: '50%',
+              background: 'linear-gradient(135deg, #fde68a, #f59e0b, #ec4899)',
+              boxShadow: '0 10px 30px -8px rgba(0,0,0,0.4)',
+            }}>
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt="Foto de perfil"
+                  style={{ width: 84, height: 84, borderRadius: '50%', objectFit: 'cover', display: 'block', border: '3px solid #1a0b3d' }}
+                />
+              ) : (
+                <div style={{
+                  width: 84, height: 84, borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #6d28d9, #4c1d95)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#fff', fontSize: 32, fontWeight: 800,
+                  border: '3px solid #1a0b3d',
+                }}>
+                  {(fullName || user?.email || '?').charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadingAvatar}
               aria-label="Alterar foto"
-              className="absolute bottom-0 right-0 w-9 h-9 rounded-full flex items-center justify-center transition-transform hover:scale-105 disabled:opacity-50"
               style={{
-                background: 'var(--color-bg-surface)',
-                border: '1px solid var(--color-border-base)',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                color: 'var(--color-text-base)',
+                position: 'absolute', bottom: -2, right: -2,
+                width: 32, height: 32, borderRadius: '50%',
+                background: '#fff',
+                border: '3px solid #1a0b3d',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', color: '#7c3aed',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
               }}
             >
-              <Camera size={15} />
+              <Camera size={14} strokeWidth={2.4} />
             </button>
             <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
           </div>
-          <h1 className="text-[20px] md:text-[24px] font-bold tracking-tight" style={{ color: 'var(--color-text-strong)' }}>
-            {fullName || 'Seu nome'}
-          </h1>
-          <p className="text-[13px] mt-0.5" style={{ color: 'var(--color-text-subtle)' }}>{user?.email}</p>
-          {avatarUrl && (
-            <button
-              type="button"
-              onClick={handleRemoveAvatar}
-              disabled={uploadingAvatar}
-              className="text-[12px] mt-2 hover:underline"
-              style={{ color: 'var(--color-text-subtle)' }}
-            >
-              {uploadingAvatar ? 'Processando…' : 'Remover foto'}
-            </button>
-          )}
+
+          {/* Identity */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              padding: '3px 8px', borderRadius: 99,
+              background: 'rgba(253,230,138,0.15)',
+              border: '1px solid rgba(253,230,138,0.35)',
+              marginBottom: 6,
+            }}>
+              <Sparkles size={9} color="#fde68a" fill="#fde68a" />
+              <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', color: '#fde68a', textTransform: 'uppercase' }}>
+                Conta Pessoal
+              </span>
+            </div>
+            <h1 style={{
+              color: '#fff', fontSize: 22, fontWeight: 900, lineHeight: 1.15,
+              letterSpacing: '-0.4px', margin: 0,
+              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            }}>
+              {fullName || 'Seu nome'}
+            </h1>
+            <p style={{
+              color: 'rgba(255,255,255,0.72)', fontSize: 12, margin: '2px 0 0',
+              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+            }}>
+              {user?.email}
+            </p>
+            {avatarUrl && (
+              <button
+                type="button"
+                onClick={handleRemoveAvatar}
+                disabled={uploadingAvatar}
+                style={{
+                  marginTop: 8, padding: 0,
+                  fontSize: 11, fontWeight: 600,
+                  color: 'rgba(255,255,255,0.6)',
+                  background: 'transparent', border: 'none',
+                  cursor: 'pointer', textDecoration: 'underline',
+                }}
+              >
+                {uploadingAvatar ? 'Processando…' : 'Remover foto'}
+              </button>
+            )}
+          </div>
         </div>
-      </header>
+      </motion.div>
 
       {/* ═══ Section: WhatsApp ═══ */}
       <SectionHeader icon={MessageCircle} title="WhatsApp" description="Registre lançamentos pelo Zap" />
@@ -562,16 +630,30 @@ export default function SettingsPage() {
 /* ═════════════ Subcomponents (premium minimal) ═════════════ */
 
 function SectionHeader({ icon: Icon, title, description, tone = 'default' }: { icon: LucideIcon; title: string; description?: string; tone?: 'default' | 'danger' }) {
-  const color = tone === 'danger' ? 'var(--color-danger-solid, #dc2626)' : 'var(--color-text-strong)';
-  const iconBg = tone === 'danger' ? 'var(--color-danger-bg, #fef2f2)' : 'var(--color-green-50)';
-  const iconColor = tone === 'danger' ? 'var(--color-danger-solid, #dc2626)' : 'var(--color-green-700)';
+  const isDanger = tone === 'danger';
   return (
     <div className="flex items-center gap-3 mb-4 px-1">
-      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: iconBg }}>
-        <Icon size={15} style={{ color: iconColor }} />
+      <div
+        className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
+        style={{
+          background: isDanger
+            ? 'linear-gradient(135deg, #fee2e2, #fecaca)'
+            : 'linear-gradient(135deg, hsl(var(--primary) / 0.18), hsl(var(--primary) / 0.06))',
+          border: `1px solid ${isDanger ? 'rgba(239,68,68,0.25)' : 'hsl(var(--primary) / 0.22)'}`,
+          boxShadow: isDanger
+            ? '0 4px 12px -4px rgba(239,68,68,0.25)'
+            : '0 4px 12px -4px hsl(var(--primary) / 0.3)',
+        }}
+      >
+        <Icon size={17} strokeWidth={2.2} style={{ color: isDanger ? '#dc2626' : 'hsl(var(--primary))' }} />
       </div>
       <div className="min-w-0">
-        <h2 className="text-[15px] font-bold leading-tight" style={{ color }}>{title}</h2>
+        <h2
+          className="text-[15px] font-extrabold leading-tight tracking-tight"
+          style={{ color: isDanger ? '#dc2626' : 'var(--color-text-strong)' }}
+        >
+          {title}
+        </h2>
         {description && (
           <p className="text-[12px] mt-0.5" style={{ color: 'var(--color-text-subtle)' }}>{description}</p>
         )}
@@ -608,10 +690,11 @@ function PrimaryButton({ children, ...props }: React.ButtonHTMLAttributes<HTMLBu
   return (
     <button
       {...props}
-      className="px-5 py-2.5 rounded-xl text-[13px] font-bold transition-all hover:brightness-110 disabled:opacity-50"
+      className="px-5 py-3 rounded-xl text-[13px] font-bold transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
       style={{
-        background: 'var(--color-green-600)',
+        background: 'linear-gradient(135deg, hsl(var(--primary)), #6d28d9)',
         color: '#fff',
+        boxShadow: '0 8px 20px -8px hsl(var(--primary) / 0.55)',
         ...(props.style || {}),
       }}
     >
@@ -643,7 +726,10 @@ function Switch({ checked, onChange }: { checked: boolean; onChange: (v: boolean
       style={{
         width: 40,
         height: 24,
-        background: checked ? 'var(--color-green-600)' : 'var(--color-border-base)',
+        background: checked
+          ? 'linear-gradient(135deg, hsl(var(--primary)), #6d28d9)'
+          : 'var(--color-border-base)',
+        boxShadow: checked ? '0 2px 8px -2px hsl(var(--primary) / 0.5)' : 'none',
       }}
     >
       <span
