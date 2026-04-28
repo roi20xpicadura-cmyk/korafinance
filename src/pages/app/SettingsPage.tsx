@@ -630,16 +630,30 @@ export default function SettingsPage() {
 /* ═════════════ Subcomponents (premium minimal) ═════════════ */
 
 function SectionHeader({ icon: Icon, title, description, tone = 'default' }: { icon: LucideIcon; title: string; description?: string; tone?: 'default' | 'danger' }) {
-  const color = tone === 'danger' ? 'var(--color-danger-solid, #dc2626)' : 'var(--color-text-strong)';
-  const iconBg = tone === 'danger' ? 'var(--color-danger-bg, #fef2f2)' : 'var(--color-green-50)';
-  const iconColor = tone === 'danger' ? 'var(--color-danger-solid, #dc2626)' : 'var(--color-green-700)';
+  const isDanger = tone === 'danger';
   return (
     <div className="flex items-center gap-3 mb-4 px-1">
-      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: iconBg }}>
-        <Icon size={15} style={{ color: iconColor }} />
+      <div
+        className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
+        style={{
+          background: isDanger
+            ? 'linear-gradient(135deg, #fee2e2, #fecaca)'
+            : 'linear-gradient(135deg, hsl(var(--primary) / 0.18), hsl(var(--primary) / 0.06))',
+          border: `1px solid ${isDanger ? 'rgba(239,68,68,0.25)' : 'hsl(var(--primary) / 0.22)'}`,
+          boxShadow: isDanger
+            ? '0 4px 12px -4px rgba(239,68,68,0.25)'
+            : '0 4px 12px -4px hsl(var(--primary) / 0.3)',
+        }}
+      >
+        <Icon size={17} strokeWidth={2.2} style={{ color: isDanger ? '#dc2626' : 'hsl(var(--primary))' }} />
       </div>
       <div className="min-w-0">
-        <h2 className="text-[15px] font-bold leading-tight" style={{ color }}>{title}</h2>
+        <h2
+          className="text-[15px] font-extrabold leading-tight tracking-tight"
+          style={{ color: isDanger ? '#dc2626' : 'var(--color-text-strong)' }}
+        >
+          {title}
+        </h2>
         {description && (
           <p className="text-[12px] mt-0.5" style={{ color: 'var(--color-text-subtle)' }}>{description}</p>
         )}
@@ -676,10 +690,11 @@ function PrimaryButton({ children, ...props }: React.ButtonHTMLAttributes<HTMLBu
   return (
     <button
       {...props}
-      className="px-5 py-2.5 rounded-xl text-[13px] font-bold transition-all hover:brightness-110 disabled:opacity-50"
+      className="px-5 py-3 rounded-xl text-[13px] font-bold transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
       style={{
-        background: 'var(--color-green-600)',
+        background: 'linear-gradient(135deg, hsl(var(--primary)), #6d28d9)',
         color: '#fff',
+        boxShadow: '0 8px 20px -8px hsl(var(--primary) / 0.55)',
         ...(props.style || {}),
       }}
     >
@@ -711,7 +726,10 @@ function Switch({ checked, onChange }: { checked: boolean; onChange: (v: boolean
       style={{
         width: 40,
         height: 24,
-        background: checked ? 'var(--color-green-600)' : 'var(--color-border-base)',
+        background: checked
+          ? 'linear-gradient(135deg, hsl(var(--primary)), #6d28d9)'
+          : 'var(--color-border-base)',
+        boxShadow: checked ? '0 2px 8px -2px hsl(var(--primary) / 0.5)' : 'none',
       }}
     >
       <span
