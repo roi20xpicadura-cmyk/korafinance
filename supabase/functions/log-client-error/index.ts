@@ -51,8 +51,9 @@ Deno.serve(async (req) => {
     let userId: string | null = null;
     const auth = req.headers.get("Authorization");
     if (auth?.startsWith("Bearer ")) {
-      const { data } = await supabase.auth.getClaims(auth.replace("Bearer ", ""));
-      userId = data?.claims?.sub ?? null;
+      const token = auth.replace("Bearer ", "");
+      const { data } = await supabase.auth.getUser(token);
+      userId = data?.user?.id ?? null;
     }
 
     // Log estruturado pro Supabase Logs (sempre visível, sem latência de DB).
