@@ -315,30 +315,50 @@ export default function SettingsPage() {
 
       {/* ═══ Section: Tipo de perfil ═══ */}
       <SectionHeader icon={User} title="Tipo de perfil" description="Como você usa o app" />
-      <div className="mb-10 space-y-1.5">
+      <div className="mb-10 space-y-2">
         {PROFILE_TYPES.map(pt => {
           const active = profileType === pt.value;
           return (
-            <button
+            <motion.button
               key={pt.value}
+              whileTap={{ scale: 0.985 }}
               onClick={() => handleSaveProfileType(pt.value)}
-              className="w-full flex items-center gap-3 p-4 rounded-2xl transition-all text-left"
+              className="w-full flex items-center gap-3 p-4 rounded-2xl transition-all text-left relative overflow-hidden"
               style={{
-                background: active ? 'var(--color-green-50)' : 'var(--color-bg-surface)',
-                border: `1px solid ${active ? 'var(--color-green-300)' : 'var(--color-border-weak)'}`,
+                background: active
+                  ? 'linear-gradient(135deg, hsl(var(--primary) / 0.10), hsl(var(--primary) / 0.04))'
+                  : 'var(--color-bg-surface)',
+                border: `1px solid ${active ? 'hsl(var(--primary) / 0.35)' : 'var(--color-border-weak)'}`,
+                boxShadow: active ? '0 6px 18px -10px hsl(var(--primary) / 0.5)' : 'none',
               }}
             >
-              <span className="text-2xl flex-shrink-0">{pt.emoji}</span>
+              <div
+                className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl"
+                style={{
+                  background: active
+                    ? 'linear-gradient(135deg, hsl(var(--primary) / 0.18), hsl(var(--primary) / 0.06))'
+                    : 'var(--color-bg-sunken)',
+                  border: `1px solid ${active ? 'hsl(var(--primary) / 0.25)' : 'var(--color-border-weak)'}`,
+                }}
+              >
+                {pt.emoji}
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[14px] font-semibold" style={{ color: 'var(--color-text-strong)' }}>{pt.title}</p>
                 <p className="text-[12px] mt-0.5" style={{ color: 'var(--color-text-muted)' }}>{pt.desc}</p>
               </div>
               {active && (
-                <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'var(--color-green-600)' }}>
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{
+                    background: 'linear-gradient(135deg, hsl(var(--primary)), #6d28d9)',
+                    boxShadow: '0 4px 10px -3px hsl(var(--primary) / 0.6)',
+                  }}
+                >
                   <Check className="w-3.5 h-3.5 text-white" />
                 </div>
               )}
-            </button>
+            </motion.button>
           );
         })}
       </div>
@@ -350,25 +370,38 @@ export default function SettingsPage() {
           {OBJECTIVES.map(obj => {
             const selected = objectives.includes(obj.key);
             return (
-              <button
+              <motion.button
                 key={obj.key}
+                whileTap={{ scale: 0.94 }}
                 onClick={() => toggleObjective(obj.key)}
                 className="relative p-3 rounded-2xl text-center transition-all"
                 style={{
-                  background: selected ? 'var(--color-green-50)' : 'var(--color-bg-surface)',
-                  border: `1px solid ${selected ? 'var(--color-green-300)' : 'var(--color-border-weak)'}`,
+                  background: selected
+                    ? 'linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--primary) / 0.04))'
+                    : 'var(--color-bg-surface)',
+                  border: `1px solid ${selected ? 'hsl(var(--primary) / 0.4)' : 'var(--color-border-weak)'}`,
+                  boxShadow: selected ? '0 6px 14px -8px hsl(var(--primary) / 0.55)' : 'none',
                 }}
               >
                 {selected && (
-                  <div className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: 'var(--color-green-600)' }}>
+                  <div
+                    className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center"
+                    style={{
+                      background: 'linear-gradient(135deg, hsl(var(--primary)), #6d28d9)',
+                      boxShadow: '0 2px 6px hsl(var(--primary) / 0.6)',
+                    }}
+                  >
                     <Check className="w-2.5 h-2.5 text-white" />
                   </div>
                 )}
                 <span className="text-xl block leading-none">{obj.emoji}</span>
-                <span className="text-[10px] font-semibold block mt-1.5" style={{ color: selected ? 'var(--color-green-800)' : 'var(--color-text-muted)' }}>
+                <span
+                  className="text-[10px] font-semibold block mt-1.5"
+                  style={{ color: selected ? 'hsl(var(--primary))' : 'var(--color-text-muted)' }}
+                >
                   {obj.label}
                 </span>
-              </button>
+              </motion.button>
             );
           })}
         </div>
@@ -438,8 +471,16 @@ export default function SettingsPage() {
               style={{ background: 'var(--color-bg-sunken)', border: '1px solid var(--color-border-weak)' }}
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: pushEnabled ? 'var(--color-green-100)' : 'var(--color-bg-surface)' }}>
-                  {pushEnabled ? <Bell size={16} style={{ color: 'var(--color-green-700)' }} /> : <BellOff size={16} style={{ color: 'var(--color-text-muted)' }} />}
+                <div
+                  className="w-9 h-9 rounded-full flex items-center justify-center"
+                  style={{
+                    background: pushEnabled
+                      ? 'linear-gradient(135deg, hsl(var(--primary) / 0.18), hsl(var(--primary) / 0.06))'
+                      : 'var(--color-bg-surface)',
+                    border: pushEnabled ? '1px solid hsl(var(--primary) / 0.25)' : '1px solid var(--color-border-weak)',
+                  }}
+                >
+                  {pushEnabled ? <Bell size={16} style={{ color: 'hsl(var(--primary))' }} /> : <BellOff size={16} style={{ color: 'var(--color-text-muted)' }} />}
                 </div>
                 <div>
                   <p className="text-[14px] font-semibold" style={{ color: 'var(--color-text-strong)' }}>Push no navegador</p>
@@ -459,10 +500,14 @@ export default function SettingsPage() {
                     toast.error('Permissão negada. Ative nas configurações do navegador.');
                   }
                 }}
-                className="px-3.5 py-2 rounded-xl text-[12px] font-semibold transition-all"
+                className="px-3.5 py-2 rounded-xl text-[12px] font-bold transition-all active:scale-95"
                 style={{
-                  background: pushEnabled ? 'var(--color-green-100)' : 'var(--color-green-600)',
-                  color: pushEnabled ? 'var(--color-green-800)' : '#fff',
+                  background: pushEnabled
+                    ? 'hsl(var(--primary) / 0.12)'
+                    : 'linear-gradient(135deg, hsl(var(--primary)), #6d28d9)',
+                  color: pushEnabled ? 'hsl(var(--primary))' : '#fff',
+                  border: pushEnabled ? '1px solid hsl(var(--primary) / 0.3)' : 'none',
+                  boxShadow: pushEnabled ? 'none' : '0 6px 14px -6px hsl(var(--primary) / 0.55)',
                 }}
               >
                 {pushEnabled ? 'Ativado ✓' : 'Ativar'}
@@ -523,11 +568,17 @@ export default function SettingsPage() {
 
         <Link
           to="/app/settings/security"
-          className="flex items-center gap-3 p-4 rounded-2xl transition-colors mt-2"
+          className="flex items-center gap-3 p-4 rounded-2xl transition-all mt-2 hover:brightness-105"
           style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-weak)' }}
         >
-          <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'var(--color-green-100)' }}>
-            <Shield size={16} style={{ color: 'var(--color-green-700)' }} />
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center"
+            style={{
+              background: 'linear-gradient(135deg, hsl(var(--primary) / 0.18), hsl(var(--primary) / 0.06))',
+              border: '1px solid hsl(var(--primary) / 0.22)',
+            }}
+          >
+            <Shield size={16} style={{ color: 'hsl(var(--primary))' }} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[14px] font-semibold" style={{ color: 'var(--color-text-strong)' }}>Segurança e privacidade</p>
@@ -544,8 +595,14 @@ export default function SettingsPage() {
           className="flex items-start gap-3 p-4 rounded-2xl"
           style={{ background: 'var(--color-bg-sunken)', border: '1px solid var(--color-border-weak)' }}
         >
-          <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'var(--color-green-100)' }}>
-            <FileText size={16} style={{ color: 'var(--color-green-700)' }} />
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{
+              background: 'linear-gradient(135deg, hsl(var(--primary) / 0.18), hsl(var(--primary) / 0.06))',
+              border: '1px solid hsl(var(--primary) / 0.22)',
+            }}
+          >
+            <FileText size={16} style={{ color: 'hsl(var(--primary))' }} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[14px] font-semibold" style={{ color: 'var(--color-text-strong)' }}>Aceitação dos termos</p>
@@ -560,11 +617,11 @@ export default function SettingsPage() {
         <button
           onClick={handleExportData}
           disabled={exporting}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-[13px] font-semibold transition-all disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-[13px] font-bold transition-all disabled:opacity-50 active:scale-[0.99]"
           style={{
-            background: 'var(--color-bg-surface)',
-            border: '1px solid var(--color-border-base)',
-            color: 'var(--color-text-base)',
+            background: 'linear-gradient(135deg, hsl(var(--primary) / 0.10), hsl(var(--primary) / 0.03))',
+            border: '1px solid hsl(var(--primary) / 0.3)',
+            color: 'hsl(var(--primary))',
           }}
         >
           <Download size={15} />
@@ -573,26 +630,33 @@ export default function SettingsPage() {
 
         <p className="text-[11px] px-1" style={{ color: 'var(--color-text-subtle)' }}>
           Conforme a LGPD (Art. 18), você pode acessar, corrigir e exportar seus dados.{' '}
-          <a href="/lgpd" className="underline" style={{ color: 'var(--color-green-700)' }}>Saiba mais</a>
+          <a href="/lgpd" className="underline font-semibold" style={{ color: 'hsl(var(--primary))' }}>Saiba mais</a>
         </p>
       </div>
 
       {/* ═══ Section: Zona de perigo ═══ */}
       <SectionHeader icon={AlertTriangle} title="Zona de perigo" description="Ações irreversíveis" tone="danger" />
-      <div className="mb-6">
+      <div
+        className="mb-6 p-4 rounded-2xl"
+        style={{
+          background: 'linear-gradient(135deg, rgba(239,68,68,0.04), rgba(239,68,68,0.02))',
+          border: '1px solid rgba(239,68,68,0.18)',
+        }}
+      >
         <button
           onClick={() => setShowDeleteModal(true)}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-[13px] font-semibold transition-all"
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[13px] font-bold transition-all active:scale-[0.99]"
           style={{
-            background: 'var(--color-bg-surface)',
-            border: '1px solid var(--color-danger-border, #fecaca)',
-            color: 'var(--color-danger-solid, #dc2626)',
+            background: '#fff',
+            border: '1px solid rgba(239,68,68,0.35)',
+            color: '#dc2626',
+            boxShadow: '0 4px 10px -6px rgba(239,68,68,0.35)',
           }}
         >
           <Trash2 size={15} />
           Solicitar exclusão da conta
         </button>
-        <p className="text-[11px] mt-2 px-1" style={{ color: 'var(--color-text-subtle)' }}>
+        <p className="text-[11px] mt-2 px-1 text-center" style={{ color: 'var(--color-text-subtle)' }}>
           Seus dados serão removidos em até 30 dias.
         </p>
       </div>
