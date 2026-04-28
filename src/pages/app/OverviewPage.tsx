@@ -15,6 +15,7 @@ import { format, parseISO, startOfMonth, endOfMonth, subMonths } from 'date-fns'
 import { ptBR } from 'date-fns/locale';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { lazyWithRetry } from '@/lib/lazyWithRetry';
+import TransactionIcon from '@/components/app/TransactionIcon';
 // Heavy below-the-fold widgets are lazy-loaded so the dashboard hero paints fast.
 // lazyWithRetry: se o chunk falhar (deploy novo, glitch de rede), tenta de novo
 // e cai pra null em vez de derrubar a Overview com o ErrorBoundary.
@@ -74,24 +75,6 @@ function useCountUp(target: number, duration = 800) {
 function AnimatedCurrency({ value, currency }: { value: number; currency: string }) {
   const v = useCountUp(value);
   return <>{formatCurrency(v, currency)}</>;
-}
-
-const CATEGORY_EMOJI: Record<string, string> = {
-  'Salário': '💼', 'Freelance': '💻', 'Vendas': '📦', 'Investimentos': '📈',
-  'Renda Extra': '💵', 'Aluguel Recebido': '🏠', 'Dividendos': '💰',
-  'Supermercado': '🛒', 'Alimentação': '🍽️', 'Delivery': '🛵', 'Restaurante': '🍴',
-  'Transporte': '🚗', 'Combustível': '⛽', 'Uber/Taxi': '🚕',
-  'Moradia': '🏠', 'Aluguel': '🏘️', 'Contas': '💡',
-  'Saúde': '❤️', 'Farmácia': '💊', 'Academia': '🏋️',
-  'Educação': '📚', 'Cursos': '🎓',
-  'Lazer': '🎮', 'Streaming': '📺', 'Assinaturas': '📱',
-  'Financeiro': '💳', 'Investimento': '📊', 'Poupança': '🐷', 'Dívidas': '⚠️',
-  'Vestuário': '👕', 'Beleza': '💄', 'Pets': '🐾', 'Tecnologia': '💻',
-  'Seguros': '🛡️', 'Outros': '💸',
-};
-
-function getCategoryEmoji(cat: string): string {
-  return CATEGORY_EMOJI[cat] || '💸';
 }
 
 function getGoalEmoji(name: string): string {
