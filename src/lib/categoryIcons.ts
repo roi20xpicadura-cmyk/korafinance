@@ -91,7 +91,7 @@ const MAP: Record<string, CategoryStyle> = {
   "Marketing":          { Icon: Megaphone,  ...palette.brand  },
   "Fornecedor":         { Icon: Package,    ...palette.amber  },
   "Folha de Pagamento": { Icon: Users,      ...palette.blue   },
-  "Software":           { Icon: Laptop,     ...palette.indigo },
+  "Software":           { Icon: Laptop,     ...palette.brand  },
   "Impostos":           { Icon: Landmark,   ...palette.slate  },
   "Equipamentos":       { Icon: Monitor,    ...palette.blue   },
   "Logística":          { Icon: Truck,      ...palette.amber  },
@@ -108,7 +108,7 @@ const MAP: Record<string, CategoryStyle> = {
   "Presente":        { Icon: Gift,       ...palette.brandSoft },
   "Reembolso":       { Icon: Undo2,      ...palette.blue    },
   "Serviços":        { Icon: Wrench,     ...palette.slate   },
-  "Consultoria":     { Icon: Brain,      ...palette.indigo  },
+  "Consultoria":     { Icon: Brain,      ...palette.brand   },
   "Parceria":        { Icon: Handshake,  ...palette.brand   },
 };
 
