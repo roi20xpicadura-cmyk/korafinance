@@ -48,6 +48,23 @@ jobs:
       - name: Capacitor sync
         run: npx cap sync android
 
+      - name: Bump versionCode and versionName
+        run: |
+          # A cada run do workflow, sobe versionCode = GITHUB_RUN_NUMBER
+          # Assim nunca repete na Play Store.
+          NEW_VERSION_CODE=${GITHUB_RUN_NUMBER}
+          NEW_VERSION_NAME="${{ inputs.version_name }}"
+          if [ -z "$NEW_VERSION_NAME" ]; then NEW_VERSION_NAME="1.0.${NEW_VERSION_CODE}"; fi
+
+          echo "Setting versionCode=$NEW_VERSION_CODE versionName=$NEW_VERSION_NAME"
+
+          # Substitui no build.gradle gerado pelo Capacitor
+          sed -i "s/versionCode [0-9]\+/versionCode ${NEW_VERSION_CODE}/" android/app/build.gradle
+          sed -i "s/versionName \"[^\"]*\"/versionName \"${NEW_VERSION_NAME}\"/" android/app/build.gradle
+
+          echo "--- build.gradle (relevant lines) ---"
+          grep -E "versionCode|versionName" android/app/build.gradle
+
       - name: Decode and validate keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
