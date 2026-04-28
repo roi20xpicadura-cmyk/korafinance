@@ -1,9 +1,12 @@
-import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import { useState, useEffect, useMemo, forwardRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatCurrency } from '@/lib/plans';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { buildPrediction, generateAlerts, DayPrediction, PredictionAlert } from '@/lib/predictionEngine';
+import {
+  ResponsiveContainer, ComposedChart, XAxis, YAxis, ReferenceLine, Tooltip, Area,
+} from 'recharts';
 import {
   AlertCircle, Activity, Zap, Sparkles, ShieldCheck
 } from 'lucide-react';
@@ -12,40 +15,38 @@ import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
 
-const LazyPredChart = lazy(() => import('recharts').then(m => ({
-  default: ({ predictions, status }: { predictions: DayPrediction[]; status: string }) => {
-    const data = predictions.map(p => ({
-      date: format(new Date(p.date), 'dd/MM'),
-      saldo: Math.round(p.projectedBalance),
-      upper: Math.round(p.projectedBalance * (1 + (1 - p.confidence) * 0.5)),
-      lower: Math.round(p.projectedBalance * (1 - (1 - p.confidence) * 0.5)),
-    }));
-    const strokeColor = status === 'danger' ? '#ef4444' : '#22c55e';
-    return (
-      <m.ResponsiveContainer width="100%" height="100%">
-        <m.ComposedChart data={data} margin={{ top: 10, right: 10, bottom: 0, left: -10 }}>
-          <defs>
-            <linearGradient id="predGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={strokeColor} stopOpacity={0.15} />
-              <stop offset="95%" stopColor={strokeColor} stopOpacity={0} />
-            </linearGradient>
-            <linearGradient id="confGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={strokeColor} stopOpacity={0.08} />
-              <stop offset="95%" stopColor={strokeColor} stopOpacity={0.02} />
-            </linearGradient>
-          </defs>
-          <m.XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: 'var(--color-text-subtle)' }} interval={6} />
-          <m.YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: 'var(--color-text-subtle)' }} tickFormatter={(v: number) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : `${v}`} />
-          <m.ReferenceLine y={0} stroke="#ef4444" strokeDasharray="4 4" />
-          <m.Tooltip contentStyle={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-base)', borderRadius: 10, fontSize: 12 }} />
-          <m.Area type="monotone" dataKey="upper" stroke="none" fill="url(#confGrad)" name="Limite superior" />
-          <m.Area type="monotone" dataKey="lower" stroke="none" fill="url(#confGrad)" name="Limite inferior" />
-          <m.Area type="monotone" dataKey="saldo" stroke={strokeColor} strokeWidth={2.5} fill="url(#predGrad)" name="Saldo projetado" />
-        </m.ComposedChart>
-      </m.ResponsiveContainer>
-    );
-  }
-})));
+function PredChart({ predictions, status }: { predictions: DayPrediction[]; status: string }) {
+  const data = predictions.map(p => ({
+    date: format(new Date(p.date), 'dd/MM'),
+    saldo: Math.round(p.projectedBalance),
+    upper: Math.round(p.projectedBalance * (1 + (1 - p.confidence) * 0.5)),
+    lower: Math.round(p.projectedBalance * (1 - (1 - p.confidence) * 0.5)),
+  }));
+  const strokeColor = status === 'danger' ? 'var(--color-danger-solid)' : 'var(--color-success-solid)';
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <ComposedChart data={data} margin={{ top: 10, right: 10, bottom: 0, left: -10 }}>
+        <defs>
+          <linearGradient id="predGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor={strokeColor} stopOpacity={0.15} />
+            <stop offset="95%" stopColor={strokeColor} stopOpacity={0} />
+          </linearGradient>
+          <linearGradient id="confGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor={strokeColor} stopOpacity={0.08} />
+            <stop offset="95%" stopColor={strokeColor} stopOpacity={0.02} />
+          </linearGradient>
+        </defs>
+        <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: 'var(--color-text-subtle)' }} interval={6} />
+        <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: 'var(--color-text-subtle)' }} tickFormatter={(v: number) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : `${v}`} />
+        <ReferenceLine y={0} stroke="var(--color-danger-solid)" strokeDasharray="4 4" />
+        <Tooltip contentStyle={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-base)', borderRadius: 10, fontSize: 12 }} />
+        <Area type="monotone" dataKey="upper" stroke="none" fill="url(#confGrad)" name="Limite superior" />
+        <Area type="monotone" dataKey="lower" stroke="none" fill="url(#confGrad)" name="Limite inferior" />
+        <Area type="monotone" dataKey="saldo" stroke={strokeColor} strokeWidth={2.5} fill="url(#predGrad)" name="Saldo projetado" />
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+}
 
 export default function PredictionsPage() {
   const { user } = useAuth();
@@ -229,9 +230,7 @@ export default function PredictionsPage() {
           </div>
         </div>
         <div style={{ height: isMobile ? 220 : 320 }}>
-          <Suspense fallback={<div className="skeleton-shimmer w-full h-full" style={{ borderRadius: 12 }} />}>
-            <LazyPredChart predictions={visiblePreds} status={status} />
-          </Suspense>
+          <PredChart predictions={visiblePreds} status={status} />
         </div>
       </div>
 
@@ -387,7 +386,7 @@ function MetricCard({ icon, label, value, sub, tone, progress }: {
   );
 }
 
-function AlertCard({ alert, onAction }: { alert: PredictionAlert; onAction: () => void }) {
+const AlertCard = forwardRef<HTMLDivElement, { alert: PredictionAlert; onAction: () => void }>(function AlertCard({ alert, onAction }, ref) {
   const colors = {
     danger: { bg: 'var(--color-danger-bg)', border: 'var(--color-danger-border)', text: 'var(--color-danger-text)' },
     warning: { bg: '#fffbeb', border: '#fde68a', text: '#92400e' },
@@ -396,7 +395,7 @@ function AlertCard({ alert, onAction }: { alert: PredictionAlert; onAction: () =
   }[alert.type];
 
   return (
-    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+    <motion.div ref={ref} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       style={{ background: colors.bg, border: `1px solid ${colors.border}`, borderRadius: 14, padding: 16 }}>
       <div className="flex items-start gap-3">
         <span style={{ fontSize: 20 }}>{alert.icon}</span>
@@ -412,4 +411,4 @@ function AlertCard({ alert, onAction }: { alert: PredictionAlert; onAction: () =
       </div>
     </motion.div>
   );
-}
+});
