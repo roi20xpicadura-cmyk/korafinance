@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ACHIEVEMENTS, CATEGORIES, getNextLevelName, type Achievement } from '@/lib/achievements';
 import { useAchievements } from '@/hooks/useAchievements';
 import { Lock, Sparkles, Trophy, Flame, Target, Zap, ChevronRight, Award } from 'lucide-react';
+import { AchievementIcon } from '@/components/achievements/AchievementIcon';
 
 type Rarity = 'common' | 'rare' | 'epic' | 'legendary';
 
@@ -225,7 +226,7 @@ export default function AchievementsPage() {
               fontSize: 28, flexShrink: 0,
               boxShadow: RARITY[rarityOf(featured.a.xp)].glow,
             }}>
-              {featured.a.emoji}
+              <AchievementIcon id={featured.a.id} rarity={rarityOf(featured.a.xp)} unlocked={true} size={32} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
@@ -363,9 +364,7 @@ export default function AchievementsPage() {
                   position: 'relative',
                   overflow: 'hidden',
                 }}>
-                  <span style={{ filter: isUnlocked ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' : 'none' }}>
-                    {a.emoji}
-                  </span>
+                  <AchievementIcon id={a.id} rarity={r} unlocked={isUnlocked} size={42} />
                   {/* Shine */}
                   {isUnlocked && (
                     <motion.div
@@ -514,7 +513,7 @@ export default function AchievementsPage() {
                       : 'inset 0 -3px 0 rgba(0,0,0,0.1)',
                   }}
                 >
-                  <span style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.3))' }}>{selected.emoji}</span>
+                  <AchievementIcon id={selected.id} rarity={rarityOf(selected.xp)} unlocked={unlocked.includes(selected.id)} size={64} />
                 </motion.div>
 
                 <div style={{
