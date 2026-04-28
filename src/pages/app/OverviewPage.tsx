@@ -608,13 +608,13 @@ export default function OverviewPage() {
           ) : (
             recent.map((tx, i) => (
               <div key={tx.id} className="flex items-center gap-3" style={{ padding: '14px 16px', borderBottom: i < recent.length - 1 ? '0.5px solid var(--color-border-weak)' : 'none' }}>
-                <div style={{
-                  width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-                  background: tx.type === 'income' ? 'var(--color-success-bg)' : 'var(--color-danger-bg)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
-                }}>
-                  {getCategoryEmoji(tx.category)}
-                </div>
+                <TransactionIcon
+                  description={tx.description}
+                  category={tx.category}
+                  isIncome={tx.type === 'income'}
+                  size={40}
+                  rounded={12}
+                />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-base)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{tx.description}</div>
                   <div style={{ fontSize: 11, color: 'var(--color-text-subtle)', marginTop: 2 }}>
