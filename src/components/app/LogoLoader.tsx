@@ -111,6 +111,10 @@ export default function LogoLoader({ fullScreen = false, label }: LogoLoaderProp
               src={koraIcon}
               alt=""
               draggable={false}
+              decoding="async"
+              fetchPriority="high"
+              width={84}
+              height={84}
               style={{ width: 84, height: 84, objectFit: 'cover' }}
             />
             {/* Glossy highlight */}
