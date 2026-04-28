@@ -263,62 +263,157 @@ export default function BudgetPage() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ background: '#FAFAFB' }}>
-      <div className="py-5 md:p-7 pb-4 flex flex-col gap-5 max-w-[1400px] mx-auto">
-        {/* Header row */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <button
-              onClick={() => setCurrentMonth(m => subMonths(m, 1))}
-              style={{ width: 32, height: 32, borderRadius: '50%', background: C.violetSoft, border: 'none', color: C.violet, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              aria-label="Mês anterior"
-            >‹</button>
-            <div style={{ color: C.textStrong, fontSize: 16, fontWeight: 800, textTransform: 'capitalize', minWidth: 110, textAlign: 'center' }}>
-              {monthLabel}
+    <div className="min-h-screen" style={{ background: 'var(--color-bg-base, #FAFAFB)' }}>
+      <div className="py-4 md:p-7 pb-4 flex flex-col gap-4 max-w-[1400px] mx-auto">
+        {/* ─────── HERO HEADER (gradiente roxo premium) ─────── */}
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="mx-4 relative overflow-hidden"
+          style={{
+            borderRadius: 20,
+            background: 'linear-gradient(135deg, #2a0f5f 0%, #4c1d95 45%, #7c3aed 100%)',
+            padding: '18px 18px 20px',
+            boxShadow: '0 18px 40px -18px rgba(124,58,237,0.55), inset 0 1px 0 rgba(255,255,255,0.10)',
+          }}
+        >
+          {/* sheen sutil no topo */}
+          <span aria-hidden style={{
+            position: 'absolute', inset: '0 0 auto 0', height: 1,
+            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)',
+          }} />
+          {/* glow ambiente */}
+          <span aria-hidden style={{
+            position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(167,139,250,0.35), transparent 70%)',
+            filter: 'blur(8px)', pointerEvents: 'none',
+          }} />
+
+          {/* linha 1: navegador de mês + CTA */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, position: 'relative' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
+              <button
+                onClick={() => setCurrentMonth(m => subMonths(m, 1))}
+                aria-label="Mês anterior"
+                style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(255,255,255,0.10)', border: '1px solid rgba(255,255,255,0.18)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+              >
+                <ChevronLeft style={{ width: 16, height: 16 }} />
+              </button>
+              <div style={{ minWidth: 0, flex: 1, textAlign: 'center' }}>
+                <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase' }}>Orçamento mensal</div>
+                <div style={{ color: '#fff', fontSize: 17, fontWeight: 800, textTransform: 'capitalize', letterSpacing: '-0.01em', lineHeight: 1.15 }}>
+                  {monthLabel}
+                </div>
+              </div>
+              <button
+                onClick={() => setCurrentMonth(m => addMonths(m, 1))}
+                aria-label="Próximo mês"
+                style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(255,255,255,0.10)', border: '1px solid rgba(255,255,255,0.18)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+              >
+                <ChevronRight style={{ width: 16, height: 16 }} />
+              </button>
             </div>
             <button
-              onClick={() => setCurrentMonth(m => addMonths(m, 1))}
-              style={{ width: 32, height: 32, borderRadius: '50%', background: C.violetSoft, border: 'none', color: C.violet, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              aria-label="Próximo mês"
-            >›</button>
-          </div>
-          <button
-            onClick={openSetup}
-            style={{ background: C.violet, color: C.white, border: 'none', borderRadius: 10, padding: '8px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
-          >
-            + Configurar
-          </button>
-        </div>
-
-        {/* KPI cards — 2x2 on mobile, 4 across on tablet+ so values never truncate */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 px-4">
-          {kpis.map((s, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
+              onClick={openSetup}
               style={{
-                background: C.white,
-                border: `1px solid ${C.cardBorder}`,
-                borderRadius: 14,
-                padding: '12px 14px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                minWidth: 0,
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                background: '#fff', color: '#5B21B6', border: 'none', borderRadius: 10,
+                padding: '8px 12px', fontSize: 12, fontWeight: 800, cursor: 'pointer',
+                boxShadow: '0 6px 14px -4px rgba(0,0,0,0.25)',
+                flexShrink: 0,
               }}
             >
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: s.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <s.Icon style={{ width: 18, height: 18, color: s.iconColor }} />
+              <Settings2 style={{ width: 13, height: 13 }} /> Configurar
+            </button>
+          </div>
+
+          {/* linha 2: total destaque + barra global */}
+          <div style={{ marginTop: 16, position: 'relative' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginBottom: 8 }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: 600 }}>Gasto este mês</div>
+                <div style={{ color: '#fff', fontSize: 26, fontWeight: 900, letterSpacing: '-0.025em', fontVariantNumeric: 'tabular-nums', lineHeight: 1.1 }}>
+                  {formatCurrency(totalSpent)}
+                </div>
               </div>
-              <div style={{ minWidth: 0, flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <p style={{ color: C.textMuted, fontSize: 11, fontWeight: 600, lineHeight: 1.1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.label}</p>
-                <p style={{ color: s.valColor, fontSize: 16, fontWeight: 800, lineHeight: 1.15, letterSpacing: '-0.015em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={s.value}>{s.value}</p>
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: 600 }}>de</div>
+                <div style={{ color: '#fff', fontSize: 14, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                  {totalBudget > 0 ? formatCurrency(totalBudget) : '— sem limite'}
+                </div>
               </div>
-            </motion.div>
-          ))}
+            </div>
+            {totalBudget > 0 && (
+              <>
+                <div style={{ background: 'rgba(255,255,255,0.14)', borderRadius: 99, height: 8, overflow: 'hidden', position: 'relative' }}>
+                  <motion.div
+                    initial={{ width: '0%' }}
+                    animate={{ width: `${globalPct}%` }}
+                    transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+                    style={{
+                      height: '100%',
+                      background: globalPct >= 100
+                        ? 'linear-gradient(90deg, #f87171, #ef4444)'
+                        : globalPct >= 80
+                          ? 'linear-gradient(90deg, #fbbf24, #f59e0b)'
+                          : 'linear-gradient(90deg, #c4b5fd, #ffffff)',
+                      borderRadius: 99,
+                      boxShadow: '0 0 12px rgba(255,255,255,0.45)',
+                    }}
+                  />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+                  <span style={{ color: 'rgba(255,255,255,0.75)', fontSize: 11, fontWeight: 600 }}>
+                    {Math.round(globalPct)}% utilizado
+                  </span>
+                  <span style={{ color: 'rgba(255,255,255,0.75)', fontSize: 11, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+                    {formatCurrency(Math.max(0, totalBudget - totalSpent))} restante
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
+        </motion.div>
+
+        {/* ─────── KPI cards premium ─────── */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 px-4">
+          {kpis.map((s, i) => {
+            const t = tintMap[s.tint];
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                style={{
+                  background: C.white,
+                  border: `1px solid ${C.cardBorder}`,
+                  borderRadius: 14,
+                  padding: '12px 14px',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.03), 0 4px 12px -6px rgba(124,58,237,0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 11,
+                  minWidth: 0,
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                <div style={{
+                  width: 38, height: 38, borderRadius: 11,
+                  background: t.bg, border: `1px solid ${t.border}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}>
+                  <s.Icon style={{ width: 18, height: 18, color: t.icon, strokeWidth: 2.2 }} />
+                </div>
+                <div style={{ minWidth: 0, flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <p style={{ color: C.textMuted, fontSize: 10, fontWeight: 700, lineHeight: 1.1, letterSpacing: '0.04em', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.label}</p>
+                  <p style={{ color: t.val, fontSize: 16, fontWeight: 800, lineHeight: 1.15, letterSpacing: '-0.015em', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={s.value}>{s.value}</p>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Empty state OR category list */}
