@@ -46,20 +46,17 @@ export default function InvestmentsPage() {
 
   return (
     <div className="space-y-4 pb-24">
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Investimentos</h1>
-          <p className="text-xs text-muted-foreground">
-            Acompanhe sua carteira e o retorno de cada aplicação.
-          </p>
-        </div>
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground">
+          Acompanhe sua carteira e o retorno de cada aplicação.
+        </p>
         <button
           onClick={() => setShowForm(true)}
           className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-md hover:brightness-110 transition"
         >
           <Plus className="w-4 h-4" /> Novo
         </button>
-      </header>
+      </div>
 
       {/* Hero card */}
       <div className="rounded-2xl p-5 text-white shadow-lg relative overflow-hidden"
