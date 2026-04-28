@@ -207,10 +207,27 @@ export default function PredictionsPage() {
       </div>
 
       {/* Main chart */}
-      <div style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-base)', borderRadius: 16, padding: 20 }}>
-        <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-strong)', marginBottom: 16 }}>
-          Projeção de saldo — próximos {period} dias
-        </p>
+      <div style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-base)', borderRadius: 18, padding: 20 }}>
+        <div className="flex items-start justify-between mb-4 gap-3 flex-wrap">
+          <div>
+            <p style={{ fontSize: 15, fontWeight: 800, color: 'var(--color-text-strong)', letterSpacing: '-0.2px' }}>
+              Projeção de saldo
+            </p>
+            <p style={{ fontSize: 11, color: 'var(--color-text-muted)', marginTop: 2 }}>
+              Próximos {period} dias · faixa de confiança sombreada
+            </p>
+          </div>
+          <div className="flex items-center gap-3" style={{ fontSize: 11 }}>
+            <span className="flex items-center gap-1.5" style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>
+              <span style={{ width: 10, height: 2, borderRadius: 99, background: status === 'danger' ? '#ef4444' : '#22c55e' }} />
+              Saldo
+            </span>
+            <span className="flex items-center gap-1.5" style={{ color: 'var(--color-text-muted)', fontWeight: 600 }}>
+              <span style={{ width: 10, height: 8, borderRadius: 2, background: status === 'danger' ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)' }} />
+              Variação
+            </span>
+          </div>
+        </div>
         <div style={{ height: isMobile ? 220 : 320 }}>
           <Suspense fallback={<div className="skeleton-shimmer w-full h-full" style={{ borderRadius: 12 }} />}>
             <LazyPredChart predictions={visiblePreds} status={status} />
