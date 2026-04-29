@@ -1763,6 +1763,63 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_attachment_telemetry: {
+        Row: {
+          attachment_kind: string | null
+          created_at: string
+          duration_ms: number | null
+          error_message: string | null
+          file_bytes: number | null
+          id: string
+          metadata: Json | null
+          mime_type: string | null
+          model: string | null
+          phone: string | null
+          stage: string
+          status: string
+          trace_id: string
+          transactions_found: number | null
+          transactions_saved: number | null
+          user_id: string | null
+        }
+        Insert: {
+          attachment_kind?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          file_bytes?: number | null
+          id?: string
+          metadata?: Json | null
+          mime_type?: string | null
+          model?: string | null
+          phone?: string | null
+          stage: string
+          status: string
+          trace_id: string
+          transactions_found?: number | null
+          transactions_saved?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          attachment_kind?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          file_bytes?: number | null
+          id?: string
+          metadata?: Json | null
+          mime_type?: string | null
+          model?: string | null
+          phone?: string | null
+          stage?: string
+          status?: string
+          trace_id?: string
+          transactions_found?: number | null
+          transactions_saved?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       whatsapp_connections: {
         Row: {
           active: boolean | null
