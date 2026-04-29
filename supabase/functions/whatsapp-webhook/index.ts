@@ -107,11 +107,20 @@ function getBasicFastReply(text: string): string | null {
   }
 
   if (/^(ajuda|help|socorro|como funciona|como (que )?funciona|o que (voce|vc|tu) faz|o que da pra fazer|menu|comandos)\b[\s!?.]*$/.test(t)) {
-    return "Posso registrar gastos/receitas, consultar saldo, gastos, metas, dívidas, orçamentos e ler comprovantes ou extratos por foto/PDF.";
+    return "Posso registrar gastos/receitas, consultar saldo, gastos, metas, dívidas e orçamentos.\n\n📄 *Manda extrato (PDF) ou foto* que eu *leio e registro tudo automaticamente* — sem precisar digitar nada. 🐨";
   }
 
   if (/^(voce|vc) (esta|ta) ai\??$/.test(t) || /^(ta ai|esta online|ta online|ta on|funciona|teste|ping)\b[\s!?.]*$/.test(t)) {
     return "Tô online sim 🐨 Pode mandar.";
+  }
+
+  // Usuário pergunta/avisa que vai mandar extrato, fatura, comprovante ou PDF.
+  // Antes a LLM alucinava dizendo "só leio e comento, registrar tem que ser manual".
+  // Resposta canônica garante que o cliente saiba: é só mandar, ela já registra.
+  if (/\b(consegue|da pra|posso|vou|vou te|te|vc|voce)\s*(ler|analisar|olhar|ver|importar|registrar|salvar|cadastrar|processar)?\s*(o |a |meu |minha |um |uma )?(extrato|fatura|comprovante|pdf|cupom|recibo|nota|csv|ofx|planilha)\b/.test(t)
+      || /\b(te (vou|to) mand|vou (te )?mandar|posso mandar|mando|envio)\s+(o |a |meu |minha |um |uma )?(extrato|fatura|comprovante|pdf|csv|ofx|planilha|foto|imagem|arquivo)\b/.test(t)
+      || /^(extrato|fatura|comprovante)\??$/.test(t)) {
+    return "Manda aí! 📄 Eu *leio o arquivo e já registro todos os lançamentos automaticamente* no KoraFinance. Funciona com extrato (PDF), fatura de cartão, comprovante (foto) e cupom fiscal. 🐨";
   }
 
   return null;
