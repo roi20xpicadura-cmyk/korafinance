@@ -40,3 +40,8 @@ verify_jwt = false
 
 [functions.kora-confirm-action]
 verify_jwt = false
+
+# Auth Email Hook — recebe webhook do Supabase Auth (sem JWT do usuário),
+# valida via assinatura standardwebhooks com SEND_EMAIL_HOOK_SECRET.
+[functions.auth-email-resend]
+verify_jwt = false
