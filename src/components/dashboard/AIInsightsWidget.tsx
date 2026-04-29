@@ -191,7 +191,7 @@ export default function AIInsightsWidget({ onOpenChat }: { onOpenChat: () => voi
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (error) throw error;
-      setAgentAlerts(data?.alerts || []);
+      setAgentAlerts(Array.isArray(data?.alerts) ? data.alerts : []);
     } catch {
       // Fallback: load from DB
       const sevenDaysAgo = new Date();
@@ -204,7 +204,7 @@ export default function AIInsightsWidget({ onOpenChat }: { onOpenChat: () => voi
         .eq('dismissed', false)
         .order('triggered_date', { ascending: false })
         .limit(10);
-      setAgentAlerts(data || []);
+      setAgentAlerts(Array.isArray(data) ? data : []);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -225,7 +225,8 @@ export default function AIInsightsWidget({ onOpenChat }: { onOpenChat: () => voi
     const out: CardItem[] = [];
 
     // Agent alerts first (more actionable / time-sensitive)
-    for (const alert of agentAlerts.filter((a) => !a.dismissed)) {
+    const safeAlerts = Array.isArray(agentAlerts) ? agentAlerts : [];
+    for (const alert of safeAlerts.filter((a) => !a.dismissed)) {
       const title = titleCaseName(alert.title);
       const message = alert.description || '';
       const hash = insightHash(title, message);
