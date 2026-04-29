@@ -185,7 +185,7 @@ export default function AppLayout() {
   }
 
   return (
-    <div className="min-h-screen flex" style={{ background: 'var(--color-bg-base)' }}>
+    <div className="app-shell min-h-screen flex" style={{ background: 'var(--color-bg-base)' }}>
       <OfflineBanner />
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
