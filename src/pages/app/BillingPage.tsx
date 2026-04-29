@@ -2,7 +2,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { PricingCards } from '@/pages/LandingPage';
 import { PLAN_LIMITS, PlanType } from '@/lib/plans';
 import { toast } from 'sonner';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -14,6 +14,7 @@ export default function BillingPage() {
   const [goalCount, setGoalCount] = useState(0);
   const [cardCount, setCardCount] = useState(0);
   const [invCount, setInvCount] = useState(0);
+  const upgradeLockRef = useRef(false);
 
   useEffect(() => {
     if (!user) return;
@@ -36,6 +37,11 @@ export default function BillingPage() {
   };
 
   const handleUpgrade = (planName: string) => {
+    // Evita múltiplos disparos (duplo clique / re-render abrindo 2 abas)
+    if (upgradeLockRef.current) return;
+    upgradeLockRef.current = true;
+    setTimeout(() => { upgradeLockRef.current = false; }, 1500);
+
     const key = planName.toLowerCase();
     const url = HOTMART_LINKS[key];
     if (!url) {
@@ -43,16 +49,10 @@ export default function BillingPage() {
       return;
     }
 
-    // Abre o checkout direto na URL final. Usar 'about:blank' + redirect
-    // é bloqueado por COOP/popup blockers em navegadores modernos.
-    // O email é preenchido na própria página da Hotmart e o vínculo com o
-    // perfil acontece no webhook via email recebido da Hotmart.
-    const popup = window.open(url, '_blank', 'noopener,noreferrer');
-    if (!popup) {
-      // Pop-up bloqueado: faz fallback para navegação na mesma aba.
-      toast.info('Abrindo checkout...');
-      window.location.href = url;
-    }
+    // Abre o checkout em uma nova aba. Não fazemos fallback automático para
+    // a mesma aba porque com `noopener` o retorno de window.open é sempre
+    // null em vários navegadores, o que fazia abrir 2 guias.
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const limits = PLAN_LIMITS[plan];
