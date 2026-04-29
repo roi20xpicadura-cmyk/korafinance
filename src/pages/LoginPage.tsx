@@ -20,7 +20,7 @@ function DarkHeroSection({ variant = 'login' }: { variant?: 'login' | 'register'
       className="relative overflow-hidden w-full"
       style={{
         minHeight: '42vh',
-        background: '#0a1a0f',
+        background: '#0F0820',
       }}
     >
       {/* Radial gradient overlay */}
@@ -105,7 +105,7 @@ function DesktopLeftPanel() {
     <div
       className="hidden lg:flex w-[55%] flex-col justify-between relative overflow-hidden"
       style={{
-        background: '#0a1a0f',
+        background: '#0F0820',
         padding: '48px 48px 40px',
       }}
     >
@@ -463,7 +463,7 @@ export default function LoginPage() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row" style={{ background: '#0a1a0f' }}>
+    <div className="min-h-screen flex flex-col lg:flex-row" style={{ background: '#0F0820' }}>
       {/* Desktop left panel */}
       <DesktopLeftPanel />
 
