@@ -18,23 +18,25 @@ interface RecoveryEmailProps {
   confirmationUrl: string
 }
 
-export const RecoveryEmail = ({ siteName, confirmationUrl }: RecoveryEmailProps) => (
+export const RecoveryEmail = ({
+  siteName,
+  confirmationUrl,
+}: RecoveryEmailProps) => (
   <Html lang="pt-BR" dir="ltr">
     <Head />
-    <Preview>Redefina sua senha na Kora</Preview>
+    <Preview>Redefina sua senha no {siteName}</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Text style={logo}>Kora</Text>
-        <Heading style={h1}>Redefina sua senha</Heading>
+        <Text style={brand}>🐨 KORA FINANCE</Text>
+        <Heading style={h1}>Redefinir senha</Heading>
         <Text style={text}>
-          Recebemos um pedido para redefinir a senha da sua conta Kora.
-          Clique no botão abaixo pra escolher uma nova senha.
+          Recebemos um pedido pra redefinir sua senha no <strong>{siteName}</strong>. Clique no botão abaixo pra escolher uma nova senha.
         </Text>
         <Button style={button} href={confirmationUrl}>
           Redefinir senha
         </Button>
         <Text style={footer}>
-          Se você não solicitou essa alteração, pode ignorar este email — sua senha continuará a mesma.
+          Se você não pediu a redefinição, pode ignorar este email — sua senha continua a mesma.
         </Text>
       </Container>
     </Body>
@@ -43,11 +45,10 @@ export const RecoveryEmail = ({ siteName, confirmationUrl }: RecoveryEmailProps)
 
 export default RecoveryEmail
 
-const main = { backgroundColor: '#ffffff', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", margin: '0', padding: '0' }
-const container = { maxWidth: '560px', margin: '0 auto', padding: '40px 32px', backgroundColor: '#ffffff' }
-const logo = { fontSize: '24px', fontWeight: '800' as const, color: '#7C3AED', margin: '0 0 32px', letterSpacing: '-0.02em' }
-const h1 = { fontSize: '24px', fontWeight: '700' as const, color: '#1a0b2e', margin: '0 0 16px', letterSpacing: '-0.02em', lineHeight: '1.3' }
-const text = { fontSize: '15px', color: '#52525b', lineHeight: '1.6', margin: '0 0 20px' }
-const link = { color: '#7C3AED', textDecoration: 'underline', fontWeight: '500' as const }
-const button = { backgroundColor: '#7C3AED', color: '#ffffff', fontSize: '15px', fontWeight: '600' as const, borderRadius: '12px', padding: '14px 28px', textDecoration: 'none', display: 'inline-block', margin: '8px 0 28px' }
-const footer = { fontSize: '13px', color: '#a1a1aa', lineHeight: '1.5', margin: '32px 0 0', paddingTop: '24px', borderTop: '1px solid #f4f4f5' }
+const main = { backgroundColor: '#ffffff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif' }
+const container = { padding: '32px 28px', maxWidth: '560px' }
+const brand = { fontSize: '13px', fontWeight: 'bold' as const, color: '#7C3AED', letterSpacing: '0.5px', margin: '0 0 24px' }
+const h1 = { fontSize: '24px', fontWeight: 'bold' as const, color: '#0F172A', margin: '0 0 16px', lineHeight: '1.3' }
+const text = { fontSize: '15px', color: '#475569', lineHeight: '1.6', margin: '0 0 20px' }
+const button = { backgroundColor: '#7C3AED', color: '#ffffff', fontSize: '15px', fontWeight: 'bold' as const, borderRadius: '10px', padding: '14px 28px', textDecoration: 'none', display: 'inline-block' as const }
+const footer = { fontSize: '12px', color: '#94A3B8', margin: '32px 0 0', borderTop: '1px solid #E2E8F0', paddingTop: '20px' }
