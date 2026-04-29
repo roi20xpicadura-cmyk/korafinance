@@ -810,3 +810,46 @@
   background: rgba(124,58,237,0.08) !important;
   color: #6D28D9 !important;
 }
+
+/* ─────────────────────────────────────────────
+   Auth pages responsive auto-scaling
+   Ajusta proporcionalmente o conteúdo das telas
+   de Login/Cadastro/Esqueci-senha para celulares
+   menores (iPhone SE 320–360px) e maiores (Pro Max).
+   ───────────────────────────────────────────── */
+.auth-screen {
+  /* Scale factor controlado por viewport. 1 = tamanho original (375px base). */
+  --auth-scale: 1;
+}
+
+/* Telas muito pequenas (iPhone SE, Galaxy Fold fechado) */
+@media (max-width: 359px) {
+  .auth-screen { --auth-scale: 0.86; }
+}
+@media (min-width: 360px) and (max-width: 374px) {
+  .auth-screen { --auth-scale: 0.92; }
+}
+/* Telas grandes (iPhone Pro Max, Android XL) */
+@media (min-width: 414px) and (max-width: 480px) {
+  .auth-screen { --auth-scale: 1.06; }
+}
+@media (min-width: 481px) and (max-width: 767px) {
+  .auth-screen { --auth-scale: 1.12; }
+}
+
+/* Aplica o fator de escala via zoom no card do formulário e no hero,
+   mantendo o layout fluido sem mexer em cada estilo inline. */
+@media (max-width: 1023px) {
+  .auth-screen .auth-form-card,
+  .auth-screen .auth-hero {
+    zoom: var(--auth-scale);
+  }
+  /* Fallback para navegadores sem suporte a zoom (Firefox antigo) */
+  @supports not (zoom: 1) {
+    .auth-screen .auth-form-card,
+    .auth-screen .auth-hero {
+      transform: scale(var(--auth-scale));
+      transform-origin: top center;
+    }
+  }
+}
