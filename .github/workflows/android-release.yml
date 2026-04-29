@@ -50,9 +50,11 @@ jobs:
 
       - name: Bump versionCode and versionName
         run: |
-          # A cada run do workflow, sobe versionCode = GITHUB_RUN_NUMBER
-          # Assim nunca repete na Play Store.
-          NEW_VERSION_CODE=${GITHUB_RUN_NUMBER}
+          # versionCode = GITHUB_RUN_NUMBER + OFFSET
+          # OFFSET garante que ficamos acima do maior versionCode já enviado à Play Store.
+          # Última rejeição: versionCode 12 já usado → começamos de 100 pra ter folga.
+          VERSION_CODE_OFFSET=100
+          NEW_VERSION_CODE=$((GITHUB_RUN_NUMBER + VERSION_CODE_OFFSET))
           NEW_VERSION_NAME="${{ inputs.version_name }}"
           if [ -z "$NEW_VERSION_NAME" ]; then NEW_VERSION_NAME="1.0.${NEW_VERSION_CODE}"; fi
 
