@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import koraIcon from '@/assets/korafinance-icon.png';
 import { toast } from 'sonner';
+import { translateAuthError } from '@/lib/auth-errors';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -16,7 +17,7 @@ export default function ForgotPasswordPage() {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setLoading(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) { toast.error(translateAuthError(error.message)); return; }
     setSent(true);
   };
 
