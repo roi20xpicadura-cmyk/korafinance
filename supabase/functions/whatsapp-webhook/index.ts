@@ -29,6 +29,89 @@ function fmt(v: number): string {
   });
 }
 
+// ─── TELEMETRIA DE ANEXOS ───────────────────────────
+// Registra cada etapa do pipeline (recebido → baixado → IA → salvo → concluído).
+// Falhas no log NUNCA quebram o fluxo principal — apenas console.error.
+type TelemetryStage =
+  | "received"
+  | "downloaded"
+  | "ai_started"
+  | "ai_extracted"
+  | "saved"
+  | "completed"
+  | "failed";
+
+type TelemetryStatus = "success" | "error" | "warning";
+
+interface TelemetryEvent {
+  traceId: string;
+  userId?: string | null;
+  phone?: string | null;
+  stage: TelemetryStage;
+  status: TelemetryStatus;
+  attachmentKind?: "pdf" | "image" | "unknown" | null;
+  mimeType?: string | null;
+  fileBytes?: number | null;
+  model?: string | null;
+  durationMs?: number | null;
+  transactionsFound?: number | null;
+  transactionsSaved?: number | null;
+  errorMessage?: string | null;
+  metadata?: Record<string, unknown>;
+}
+
+async function logAttachmentTelemetry(ev: TelemetryEvent): Promise<void> {
+  // Log estruturado no console — fácil de filtrar nos Edge Function Logs.
+  const line = {
+    tag: "ATTACHMENT_TELEMETRY",
+    trace_id: ev.traceId,
+    stage: ev.stage,
+    status: ev.status,
+    user_id: ev.userId ?? null,
+    phone: ev.phone ?? null,
+    attachment_kind: ev.attachmentKind ?? null,
+    mime_type: ev.mimeType ?? null,
+    file_bytes: ev.fileBytes ?? null,
+    model: ev.model ?? null,
+    duration_ms: ev.durationMs ?? null,
+    transactions_found: ev.transactionsFound ?? null,
+    transactions_saved: ev.transactionsSaved ?? null,
+    error: ev.errorMessage ?? null,
+    metadata: ev.metadata ?? null,
+  };
+  if (ev.status === "error") {
+    console.error(JSON.stringify(line));
+  } else {
+    console.log(JSON.stringify(line));
+  }
+
+  try {
+    const { error } = await supabase
+      .from("whatsapp_attachment_telemetry")
+      .insert({
+        trace_id: ev.traceId,
+        user_id: ev.userId ?? null,
+        phone: ev.phone ?? null,
+        stage: ev.stage,
+        status: ev.status,
+        attachment_kind: ev.attachmentKind ?? null,
+        mime_type: ev.mimeType ?? null,
+        file_bytes: ev.fileBytes ?? null,
+        model: ev.model ?? null,
+        duration_ms: ev.durationMs ?? null,
+        transactions_found: ev.transactionsFound ?? null,
+        transactions_saved: ev.transactionsSaved ?? null,
+        error_message: ev.errorMessage ?? null,
+        metadata: ev.metadata ?? {},
+      });
+    if (error) {
+      console.error("[ATTACHMENT_TELEMETRY] insert failed:", error.message);
+    }
+  } catch (e) {
+    console.error("[ATTACHMENT_TELEMETRY] insert exception:", e);
+  }
+}
+
 // normalizeIntentText, applyTypoFixes, normalizeForIntent e getBasicFastReply
 // foram movidos pra _shared/whatsapp-fast-replies.ts pra ficarem testáveis.
 // Mantenha-os lá — não duplique aqui.
