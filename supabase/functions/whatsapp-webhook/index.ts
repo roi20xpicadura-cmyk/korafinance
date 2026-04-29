@@ -29,6 +29,89 @@ function fmt(v: number): string {
   });
 }
 
+// ─── TELEMETRIA DE ANEXOS ───────────────────────────
+// Registra cada etapa do pipeline (recebido → baixado → IA → salvo → concluído).
+// Falhas no log NUNCA quebram o fluxo principal — apenas console.error.
+type TelemetryStage =
+  | "received"
+  | "downloaded"
+  | "ai_started"
+  | "ai_extracted"
+  | "saved"
+  | "completed"
+  | "failed";
+
+type TelemetryStatus = "success" | "error" | "warning";
+
+interface TelemetryEvent {
+  traceId: string;
+  userId?: string | null;
+  phone?: string | null;
+  stage: TelemetryStage;
+  status: TelemetryStatus;
+  attachmentKind?: "pdf" | "image" | "unknown" | null;
+  mimeType?: string | null;
+  fileBytes?: number | null;
+  model?: string | null;
+  durationMs?: number | null;
+  transactionsFound?: number | null;
+  transactionsSaved?: number | null;
+  errorMessage?: string | null;
+  metadata?: Record<string, unknown>;
+}
+
+async function logAttachmentTelemetry(ev: TelemetryEvent): Promise<void> {
+  // Log estruturado no console — fácil de filtrar nos Edge Function Logs.
+  const line = {
+    tag: "ATTACHMENT_TELEMETRY",
+    trace_id: ev.traceId,
+    stage: ev.stage,
+    status: ev.status,
+    user_id: ev.userId ?? null,
+    phone: ev.phone ?? null,
+    attachment_kind: ev.attachmentKind ?? null,
+    mime_type: ev.mimeType ?? null,
+    file_bytes: ev.fileBytes ?? null,
+    model: ev.model ?? null,
+    duration_ms: ev.durationMs ?? null,
+    transactions_found: ev.transactionsFound ?? null,
+    transactions_saved: ev.transactionsSaved ?? null,
+    error: ev.errorMessage ?? null,
+    metadata: ev.metadata ?? null,
+  };
+  if (ev.status === "error") {
+    console.error(JSON.stringify(line));
+  } else {
+    console.log(JSON.stringify(line));
+  }
+
+  try {
+    const { error } = await supabase
+      .from("whatsapp_attachment_telemetry")
+      .insert({
+        trace_id: ev.traceId,
+        user_id: ev.userId ?? null,
+        phone: ev.phone ?? null,
+        stage: ev.stage,
+        status: ev.status,
+        attachment_kind: ev.attachmentKind ?? null,
+        mime_type: ev.mimeType ?? null,
+        file_bytes: ev.fileBytes ?? null,
+        model: ev.model ?? null,
+        duration_ms: ev.durationMs ?? null,
+        transactions_found: ev.transactionsFound ?? null,
+        transactions_saved: ev.transactionsSaved ?? null,
+        error_message: ev.errorMessage ?? null,
+        metadata: ev.metadata ?? {},
+      });
+    if (error) {
+      console.error("[ATTACHMENT_TELEMETRY] insert failed:", error.message);
+    }
+  } catch (e) {
+    console.error("[ATTACHMENT_TELEMETRY] insert exception:", e);
+  }
+}
+
 // normalizeIntentText, applyTypoFixes, normalizeForIntent e getBasicFastReply
 // foram movidos pra _shared/whatsapp-fast-replies.ts pra ficarem testáveis.
 // Mantenha-os lá — não duplique aqui.
@@ -545,9 +628,20 @@ async function processAttachment(
   fileUrl: string,
   userName: string,
   defaultProfile: string,
+  telemetry?: { traceId: string; userId?: string | null; phone?: string | null },
 ): Promise<{ transactions: any[]; reply: string; importDirect: boolean }> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) {
+    if (telemetry) {
+      await logAttachmentTelemetry({
+        traceId: telemetry.traceId,
+        userId: telemetry.userId,
+        phone: telemetry.phone,
+        stage: "failed",
+        status: "error",
+        errorMessage: "LOVABLE_API_KEY ausente",
+      });
+    }
     return {
       transactions: [],
       reply: `Configuração da IA pendente, ${userName}. Tenta de novo em instantes!`,
@@ -556,13 +650,42 @@ async function processAttachment(
   }
 
   try {
+    const tDownloadStart = Date.now();
     const { base64, mimeType, bytes } = await downloadAsBase64(fileUrl);
     console.log(`[ATTACHMENT] ${mimeType} | ${(bytes / 1024).toFixed(1)} KB`);
 
     const isPdf = mimeType === "application/pdf";
     const isImage = mimeType.startsWith("image/");
+    const kind: "pdf" | "image" | "unknown" = isPdf ? "pdf" : isImage ? "image" : "unknown";
+
+    if (telemetry) {
+      await logAttachmentTelemetry({
+        traceId: telemetry.traceId,
+        userId: telemetry.userId,
+        phone: telemetry.phone,
+        stage: "downloaded",
+        status: "success",
+        attachmentKind: kind,
+        mimeType,
+        fileBytes: bytes,
+        durationMs: Date.now() - tDownloadStart,
+      });
+    }
 
     if (!isPdf && !isImage) {
+      if (telemetry) {
+        await logAttachmentTelemetry({
+          traceId: telemetry.traceId,
+          userId: telemetry.userId,
+          phone: telemetry.phone,
+          stage: "failed",
+          status: "error",
+          attachmentKind: kind,
+          mimeType,
+          fileBytes: bytes,
+          errorMessage: `mime_type não suportado: ${mimeType}`,
+        });
+      }
       return {
         transactions: [],
         reply: `Não consigo ler esse tipo de arquivo (${mimeType}), ${userName} 😕\nManda PDF de extrato/fatura ou foto do comprovante!`,
@@ -604,6 +727,22 @@ async function processAttachment(
       }
     }
     console.log(`[ATTACHMENT] modelo escolhido: ${chosenModel} — ${modelReason}`);
+
+    if (telemetry) {
+      await logAttachmentTelemetry({
+        traceId: telemetry.traceId,
+        userId: telemetry.userId,
+        phone: telemetry.phone,
+        stage: "ai_started",
+        status: "success",
+        attachmentKind: kind,
+        mimeType,
+        fileBytes: bytes,
+        model: chosenModel,
+        metadata: { reason: modelReason, size_kb: sizeKB },
+      });
+    }
+    const tAiStart = Date.now();
 
     const systemPrompt = `Você é a Kora IA, especialista em extrair transações financeiras de extratos bancários, faturas de cartão e comprovantes brasileiros.
 
@@ -737,6 +876,21 @@ Se não encontrar nenhuma transação:
     if (!response.ok) {
       const errBody = await response.text();
       console.error(`[ATTACHMENT] Gemini error (${chosenModel}):`, response.status, errBody.slice(0, 500));
+      if (telemetry) {
+        await logAttachmentTelemetry({
+          traceId: telemetry.traceId,
+          userId: telemetry.userId,
+          phone: telemetry.phone,
+          stage: "failed",
+          status: "error",
+          attachmentKind: kind,
+          mimeType,
+          fileBytes: bytes,
+          model: chosenModel,
+          durationMs: Date.now() - tAiStart,
+          errorMessage: `Gemini ${response.status}: ${errBody.slice(0, 200)}`,
+        });
+      }
       if (response.status === 429) {
         return { transactions: [], reply: `IA sobrecarregada agora, ${userName} 😅 Manda de novo em 1 minutinho!`, importDirect: false };
       }
@@ -752,6 +906,23 @@ Se não encontrar nenhuma transação:
     const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : "{}");
 
     if (!parsed.found || !Array.isArray(parsed.transactions) || parsed.transactions.length === 0) {
+      if (telemetry) {
+        await logAttachmentTelemetry({
+          traceId: telemetry.traceId,
+          userId: telemetry.userId,
+          phone: telemetry.phone,
+          stage: "ai_extracted",
+          status: "warning",
+          attachmentKind: kind,
+          mimeType,
+          fileBytes: bytes,
+          model: chosenModel,
+          durationMs: Date.now() - tAiStart,
+          transactionsFound: 0,
+          errorMessage: parsed.reason || "nenhuma transação encontrada",
+          metadata: { doc_type: parsed.doc_type ?? null },
+        });
+      }
       return {
         transactions: [],
         reply: `Não identifiquei transações nesse arquivo, ${userName} 🤔\n${parsed.reason || "Confere se é um extrato/comprovante legível."}`,
@@ -774,11 +945,50 @@ Se não encontrar nenhuma transação:
       .filter((t: any) => t.amount > 0);
 
     if (txs.length === 0) {
+      if (telemetry) {
+        await logAttachmentTelemetry({
+          traceId: telemetry.traceId,
+          userId: telemetry.userId,
+          phone: telemetry.phone,
+          stage: "ai_extracted",
+          status: "warning",
+          attachmentKind: kind,
+          mimeType,
+          fileBytes: bytes,
+          model: chosenModel,
+          durationMs: Date.now() - tAiStart,
+          transactionsFound: 0,
+          errorMessage: "todas as transações vieram com amount=0",
+        });
+      }
       return { transactions: [], reply: `Encontrei o documento mas as transações estão sem valor 🤷 Tenta um arquivo mais nítido!`, importDirect: false };
     }
 
     const income = txs.filter((t: any) => t.type === "income").reduce((s: number, t: any) => s + t.amount, 0);
     const expense = txs.filter((t: any) => t.type === "expense").reduce((s: number, t: any) => s + t.amount, 0);
+
+    if (telemetry) {
+      await logAttachmentTelemetry({
+        traceId: telemetry.traceId,
+        userId: telemetry.userId,
+        phone: telemetry.phone,
+        stage: "ai_extracted",
+        status: "success",
+        attachmentKind: kind,
+        mimeType,
+        fileBytes: bytes,
+        model: chosenModel,
+        durationMs: Date.now() - tAiStart,
+        transactionsFound: txs.length,
+        metadata: {
+          doc_type: parsed.doc_type ?? null,
+          institution: parsed.institution ?? null,
+          income,
+          expense,
+        },
+      });
+    }
+
     const docLabel = parsed.doc_type ? `*${parsed.doc_type}*` : "documento";
     const inst = parsed.institution ? `\n🏦 ${parsed.institution}` : "";
 
@@ -801,6 +1011,16 @@ ${preview}${more}
     return { transactions: txs, reply, importDirect: true };
   } catch (e) {
     console.error("[ATTACHMENT] error:", e);
+    if (telemetry) {
+      await logAttachmentTelemetry({
+        traceId: telemetry.traceId,
+        userId: telemetry.userId,
+        phone: telemetry.phone,
+        stage: "failed",
+        status: "error",
+        errorMessage: e instanceof Error ? e.message : String(e),
+      });
+    }
     return {
       transactions: [],
       reply: `Tive um problema lendo esse arquivo, ${userName} 😕 Tenta de novo ou manda foto do comprovante!`,
@@ -1181,6 +1401,10 @@ serve(async (req) => {
     // ── ATTACHMENT PROCESSING (PDF de extrato/fatura/comprovante OU imagem) ──
     // Importa DIRETO no banco, sem confirmação. Detecta origem (personal/business) via IA.
     if (document || image) {
+      const traceId = crypto.randomUUID();
+      const tReceived = Date.now();
+      const isPdfHint = document ? true : false;
+
       let fileUrl: string | undefined;
       if (document) {
         fileUrl = typeof document === "string"
@@ -1192,13 +1416,23 @@ serve(async (req) => {
           : (image.imageUrl || image.url);
       }
 
+      await logAttachmentTelemetry({
+        traceId,
+        userId,
+        phone,
+        stage: "received",
+        status: fileUrl ? "success" : "error",
+        attachmentKind: isPdfHint ? "pdf" : "image",
+        errorMessage: fileUrl ? null : "fileUrl ausente no payload",
+        metadata: { has_document: !!document, has_image: !!image },
+      });
+
       if (!fileUrl) {
         await sendWhatsApp(phone, `Não consegui baixar o arquivo, ${ctx.name} 😕 Tenta enviar de novo!`);
         return new Response("OK", { status: 200 });
       }
 
       // Feedback imediato — usuário sabe que recebemos enquanto a IA processa
-      const isPdfHint = document ? true : false;
       const ackMsg = isPdfHint
         ? `📄 Recebi seu documento, ${ctx.name}! Analisando as transações... ⏳`
         : `📷 Recebi sua imagem, ${ctx.name}! Lendo o comprovante... ⏳`;
@@ -1210,7 +1444,12 @@ serve(async (req) => {
         created_at: new Date().toISOString(),
       });
 
-      const { transactions, reply, importDirect } = await processAttachment(fileUrl, ctx.name, ctx.profile);
+      const { transactions, reply, importDirect } = await processAttachment(
+        fileUrl,
+        ctx.name,
+        ctx.profile,
+        { traceId, userId, phone },
+      );
 
       // Sempre envia o resumo primeiro
       await sendWhatsApp(phone, reply);
@@ -1223,6 +1462,7 @@ serve(async (req) => {
 
       // Importa direto se a IA achou transações válidas
       if (importDirect && transactions.length > 0) {
+        const tSaveStart = Date.now();
         const rows = transactions.map((t: any) => ({
           user_id: userId,
           type: t.type,
@@ -1237,15 +1477,29 @@ serve(async (req) => {
 
         // Insert em chunks de 50
         let saved = 0;
+        let lastErr: string | null = null;
         for (let i = 0; i < rows.length; i += 50) {
           const chunk = rows.slice(i, i + 50);
           const { error } = await supabase.from("transactions").insert(chunk);
           if (error) {
             console.error("[ATTACHMENT INSERT] error:", error.message);
+            lastErr = error.message;
           } else {
             saved += chunk.length;
           }
         }
+
+        await logAttachmentTelemetry({
+          traceId,
+          userId,
+          phone,
+          stage: "saved",
+          status: saved === transactions.length ? "success" : (saved === 0 ? "error" : "warning"),
+          durationMs: Date.now() - tSaveStart,
+          transactionsFound: transactions.length,
+          transactionsSaved: saved,
+          errorMessage: lastErr,
+        });
 
         const incomeTotal = transactions.filter((t: any) => t.type === "income").reduce((s: number, t: any) => s + t.amount, 0);
         const expenseTotal = transactions.filter((t: any) => t.type === "expense").reduce((s: number, t: any) => s + t.amount, 0);
@@ -1279,6 +1533,18 @@ Acesse seu dashboard pra revisar e ajustar categorias se quiser, ${ctx.name}! �
           await checkAndAlertBudget(userId, phone, cat, ctx.name, freshCtx, amt);
         }
       }
+
+      await logAttachmentTelemetry({
+        traceId,
+        userId,
+        phone,
+        stage: "completed",
+        status: "success",
+        durationMs: Date.now() - tReceived,
+        transactionsFound: transactions.length,
+        transactionsSaved: importDirect ? transactions.length : 0,
+        metadata: { import_direct: importDirect },
+      });
 
       return new Response("OK", { status: 200 });
     }
