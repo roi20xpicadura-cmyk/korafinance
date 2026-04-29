@@ -17,12 +17,12 @@ const corsHeaders = {
 }
 
 const EMAIL_SUBJECTS: Record<string, string> = {
-  signup: 'Confirm your email',
-  invite: "You've been invited",
-  magiclink: 'Your login link',
-  recovery: 'Reset your password',
-  email_change: 'Confirm your new email',
-  reauthentication: 'Your verification code',
+  signup: 'Confirme seu email',
+  invite: 'Você foi convidado',
+  magiclink: 'Seu link de acesso',
+  recovery: 'Redefina sua senha',
+  email_change: 'Confirme seu novo email',
+  reauthentication: 'Seu código de verificação',
 }
 
 // Template mapping
@@ -40,6 +40,10 @@ const SITE_NAME = "livrededividas"
 const SENDER_DOMAIN = "notify.korafinance.app"
 const ROOT_DOMAIN = "korafinance.app"
 const FROM_DOMAIN = "korafinance.app" // Domain shown in From address (may be root or sender subdomain)
+const FROM_ADDRESS = `Kora Finance <noreply@${FROM_DOMAIN}>`
+
+// Resend gateway via Lovable connector
+const RESEND_GATEWAY_URL = 'https://connector-gateway.lovable.dev/resend'
 
 // Sample data for preview mode ONLY (not used in actual email sending).
 // URLs are baked in at scaffold time from the project's real data.
