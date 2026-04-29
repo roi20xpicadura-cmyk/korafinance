@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
+import { isNativeApp } from '@/lib/platform';
+import {
+  signInWithGoogleNative,
+  captureNativeOAuthFlag,
+  maybeForwardSessionToNativeApp,
+} from '@/lib/nativeOAuth';
 import { Eye, EyeOff, AlertCircle, Check, Sparkles, TrendingUp, Target, Wallet } from 'lucide-react';
 import koraIcon from '@/assets/korafinance-icon.png';
 import { toast } from 'sonner';
@@ -247,6 +253,13 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
+  // Captura ?native_oauth=1 quando a LoginPage é aberta no navegador externo
+  // a partir do app nativo, e tenta encaminhar uma sessão já existente.
+  useEffect(() => {
+    captureNativeOAuthFlag();
+    void maybeForwardSessionToNativeApp();
+  }, []);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -277,6 +290,17 @@ export default function LoginPage() {
   const handleOAuth = async (provider: 'google' | 'apple') => {
     haptic.light();
     const label = provider === 'google' ? 'Google' : 'Apple';
+
+    // No app nativo (Capacitor), o broker /~oauth/initiate do Lovable
+    // não está disponível dentro do WebView empacotado → 404.
+    // Abrimos o navegador externo apontando pro domínio web, e o callback
+    // volta via deep link com.korafinance.app://auth-callback#at=...&rt=...
+    if (provider === 'google' && isNativeApp()) {
+      const { error } = await signInWithGoogleNative();
+      if (error) toast.error('Não foi possível abrir o login Google. Tente novamente.');
+      return;
+    }
+
     try {
       const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: `${window.location.origin}/app`,

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
+import { isNativeApp } from '@/lib/platform';
+import { signInWithGoogleNative } from '@/lib/nativeOAuth';
 import { Check, AlertCircle } from 'lucide-react';
 import koraIcon from '@/assets/korafinance-icon.png';
 import { toast } from 'sonner';
@@ -62,6 +64,11 @@ export default function RegisterPage() {
   const handleOAuth = async (provider: 'google' | 'apple') => {
     haptic.light();
     const label = provider === 'google' ? 'Google' : 'Apple';
+    if (provider === 'google' && isNativeApp()) {
+      const { error } = await signInWithGoogleNative();
+      if (error) toast.error('Não foi possível abrir o login Google. Tente novamente.');
+      return;
+    }
     try {
       const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: `${window.location.origin}/app`,

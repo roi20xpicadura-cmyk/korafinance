@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import "./lib/persistAuth";
 import App from "./App.tsx";
 import "./index.css";
+import { installNativeOAuthListener } from "./lib/nativeOAuth";
 
 const STALE_ASSET_MARKERS = [
   'failed to fetch dynamically imported module',
@@ -59,6 +60,10 @@ window.addEventListener('unhandledrejection', (event) => {
 // 1) RENDERIZA PRIMEIRO — nada deve ficar entre o parse do bundle e a primeira
 // chamada a render(). Isso garante TTFB→FCP o mais curto possível.
 createRoot(document.getElementById("root")!).render(<App />);
+
+// Listener de deep link (com.korafinance.app://auth-callback) para o
+// fluxo de OAuth Google no app nativo. No-op em web.
+installNativeOAuthListener();
 
 // 2) Limpeza de SW/cache legados (UMA vez por device) movida para idle:
 // roda quando o navegador estiver ocioso, sem competir com hidratação,

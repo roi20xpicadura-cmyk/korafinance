@@ -5,6 +5,7 @@ import { lazyWithRetry } from "@/lib/lazyWithRetry";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ProtectedRoute, PublicRoute } from "@/components/auth/ProtectedRoute";
+import NativeOAuthForwarder from "@/components/auth/NativeOAuthForwarder";
 import LogoLoader from "@/components/app/LogoLoader";
 import InnerPageSkeleton from "@/components/app/InnerPageSkeleton";
 import Paywall from "@/components/app/Paywall";
@@ -69,6 +70,7 @@ const AuthenticatedRoutes = forwardRef<HTMLDivElement>(function AuthenticatedRou
   return (
     <div ref={ref} style={{ minHeight: '100dvh' }}>
       <AuthProvider>
+        <NativeOAuthForwarder />
         <ThemeProvider>
         <Suspense fallback={<PageSkeleton />}>
           <Routes>
