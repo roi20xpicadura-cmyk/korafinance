@@ -11,6 +11,7 @@ import {
   MoreVertical, Pause, Play, AlertTriangle, DollarSign, Sparkles,
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DebtCoachCard } from '@/components/debts/DebtCoachCard';
 
 /* ─── Types ─── */
 interface Debt {
