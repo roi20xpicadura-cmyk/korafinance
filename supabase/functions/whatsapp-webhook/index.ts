@@ -628,9 +628,20 @@ async function processAttachment(
   fileUrl: string,
   userName: string,
   defaultProfile: string,
+  telemetry?: { traceId: string; userId?: string | null; phone?: string | null },
 ): Promise<{ transactions: any[]; reply: string; importDirect: boolean }> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) {
+    if (telemetry) {
+      await logAttachmentTelemetry({
+        traceId: telemetry.traceId,
+        userId: telemetry.userId,
+        phone: telemetry.phone,
+        stage: "failed",
+        status: "error",
+        errorMessage: "LOVABLE_API_KEY ausente",
+      });
+    }
     return {
       transactions: [],
       reply: `Configuração da IA pendente, ${userName}. Tenta de novo em instantes!`,
@@ -639,13 +650,42 @@ async function processAttachment(
   }
 
   try {
+    const tDownloadStart = Date.now();
     const { base64, mimeType, bytes } = await downloadAsBase64(fileUrl);
     console.log(`[ATTACHMENT] ${mimeType} | ${(bytes / 1024).toFixed(1)} KB`);
 
     const isPdf = mimeType === "application/pdf";
     const isImage = mimeType.startsWith("image/");
+    const kind: "pdf" | "image" | "unknown" = isPdf ? "pdf" : isImage ? "image" : "unknown";
+
+    if (telemetry) {
+      await logAttachmentTelemetry({
+        traceId: telemetry.traceId,
+        userId: telemetry.userId,
+        phone: telemetry.phone,
+        stage: "downloaded",
+        status: "success",
+        attachmentKind: kind,
+        mimeType,
+        fileBytes: bytes,
+        durationMs: Date.now() - tDownloadStart,
+      });
+    }
 
     if (!isPdf && !isImage) {
+      if (telemetry) {
+        await logAttachmentTelemetry({
+          traceId: telemetry.traceId,
+          userId: telemetry.userId,
+          phone: telemetry.phone,
+          stage: "failed",
+          status: "error",
+          attachmentKind: kind,
+          mimeType,
+          fileBytes: bytes,
+          errorMessage: `mime_type não suportado: ${mimeType}`,
+        });
+      }
       return {
         transactions: [],
         reply: `Não consigo ler esse tipo de arquivo (${mimeType}), ${userName} 😕\nManda PDF de extrato/fatura ou foto do comprovante!`,
@@ -687,6 +727,22 @@ async function processAttachment(
       }
     }
     console.log(`[ATTACHMENT] modelo escolhido: ${chosenModel} — ${modelReason}`);
+
+    if (telemetry) {
+      await logAttachmentTelemetry({
+        traceId: telemetry.traceId,
+        userId: telemetry.userId,
+        phone: telemetry.phone,
+        stage: "ai_started",
+        status: "success",
+        attachmentKind: kind,
+        mimeType,
+        fileBytes: bytes,
+        model: chosenModel,
+        metadata: { reason: modelReason, size_kb: sizeKB },
+      });
+    }
+    const tAiStart = Date.now();
 
     const systemPrompt = `Você é a Kora IA, especialista em extrair transações financeiras de extratos bancários, faturas de cartão e comprovantes brasileiros.
 
@@ -820,6 +876,21 @@ Se não encontrar nenhuma transação:
     if (!response.ok) {
       const errBody = await response.text();
       console.error(`[ATTACHMENT] Gemini error (${chosenModel}):`, response.status, errBody.slice(0, 500));
+      if (telemetry) {
+        await logAttachmentTelemetry({
+          traceId: telemetry.traceId,
+          userId: telemetry.userId,
+          phone: telemetry.phone,
+          stage: "failed",
+          status: "error",
+          attachmentKind: kind,
+          mimeType,
+          fileBytes: bytes,
+          model: chosenModel,
+          durationMs: Date.now() - tAiStart,
+          errorMessage: `Gemini ${response.status}: ${errBody.slice(0, 200)}`,
+        });
+      }
       if (response.status === 429) {
         return { transactions: [], reply: `IA sobrecarregada agora, ${userName} 😅 Manda de novo em 1 minutinho!`, importDirect: false };
       }
@@ -835,6 +906,23 @@ Se não encontrar nenhuma transação:
     const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : "{}");
 
     if (!parsed.found || !Array.isArray(parsed.transactions) || parsed.transactions.length === 0) {
+      if (telemetry) {
+        await logAttachmentTelemetry({
+          traceId: telemetry.traceId,
+          userId: telemetry.userId,
+          phone: telemetry.phone,
+          stage: "ai_extracted",
+          status: "warning",
+          attachmentKind: kind,
+          mimeType,
+          fileBytes: bytes,
+          model: chosenModel,
+          durationMs: Date.now() - tAiStart,
+          transactionsFound: 0,
+          errorMessage: parsed.reason || "nenhuma transação encontrada",
+          metadata: { doc_type: parsed.doc_type ?? null },
+        });
+      }
       return {
         transactions: [],
         reply: `Não identifiquei transações nesse arquivo, ${userName} 🤔\n${parsed.reason || "Confere se é um extrato/comprovante legível."}`,
@@ -857,11 +945,50 @@ Se não encontrar nenhuma transação:
       .filter((t: any) => t.amount > 0);
 
     if (txs.length === 0) {
+      if (telemetry) {
+        await logAttachmentTelemetry({
+          traceId: telemetry.traceId,
+          userId: telemetry.userId,
+          phone: telemetry.phone,
+          stage: "ai_extracted",
+          status: "warning",
+          attachmentKind: kind,
+          mimeType,
+          fileBytes: bytes,
+          model: chosenModel,
+          durationMs: Date.now() - tAiStart,
+          transactionsFound: 0,
+          errorMessage: "todas as transações vieram com amount=0",
+        });
+      }
       return { transactions: [], reply: `Encontrei o documento mas as transações estão sem valor 🤷 Tenta um arquivo mais nítido!`, importDirect: false };
     }
 
     const income = txs.filter((t: any) => t.type === "income").reduce((s: number, t: any) => s + t.amount, 0);
     const expense = txs.filter((t: any) => t.type === "expense").reduce((s: number, t: any) => s + t.amount, 0);
+
+    if (telemetry) {
+      await logAttachmentTelemetry({
+        traceId: telemetry.traceId,
+        userId: telemetry.userId,
+        phone: telemetry.phone,
+        stage: "ai_extracted",
+        status: "success",
+        attachmentKind: kind,
+        mimeType,
+        fileBytes: bytes,
+        model: chosenModel,
+        durationMs: Date.now() - tAiStart,
+        transactionsFound: txs.length,
+        metadata: {
+          doc_type: parsed.doc_type ?? null,
+          institution: parsed.institution ?? null,
+          income,
+          expense,
+        },
+      });
+    }
+
     const docLabel = parsed.doc_type ? `*${parsed.doc_type}*` : "documento";
     const inst = parsed.institution ? `\n🏦 ${parsed.institution}` : "";
 
@@ -884,6 +1011,16 @@ ${preview}${more}
     return { transactions: txs, reply, importDirect: true };
   } catch (e) {
     console.error("[ATTACHMENT] error:", e);
+    if (telemetry) {
+      await logAttachmentTelemetry({
+        traceId: telemetry.traceId,
+        userId: telemetry.userId,
+        phone: telemetry.phone,
+        stage: "failed",
+        status: "error",
+        errorMessage: e instanceof Error ? e.message : String(e),
+      });
+    }
     return {
       transactions: [],
       reply: `Tive um problema lendo esse arquivo, ${userName} 😕 Tenta de novo ou manda foto do comprovante!`,
