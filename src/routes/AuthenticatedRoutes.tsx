@@ -80,6 +80,17 @@ const AuthenticatedRoutes = forwardRef<HTMLDivElement>(function AuthenticatedRou
             <Route path="register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
             <Route path="forgot-password" element={<ForgotPasswordPage />} />
             <Route path="reset-password" element={<ResetPasswordPage />} />
+            {/* Aliases defensivos pra variações comuns de auth */}
+            <Route path="signup" element={<Navigate to="/register" replace />} />
+            <Route path="sign-up" element={<Navigate to="/register" replace />} />
+            <Route path="signin" element={<Navigate to="/login" replace />} />
+            <Route path="sign-in" element={<Navigate to="/login" replace />} />
+            <Route path="entrar" element={<Navigate to="/login" replace />} />
+            <Route path="cadastro" element={<Navigate to="/register" replace />} />
+            <Route path="registrar" element={<Navigate to="/register" replace />} />
+            <Route path="esqueci-senha" element={<Navigate to="/forgot-password" replace />} />
+            <Route path="recuperar-senha" element={<Navigate to="/forgot-password" replace />} />
+            <Route path="redefinir-senha" element={<Navigate to="/reset-password" replace />} />
 
             <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route index element={<OverviewPage />} />
@@ -105,6 +116,33 @@ const AuthenticatedRoutes = forwardRef<HTMLDivElement>(function AuthenticatedRou
               <Route path="subscriptions" element={<SubscriptionsPage />} />
               <Route path="dre" element={<Paywall feature="dre" requiredPlan="business" title="DRE Empresarial" description="Demonstrativo de Resultado completo para empresas e MEIs."><DREPage /></Paywall>} />
               <Route path="transactions/business" element={<Paywall feature="business_transactions" requiredPlan="business" title="Lançamentos Negócio" description="Separe finanças pessoais e empresariais em um único painel."><TransactionsPage profile="business" /></Paywall>} />
+              {/* Aliases defensivos: variações PT/EN comuns que usuários podem
+                  digitar ou ter salvo de versões antigas. Redirecionam pra rota
+                  canônica em vez de cair em 404. */}
+              <Route path="dashboard" element={<Navigate to="/app" replace />} />
+              <Route path="home" element={<Navigate to="/app" replace />} />
+              <Route path="overview" element={<Navigate to="/app" replace />} />
+              <Route path="transacoes" element={<Navigate to="/app/transactions" replace />} />
+              <Route path="lancamentos" element={<Navigate to="/app/transactions" replace />} />
+              <Route path="categories" element={<Navigate to="/app/categorias" replace />} />
+              <Route path="metas" element={<Navigate to="/app/goals" replace />} />
+              <Route path="dividas" element={<Navigate to="/app/debts" replace />} />
+              <Route path="orcamento" element={<Navigate to="/app/budget" replace />} />
+              <Route path="cartoes" element={<Navigate to="/app/cards" replace />} />
+              <Route path="conquistas" element={<Navigate to="/app/achievements" replace />} />
+              <Route path="configuracoes" element={<Navigate to="/app/settings" replace />} />
+              <Route path="config" element={<Navigate to="/app/settings" replace />} />
+              <Route path="plano" element={<Navigate to="/app/billing" replace />} />
+              <Route path="planos" element={<Navigate to="/app/billing" replace />} />
+              <Route path="indicar" element={<Navigate to="/app/referral" replace />} />
+              <Route path="assinaturas" element={<Navigate to="/app/subscriptions" replace />} />
+              <Route path="investimentos" element={<Navigate to="/app/investments" replace />} />
+              <Route path="graficos" element={<Navigate to="/app/charts" replace />} />
+              <Route path="simulador" element={<Navigate to="/app/simulator" replace />} />
+              <Route path="previsoes" element={<Navigate to="/app/predictions" replace />} />
+              <Route path="integracoes" element={<Navigate to="/app/integrations" replace />} />
+              {/* Catch-all interno do /app — usa a tela 404 da marca */}
+              <Route path="*" element={<NotFound />} />
             </Route>
 
             <Route path="/admin" element={<AdminGuard><AdminLayout /></AdminGuard>}>
