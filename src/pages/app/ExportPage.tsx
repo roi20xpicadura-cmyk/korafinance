@@ -6,7 +6,7 @@ import { generateMonthlyPDF } from '@/lib/pdfExport';
 import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';
-import { FileText, Table, Download, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { FileText, Table, Download, ChevronLeft, ChevronRight, Loader2, Sparkles, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
 
 type Tx = {
@@ -98,73 +98,191 @@ export function ExportPage() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {/* Period selector */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between p-4 rounded-xl"
-        style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-weak)' }}>
-        <button onClick={() => setMonthOffset(prev => prev + 1)}
-          className="flex items-center justify-center" style={{ width: 36, height: 36, borderRadius: 'var(--radius-lg)', background: 'var(--color-bg-sunken)', color: 'var(--color-text-muted)' }}>
-          <ChevronLeft style={{ width: 16, height: 16 }} />
-        </button>
-        <div className="text-center">
-          <p className="text-sm font-extrabold" style={{ color: 'var(--color-text-strong)' }}>{periodCapitalized}</p>
-          <p className="text-[11px]" style={{ color: 'var(--color-text-subtle)' }}>{txs.length} lançamentos</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* Hero Header — gradiente roxo */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden p-6 rounded-2xl"
+        style={{
+          background: 'linear-gradient(135deg, var(--color-green-600) 0%, var(--color-green-500) 50%, var(--color-green-700) 100%)',
+          boxShadow: '0 20px 40px -12px hsl(262 83% 58% / 0.35)',
+        }}
+      >
+        {/* Decorative orbs */}
+        <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, white, transparent 70%)' }} />
+        <div className="absolute -bottom-16 -left-8 w-32 h-32 rounded-full opacity-15" style={{ background: 'radial-gradient(circle, white, transparent 70%)' }} />
+
+        <div className="relative flex items-center justify-between">
+          <button
+            onClick={() => setMonthOffset(prev => prev + 1)}
+            className="flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+            style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(8px)', color: 'white' }}
+          >
+            <ChevronLeft style={{ width: 18, height: 18 }} />
+          </button>
+
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <Sparkles style={{ width: 12, height: 12, color: 'rgba(255,255,255,0.9)' }} />
+              <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.85)' }}>
+                Período
+              </p>
+            </div>
+            <p className="text-xl font-black text-white">{periodCapitalized}</p>
+            <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.8)' }}>
+              {loading ? 'Carregando…' : `${txs.length} ${txs.length === 1 ? 'lançamento' : 'lançamentos'}`}
+            </p>
+          </div>
+
+          <button
+            onClick={() => setMonthOffset(prev => Math.max(0, prev - 1))}
+            disabled={monthOffset === 0}
+            className="flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-30 disabled:hover:scale-100"
+            style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(8px)', color: 'white' }}
+          >
+            <ChevronRight style={{ width: 18, height: 18 }} />
+          </button>
         </div>
-        <button onClick={() => setMonthOffset(prev => Math.max(0, prev - 1))} disabled={monthOffset === 0}
-          className="flex items-center justify-center disabled:opacity-30" style={{ width: 36, height: 36, borderRadius: 'var(--radius-lg)', background: 'var(--color-bg-sunken)', color: 'var(--color-text-muted)' }}>
-          <ChevronRight style={{ width: 16, height: 16 }} />
-        </button>
       </motion.div>
 
-      {/* Summary */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-        className="grid grid-cols-3 gap-3">
+      {/* Summary KPIs */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="grid grid-cols-3 gap-3"
+      >
         {[
-          { label: 'Receitas', value: totals.inc, color: 'var(--color-success-solid)' },
-          { label: 'Despesas', value: totals.exp, color: 'var(--color-danger-solid)' },
-          { label: 'Saldo', value: totals.net, color: totals.net >= 0 ? 'var(--color-success-solid)' : 'var(--color-danger-solid)' },
-        ].map(item => (
-          <div key={item.label} className="p-3 rounded-xl" style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-weak)' }}>
-            <p className="text-[10px] font-bold" style={{ color: 'var(--color-text-subtle)' }}>{item.label}</p>
-            <p className="text-sm font-black mt-1" style={{ color: item.color }}>
-              {loading ? '...' : `R$ ${item.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+          { label: 'Receitas', value: totals.inc, Icon: TrendingUp, color: 'var(--color-success-solid)', bg: 'var(--color-success-bg)' },
+          { label: 'Despesas', value: totals.exp, Icon: TrendingDown, color: 'var(--color-danger-solid)', bg: 'var(--color-danger-bg)' },
+          { label: 'Saldo', value: totals.net, Icon: Wallet, color: totals.net >= 0 ? 'var(--color-success-solid)' : 'var(--color-danger-solid)', bg: totals.net >= 0 ? 'var(--color-success-bg)' : 'var(--color-danger-bg)' },
+        ].map(({ label, value, Icon, color, bg }) => (
+          <div
+            key={label}
+            className="relative p-4 rounded-2xl overflow-hidden"
+            style={{
+              background: 'var(--color-bg-surface)',
+              border: '1px solid var(--color-border-weak)',
+              boxShadow: 'var(--shadow-sm)',
+            }}
+          >
+            <div
+              className="flex items-center justify-center mb-2"
+              style={{ width: 32, height: 32, borderRadius: 10, background: bg }}
+            >
+              <Icon style={{ width: 16, height: 16, color }} />
+            </div>
+            <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--color-text-subtle)' }}>
+              {label}
+            </p>
+            <p className="text-base font-black mt-0.5 tabular-nums" style={{ color }}>
+              {loading ? '—' : `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
             </p>
           </div>
         ))}
       </motion.div>
 
-      {/* Export buttons */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <button onClick={handlePDF} disabled={generating || loading}
-          className="flex flex-col items-center p-6 rounded-xl border-[1.5px] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
-          style={{ borderColor: 'var(--color-border-base)', background: 'var(--color-bg-surface)' }}>
-          <div className="flex items-center justify-center mb-3" style={{ width: 48, height: 48, borderRadius: 'var(--radius-xl)', background: 'var(--color-danger-bg)' }}>
-            {generating ? <Loader2 className="animate-spin" style={{ width: 24, height: 24, color: 'var(--color-danger-solid)' }} /> : <FileText style={{ width: 24, height: 24, color: 'var(--color-danger-solid)' }} />}
+      {/* Export Cards */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+      >
+        {/* PDF — destaque com gradiente roxo */}
+        <button
+          onClick={handlePDF}
+          disabled={generating || loading}
+          className="group relative overflow-hidden p-5 rounded-2xl text-left transition-all duration-300 hover:-translate-y-1 disabled:opacity-50 disabled:hover:translate-y-0"
+          style={{
+            background: 'linear-gradient(135deg, var(--color-green-600) 0%, var(--color-green-500) 100%)',
+            boxShadow: '0 12px 28px -10px hsl(262 83% 58% / 0.45)',
+            color: 'white',
+          }}
+        >
+          <div className="absolute -top-8 -right-8 w-28 h-28 rounded-full opacity-20 transition-transform duration-500 group-hover:scale-125" style={{ background: 'radial-gradient(circle, white, transparent 70%)' }} />
+          <div
+            className="relative flex items-center justify-center mb-3"
+            style={{ width: 48, height: 48, borderRadius: 14, background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)' }}
+          >
+            {generating ? (
+              <Loader2 className="animate-spin" style={{ width: 24, height: 24, color: 'white' }} />
+            ) : (
+              <FileText style={{ width: 24, height: 24, color: 'white' }} />
+            )}
           </div>
-          <span className="font-bold text-sm" style={{ color: 'var(--color-text-strong)' }}>Relatório PDF</span>
-          <span className="text-[11px] text-center mt-1" style={{ color: 'var(--color-text-subtle)' }}>Resumo completo com gráficos e categorias</span>
+          <div className="relative">
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.22)' }}>
+                Recomendado
+              </span>
+            </div>
+            <p className="font-black text-base">Relatório PDF</p>
+            <p className="text-[12px] mt-1 leading-snug" style={{ color: 'rgba(255,255,255,0.88)' }}>
+              Resumo visual com gráficos, categorias e todos os lançamentos
+            </p>
+          </div>
         </button>
 
-        <button onClick={handleCSV} disabled={loading}
-          className="flex flex-col items-center p-6 rounded-xl border-[1.5px] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
-          style={{ borderColor: 'var(--color-border-base)', background: 'var(--color-bg-surface)' }}>
-          <div className="flex items-center justify-center mb-3" style={{ width: 48, height: 48, borderRadius: 'var(--radius-xl)', background: 'var(--color-green-50)' }}>
-            <Table style={{ width: 24, height: 24, color: 'var(--color-green-600)' }} />
+        {/* CSV */}
+        <button
+          onClick={handleCSV}
+          disabled={loading}
+          className="group relative overflow-hidden p-5 rounded-2xl text-left transition-all duration-300 hover:-translate-y-1 disabled:opacity-50 disabled:hover:translate-y-0"
+          style={{
+            background: 'var(--color-bg-surface)',
+            border: '1.5px solid var(--color-border-base)',
+            boxShadow: 'var(--shadow-sm)',
+          }}
+        >
+          <div
+            className="flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110"
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 14,
+              background: 'linear-gradient(135deg, var(--color-green-100) 0%, var(--color-green-200) 100%)',
+            }}
+          >
+            <Table style={{ width: 24, height: 24, color: 'var(--color-green-700)' }} />
           </div>
-          <span className="font-bold text-sm" style={{ color: 'var(--color-text-strong)' }}>Exportar CSV</span>
-          <span className="text-[11px] text-center mt-1" style={{ color: 'var(--color-text-subtle)' }}>Lançamentos em formato planilha</span>
+          <p className="font-black text-base" style={{ color: 'var(--color-text-strong)' }}>
+            Planilha CSV
+          </p>
+          <p className="text-[12px] mt-1 leading-snug" style={{ color: 'var(--color-text-subtle)' }}>
+            Abra no Excel ou Google Sheets
+          </p>
         </button>
 
-        <button onClick={handleJSON} disabled={loading}
-          className="flex flex-col items-center p-6 rounded-xl border-[1.5px] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
-          style={{ borderColor: 'var(--color-border-base)', background: 'var(--color-bg-surface)' }}>
-          <div className="flex items-center justify-center mb-3" style={{ width: 48, height: 48, borderRadius: 'var(--radius-xl)', background: 'var(--color-info-bg)' }}>
+        {/* JSON */}
+        <button
+          onClick={handleJSON}
+          disabled={loading}
+          className="group relative overflow-hidden p-5 rounded-2xl text-left transition-all duration-300 hover:-translate-y-1 disabled:opacity-50 disabled:hover:translate-y-0"
+          style={{
+            background: 'var(--color-bg-surface)',
+            border: '1.5px solid var(--color-border-base)',
+            boxShadow: 'var(--shadow-sm)',
+          }}
+        >
+          <div
+            className="flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110"
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 14,
+              background: 'linear-gradient(135deg, var(--color-info-bg) 0%, color-mix(in srgb, var(--color-info-solid) 25%, transparent) 100%)',
+            }}
+          >
             <Download style={{ width: 24, height: 24, color: 'var(--color-info-solid)' }} />
           </div>
-          <span className="font-bold text-sm" style={{ color: 'var(--color-text-strong)' }}>Backup JSON</span>
-          <span className="text-[11px] text-center mt-1" style={{ color: 'var(--color-text-subtle)' }}>Dados brutos para backup</span>
+          <p className="font-black text-base" style={{ color: 'var(--color-text-strong)' }}>
+            Backup JSON
+          </p>
+          <p className="text-[12px] mt-1 leading-snug" style={{ color: 'var(--color-text-subtle)' }}>
+            Dados brutos para backup completo
+          </p>
         </button>
       </motion.div>
     </div>
