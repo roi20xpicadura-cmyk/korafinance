@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { clearPersistedAuthTokens } from '@/lib/persistAuth';
 
 interface AuthContextType {
   user: User | null;
@@ -38,6 +39,15 @@ function reportAuthBootIssue(stage: string, detail?: string) {
       }),
     }).catch(() => { /* silent */ });
   } catch { /* never break UX */ }
+}
+
+function isInvalidRefreshTokenError(err: unknown) {
+  const maybe = err as { message?: string; code?: string } | null;
+  const message = maybe?.message?.toLowerCase() ?? '';
+  const code = maybe?.code?.toLowerCase() ?? '';
+  return code === 'refresh_token_not_found'
+    || message.includes('invalid refresh token')
+    || message.includes('refresh token not found');
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -79,6 +89,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then(({ data: { session: s } }) => finishBoot(s))
       .catch((err) => {
         reportAuthBootIssue('getSession_failed', err?.message || String(err));
+        if (isInvalidRefreshTokenError(err)) {
+          clearPersistedAuthTokens();
+        }
         finishBoot(null);
       });
 

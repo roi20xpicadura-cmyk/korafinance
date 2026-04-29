@@ -42,6 +42,35 @@ function safeRemove(storage: Storage, key: string) {
   }
 }
 
+export function clearPersistedAuthTokens() {
+  if (typeof window === 'undefined') return;
+
+  let local: Storage;
+  let session: Storage;
+  try {
+    local = window.localStorage;
+    session = window.sessionStorage;
+  } catch {
+    return;
+  }
+
+  const keys = new Set<string>();
+  for (const storage of [local, session]) {
+    try {
+      for (let i = 0; i < storage.length; i++) {
+        const key = storage.key(i);
+        if (isAuthKey(key)) keys.add(key);
+      }
+    } catch {
+      /* ignora */
+    }
+  }
+  keys.forEach((key) => {
+    safeRemove(local, key);
+    safeRemove(session, key);
+  });
+}
+
 export function bootstrapPersistentAuth() {
   if (typeof window === 'undefined') return;
 
