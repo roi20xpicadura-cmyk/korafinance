@@ -36,7 +36,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "livrededividas"
+const SITE_NAME = "Kora Finance"
 const SENDER_DOMAIN = "notify.korafinance.app"
 const ROOT_DOMAIN = "korafinance.app"
 const FROM_DOMAIN = "korafinance.app" // Domain shown in From address (may be root or sender subdomain)
