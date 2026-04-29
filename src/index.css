@@ -853,3 +853,27 @@
     }
   }
 }
+
+/* ─────────────────────────────────────────────
+   App shell responsive auto-scaling
+   Ajusta o tamanho base do app autenticado para
+   celulares pequenos (iPhone SE, Galaxy Fold) e
+   maiores (Pro Max, Android XL). Usa font-size
+   raiz: como Tailwind é rem-based, a UI inteira
+   (spacing, sizing, typography) escala proporcional-
+   mente sem quebrar layouts fixed/sticky.
+   ───────────────────────────────────────────── */
+/* iOS força font-size mínimo 16px em inputs — preservado pelo override existente */
+@media (max-width: 359px) {
+  html:has(.app-shell) { font-size: 14px; }
+}
+@media (min-width: 360px) and (max-width: 374px) {
+  html:has(.app-shell) { font-size: 15px; }
+}
+/* 375–413px = baseline 16px (iPhone padrão) */
+@media (min-width: 414px) and (max-width: 480px) {
+  html:has(.app-shell) { font-size: 16.5px; }
+}
+@media (min-width: 481px) and (max-width: 767px) {
+  html:has(.app-shell) { font-size: 17px; }
+}
