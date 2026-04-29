@@ -21,7 +21,7 @@ interface SignupEmailProps {
   confirmationUrl: string
 }
 
-export const Email = ({ siteName, siteUrl, recipient, confirmationUrl }: SignupEmailProps) => (
+export const SignupEmail = ({ siteName, siteUrl, recipient, confirmationUrl }: SignupEmailProps) => (
   <Html lang="pt-BR" dir="ltr">
     <Head />
     <Preview>Confirme seu email na Kora</Preview>
@@ -49,7 +49,7 @@ export const Email = ({ siteName, siteUrl, recipient, confirmationUrl }: SignupE
   </Html>
 )
 
-export default Email
+export default SignupEmail
 
 const main = { backgroundColor: '#ffffff', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", margin: '0', padding: '0' }
 const container = { maxWidth: '560px', margin: '0 auto', padding: '40px 32px', backgroundColor: '#ffffff' }

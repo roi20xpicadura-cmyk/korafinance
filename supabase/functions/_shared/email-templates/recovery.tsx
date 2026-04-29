@@ -18,7 +18,7 @@ interface RecoveryEmailProps {
   confirmationUrl: string
 }
 
-export const Email = ({ siteName, confirmationUrl }: RecoveryEmailProps) => (
+export const RecoveryEmail = ({ siteName, confirmationUrl }: RecoveryEmailProps) => (
   <Html lang="pt-BR" dir="ltr">
     <Head />
     <Preview>Redefina sua senha na Kora</Preview>
@@ -41,7 +41,7 @@ export const Email = ({ siteName, confirmationUrl }: RecoveryEmailProps) => (
   </Html>
 )
 
-export default Email
+export default RecoveryEmail
 
 const main = { backgroundColor: '#ffffff', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", margin: '0', padding: '0' }
 const container = { maxWidth: '560px', margin: '0 auto', padding: '40px 32px', backgroundColor: '#ffffff' }

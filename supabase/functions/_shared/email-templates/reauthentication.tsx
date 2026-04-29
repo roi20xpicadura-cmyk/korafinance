@@ -16,7 +16,7 @@ interface ReauthenticationEmailProps {
   token: string
 }
 
-export const Email = ({ token }: ReauthenticationEmailProps) => (
+export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => (
   <Html lang="pt-BR" dir="ltr">
     <Head />
     <Preview>Seu código de verificação Kora</Preview>
@@ -36,7 +36,7 @@ export const Email = ({ token }: ReauthenticationEmailProps) => (
   </Html>
 )
 
-export default Email
+export default ReauthenticationEmail
 
 const main = { backgroundColor: '#ffffff', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", margin: '0', padding: '0' }
 const container = { maxWidth: '560px', margin: '0 auto', padding: '40px 32px', backgroundColor: '#ffffff' }

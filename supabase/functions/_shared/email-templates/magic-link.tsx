@@ -18,7 +18,7 @@ interface MagicLinkEmailProps {
   confirmationUrl: string
 }
 
-export const Email = ({ siteName, confirmationUrl }: MagicLinkEmailProps) => (
+export const MagicLinkEmail = ({ siteName, confirmationUrl }: MagicLinkEmailProps) => (
   <Html lang="pt-BR" dir="ltr">
     <Head />
     <Preview>Seu link de acesso à Kora</Preview>
@@ -40,7 +40,7 @@ export const Email = ({ siteName, confirmationUrl }: MagicLinkEmailProps) => (
   </Html>
 )
 
-export default Email
+export default MagicLinkEmail
 
 const main = { backgroundColor: '#ffffff', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", margin: '0', padding: '0' }
 const container = { maxWidth: '560px', margin: '0 auto', padding: '40px 32px', backgroundColor: '#ffffff' }
