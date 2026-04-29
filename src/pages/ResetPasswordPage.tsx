@@ -18,6 +18,14 @@ export default function ResetPasswordPage() {
     let timer: ReturnType<typeof setTimeout>;
     const markReady = () => { resolved = true; setStatus('ready'); };
     const markInvalid = () => { resolved = true; setStatus('invalid'); };
+    const waitForRecoverySession = async () => {
+      for (let attempt = 0; attempt < 10; attempt += 1) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) { markReady(); return true; }
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      return false;
+    };
 
     const url = new URL(window.location.href);
     const hash = window.location.hash;
@@ -41,8 +49,10 @@ export default function ResetPasswordPage() {
 
       // Legacy hash-based links: #access_token=...&type=recovery
       if (hash.includes('type=recovery') || hash.includes('access_token')) {
-        // onAuthStateChange will fire — give it a moment
-        timer = setTimeout(() => { if (!resolved) markInvalid(); }, 4000);
+        // The global auth provider can consume the URL token before this page's
+        // listener is attached, so also poll for the session it creates.
+        if (await waitForRecoverySession()) return;
+        if (!resolved) markInvalid();
         return;
       }
 
@@ -50,7 +60,8 @@ export default function ResetPasswordPage() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) { markReady(); return; }
 
-      timer = setTimeout(() => { if (!resolved) markInvalid(); }, 4000);
+      if (await waitForRecoverySession()) return;
+      if (!resolved) markInvalid();
     })();
 
     return () => {
