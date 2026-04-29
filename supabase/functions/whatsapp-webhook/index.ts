@@ -645,11 +645,49 @@ REGRAS DE CATEGORIZAÇÃO (use apenas estas):
 - Cartão (pagamento de fatura)
 - Transferência, Pix
 - Empréstimo, Juros, Tarifas
+- Taxas Bancárias, Impostos, Despesas Operacionais
 - Outros
+
+REGRAS ESPECIAIS DE CLASSIFICAÇÃO (PRIORIDADE ALTA — aplicar ANTES das categorias gerais):
+
+1) TAXAS BANCÁRIAS / TARIFAS → category="Taxas Bancárias", subcategory específica:
+   - "tarifa", "anuidade", "manutenção de conta", "pacote de serviços", "cesta", "TED", "DOC", "tarifa pix" → subcategory="Tarifa Bancária"
+   - "IOF", "IOF compra", "IOF câmbio" → subcategory="IOF"
+   - "juros", "juros rotativo", "juros cheque especial", "encargos", "multa", "mora" → subcategory="Juros e Encargos"
+   - "taxa cartão", "taxa maquininha", "MDR", "antecipação", "Stone", "Cielo", "Rede", "PagSeguro taxa", "Mercado Pago taxa" → subcategory="Taxa de Maquininha"
+   - "spread", "câmbio", "conversão moeda" → subcategory="Spread/Câmbio"
+
+2) IMPOSTOS → category="Impostos", subcategory específica:
+   - "DARF", "IRPF", "IRPJ", "Imposto de Renda", "IR retido" → subcategory="Imposto de Renda"
+   - "DAS", "Simples Nacional", "MEI" → subcategory="DAS/Simples"
+   - "INSS", "GPS", "previdência" → subcategory="INSS"
+   - "ISS", "ISSQN" → subcategory="ISS"
+   - "ICMS" → subcategory="ICMS"
+   - "IPTU" → subcategory="IPTU"
+   - "IPVA", "licenciamento", "DPVAT" → subcategory="IPVA"
+   - "PIS", "COFINS", "CSLL" → subcategory="Tributos Federais"
+   - "FGTS" → subcategory="FGTS"
+   - origem SEMPRE "business" se for DARF/DAS/ISS/ICMS/PIS/COFINS/CSLL/FGTS
+
+3) DESPESAS OPERACIONAIS (apenas para origin="business") → category="Despesas Operacionais", subcategory específica:
+   - folha, salário pago a funcionário, vale-transporte, vale-refeição, pró-labore → subcategory="Folha de Pagamento"
+   - aluguel comercial, condomínio comercial, IPTU comercial → subcategory="Aluguel Comercial"
+   - energia/água/internet de empresa → subcategory="Utilidades"
+   - software/SaaS (AWS, Google Workspace, Office 365, Hotmart, Stripe, ferramentas) → subcategory="Software/SaaS"
+   - contador, advogado, consultoria → subcategory="Serviços Profissionais"
+   - marketing, anúncios (Meta Ads, Google Ads, TikTok Ads), tráfego pago → subcategory="Marketing"
+   - matéria-prima, estoque, fornecedor, mercadoria revenda → subcategory="Insumos/Estoque"
+   - frete, transportadora, Correios, logística → subcategory="Logística"
+   - manutenção, equipamento, ferramenta de trabalho → subcategory="Manutenção"
+
+4) Para todas as OUTRAS transações: subcategory pode ficar como string vazia "".
+
+5) Em caso de DÚVIDA entre 2 categorias, escolha a MAIS ESPECÍFICA. Use "Outros" apenas como último recurso.
 
 DETECÇÃO DE ORIGEM (origin):
 - "business" se houver: CNPJ, nome de empresa fantasia, "LTDA", "ME", "EIRELI", taxa de maquininha, fornecedor, nota fiscal de serviço B2B
 - "personal" para gastos pessoais (mercado, farmácia, salário, transferências entre pessoas físicas)
+- SEMPRE "business" para: impostos PJ (DARF, DAS, ISS, ICMS, PIS, COFINS, CSLL, FGTS), taxa de maquininha, despesas operacionais
 - Se ambíguo, use "${defaultProfile}"
 
 REGRAS DE TIPO:
@@ -674,6 +712,7 @@ Responda APENAS JSON válido (sem markdown, sem comentários):
       "amount": 123.45,
       "type": "expense",
       "category": "Categoria",
+      "subcategory": "subcategoria específica ou string vazia",
       "origin": "personal"
     }
   ]
@@ -747,6 +786,7 @@ Se não encontrar nenhuma transação:
         amount: Math.abs(Number(t.amount) || 0),
         type: t.type === "income" ? "income" : "expense",
         category: String(t.category || "Outros").slice(0, 50),
+        subcategory: String(t.subcategory || "").slice(0, 50),
         origin: t.origin === "business" ? "business" : "personal",
       }))
       .filter((t: any) => t.amount > 0);
@@ -1210,6 +1250,7 @@ serve(async (req) => {
           date: t.date,
           origin: t.origin || ctx.profile || "personal",
           source: "whatsapp",
+          notes: t.subcategory ? `Subcategoria: ${t.subcategory}` : null,
         }));
 
         // Insert em chunks de 50
