@@ -15,7 +15,7 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     let resolved = false;
-    let timer: ReturnType<typeof setTimeout>;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const markReady = () => { resolved = true; setStatus('ready'); };
     const markInvalid = () => { resolved = true; setStatus('invalid'); };
     const waitForRecoverySession = async () => {
