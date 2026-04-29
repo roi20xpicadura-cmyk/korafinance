@@ -1,5 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  applyTypoFixes,
+  getBasicFastReply,
+  normalizeForIntent,
+  normalizeIntentText,
+} from "../_shared/whatsapp-fast-replies.ts";
 
 const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
 // Modelo padrão de texto: Haiku é ~3-4x mais rápido que o Sonnet e mantém
@@ -24,59 +30,9 @@ function fmt(v: number): string {
   });
 }
 
-function normalizeIntentText(value: string): string {
-  return String(value || "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9\s?]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-// Corrige erros comuns de digitação em PT-BR (foneticamente próximos)
-// para aumentar o recall do fast path SEM disparar o LLM por engano.
-// Mantemos a lista pequena e cirúrgica — só termos do domínio financeiro
-// que aparecem com frequência no WhatsApp.
-const TYPO_FIXES: Array<[RegExp, string]> = [
-  // saldo
-  [/\bsalda\b/g, "saldo"],
-  [/\bsald\b/g, "saldo"],
-  [/\bsaaldo\b/g, "saldo"],
-  // gasto / gastos
-  [/\bgastoss\b/g, "gastos"],
-  [/\bgastei\s+qto\b/g, "gastei quanto"],
-  [/\bqto\b/g, "quanto"],
-  [/\bqnt(o|os)?\b/g, "quanto"],
-  [/\bqnd(o)?\b/g, "quando"],
-  // mes / meses
-  [/\bmess\b/g, "mes"],
-  [/\bmeis\b/g, "mes"],
-  [/\bmesss?\b/g, "mes"],
-  // meta(s) / objetivo(s)
-  [/\bmetaa\b/g, "meta"],
-  [/\bmetass\b/g, "metas"],
-  [/\bobjetiv(o|os|us)\b/g, "objetivo"],
-  // orcamento
-  [/\borcament(o|os|u)\b/g, "orcamento"],
-  [/\bornament(o|os)\b/g, "orcamento"],
-  // divida
-  [/\bdivd(a|as)\b/g, "divida"],
-  [/\bdivid(as|aas)\b/g, "dividas"],
-  // score
-  [/\bscor\b/g, "score"],
-  [/\besccore\b/g, "score"],
-];
-
-function applyTypoFixes(text: string): string {
-  let out = text;
-  for (const [re, repl] of TYPO_FIXES) out = out.replace(re, repl);
-  return out.replace(/\s+/g, " ").trim();
-}
-
-function normalizeForIntent(text: string): string {
-  return applyTypoFixes(normalizeIntentText(text));
-}
+// normalizeIntentText, applyTypoFixes, normalizeForIntent e getBasicFastReply
+// foram movidos pra _shared/whatsapp-fast-replies.ts pra ficarem testáveis.
+// Mantenha-os lá — não duplique aqui.
 
 // Palavras que sinalizam AÇÃO (lançar, criar, exportar) — se aparecem,
 // o fast path NÃO responde e cai pro LLM. Lista ampla pra reduzir falso
@@ -94,37 +50,7 @@ function looksLikeQuery(t: string): boolean {
   return true;
 }
 
-function getBasicFastReply(text: string): string | null {
-  const t = normalizeForIntent(text);
-  if (!t || t.length > 80) return null;
-
-  if (/^(oi+|ola+|opa+|eai|e ai|bom dia|boa tarde|boa noite|tudo bem|td bem|tudo certo|fala|salve|hey|hi|hello|alo)\b[\s!?.]*$/.test(t)) {
-    return "Opa! Tô por aqui 🐨 Me manda um gasto, receita ou pergunta rápida sobre suas finanças.";
-  }
-
-  if (/^(obrigad[oa]+|valeu+|vlw|show|beleza|blz|perfeito|top|massa|otimo|legal|maravilha|tmj)\b[\s!?.]*$/.test(t)) {
-    return "Fechado! Sempre que precisar, é só chamar 🐨";
-  }
-
-  if (/^(ajuda|help|socorro|como funciona|como (que )?funciona|o que (voce|vc|tu) faz|o que da pra fazer|menu|comandos)\b[\s!?.]*$/.test(t)) {
-    return "Posso registrar gastos/receitas, consultar saldo, gastos, metas, dívidas e orçamentos.\n\n📄 *Manda extrato (PDF) ou foto* que eu *leio e registro tudo automaticamente* — sem precisar digitar nada. 🐨";
-  }
-
-  if (/^(voce|vc) (esta|ta) ai\??$/.test(t) || /^(ta ai|esta online|ta online|ta on|funciona|teste|ping)\b[\s!?.]*$/.test(t)) {
-    return "Tô online sim 🐨 Pode mandar.";
-  }
-
-  // Usuário pergunta/avisa que vai mandar extrato, fatura, comprovante ou PDF.
-  // Antes a LLM alucinava dizendo "só leio e comento, registrar tem que ser manual".
-  // Resposta canônica garante que o cliente saiba: é só mandar, ela já registra.
-  if (/\b(consegue|da pra|posso|vou|vou te|te|vc|voce)\s*(ler|analisar|olhar|ver|importar|registrar|salvar|cadastrar|processar)?\s*(o |a |meu |minha |um |uma )?(extrato|fatura|comprovante|pdf|cupom|recibo|nota|csv|ofx|planilha)\b/.test(t)
-      || /\b(te (vou|to) mand|vou (te )?mandar|posso mandar|mando|envio)\s+(o |a |meu |minha |um |uma )?(extrato|fatura|comprovante|pdf|csv|ofx|planilha|foto|imagem|arquivo)\b/.test(t)
-      || /^(extrato|fatura|comprovante)\??$/.test(t)) {
-    return "Manda aí! 📄 Eu *leio o arquivo e já registro todos os lançamentos automaticamente* no KoraFinance. Funciona com extrato (PDF), fatura de cartão, comprovante (foto) e cupom fiscal. 🐨";
-  }
-
-  return null;
-}
+// getBasicFastReply: importado de _shared/whatsapp-fast-replies.ts (acima).
 
 function getContextFastReply(text: string, ctx: any): string | null {
   const t = normalizeForIntent(text);
