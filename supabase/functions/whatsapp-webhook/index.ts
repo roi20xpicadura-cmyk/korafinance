@@ -786,6 +786,7 @@ Se não encontrar nenhuma transação:
         amount: Math.abs(Number(t.amount) || 0),
         type: t.type === "income" ? "income" : "expense",
         category: String(t.category || "Outros").slice(0, 50),
+        subcategory: String(t.subcategory || "").slice(0, 50),
         origin: t.origin === "business" ? "business" : "personal",
       }))
       .filter((t: any) => t.amount > 0);
