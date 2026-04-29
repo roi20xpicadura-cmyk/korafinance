@@ -35,7 +35,7 @@ export default function BillingPage() {
     business: 'https://pay.hotmart.com/S105430199N?off=ir7ki0tu',
   };
 
-  const handleUpgrade = async (planName: string) => {
+  const handleUpgrade = (planName: string) => {
     const key = planName.toLowerCase();
     const url = HOTMART_LINKS[key];
     if (!url) {
@@ -43,16 +43,16 @@ export default function BillingPage() {
       return;
     }
 
-    // Abre o checkout sem expor o email do usuário na URL (evita vazamento
-    // via histórico do navegador, logs de servidor intermediário e Referer).
-    // Se necessário, o usuário preenche o email na própria página da Hotmart.
-    // O vínculo com o perfil acontece no webhook via email recebido da Hotmart.
-    const popup = window.open('about:blank', '_blank', 'noopener,noreferrer');
+    // Abre o checkout direto na URL final. Usar 'about:blank' + redirect
+    // é bloqueado por COOP/popup blockers em navegadores modernos.
+    // O email é preenchido na própria página da Hotmart e o vínculo com o
+    // perfil acontece no webhook via email recebido da Hotmart.
+    const popup = window.open(url, '_blank', 'noopener,noreferrer');
     if (!popup) {
-      toast.error('Permita pop-ups para continuar o pagamento.');
-      return;
+      // Pop-up bloqueado: faz fallback para navegação na mesma aba.
+      toast.info('Abrindo checkout...');
+      window.location.href = url;
     }
-    popup.location.href = url;
   };
 
   const limits = PLAN_LIMITS[plan];
