@@ -50,7 +50,7 @@ export default function SecuritySection() {
         <div className="relative rounded-[24px] bg-[#0a0f0a] p-8 md:p-10 mb-10 overflow-hidden">
           <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-[#7C3AED]/20 blur-3xl pointer-events-none" />
           <div className="relative">
-            <div className="text-[11px] font-extrabold tracking-[2px] uppercase text-[#4ade80] mb-6">Nossa promessa</div>
+            <div className="text-[11px] font-extrabold tracking-[2px] uppercase text-[#A78BFA] mb-6">Nossa promessa</div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {promises.map((item, i) => (
                 <motion.div

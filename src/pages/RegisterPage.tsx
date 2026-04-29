@@ -376,9 +376,9 @@ export default function RegisterPage() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row" style={{ background: '#0a1a0f' }}>
+    <div className="min-h-screen flex flex-col lg:flex-row" style={{ background: '#0F0820' }}>
       {/* Desktop left panel */}
-      <div className="hidden lg:flex w-[55%] flex-col justify-between relative overflow-hidden" style={{ background: '#0a1a0f', padding: '48px 48px 40px' }}>
+      <div className="hidden lg:flex w-[55%] flex-col justify-between relative overflow-hidden" style={{ background: '#0F0820', padding: '48px 48px 40px' }}>
         <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 70% at 40% 50%, rgba(124, 58, 237,0.30) 0%, rgba(124, 58, 237,0.08) 50%, transparent 80%)' }} />
         <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
         <div className="absolute" style={{ width: 250, height: 250, borderRadius: '50%', background: 'rgba(124, 58, 237,0.18)', filter: 'blur(60px)', top: -60, right: -60 }} />
@@ -393,7 +393,7 @@ export default function RegisterPage() {
             <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
               style={{ fontSize: 44, fontWeight: 900, color: 'white', letterSpacing: '-1.5px', lineHeight: 1.1 }}>
               Comece hoje.<br />É grátis.<br />
-              <span style={{ color: '#4ade80' }}>Para sempre.</span>
+              <span style={{ color: '#A78BFA' }}>Para sempre.</span>
             </motion.h1>
             <p style={{ marginTop: 14, fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
               Dashboard completo, IA financeira e gamificação<br />sem precisar de cartão de crédito.
@@ -405,7 +405,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Mobile hero */}
-      <div className="lg:hidden relative overflow-hidden" style={{ minHeight: '38vh', background: '#0a1a0f' }}>
+      <div className="lg:hidden relative overflow-hidden" style={{ minHeight: '38vh', background: '#0F0820' }}>
         <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 70% at 40% 50%, rgba(124, 58, 237,0.30) 0%, rgba(124, 58, 237,0.08) 50%, transparent 80%)' }} />
         <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
         <div className="absolute" style={{ width: 180, height: 180, borderRadius: '50%', background: 'rgba(124, 58, 237,0.18)', filter: 'blur(50px)', top: -40, right: -40 }} />

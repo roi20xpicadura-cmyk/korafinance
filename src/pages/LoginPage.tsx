@@ -20,7 +20,7 @@ function DarkHeroSection({ variant = 'login' }: { variant?: 'login' | 'register'
       className="relative overflow-hidden w-full"
       style={{
         minHeight: '42vh',
-        background: '#0a1a0f',
+        background: '#0F0820',
       }}
     >
       {/* Radial gradient overlay */}
@@ -105,7 +105,7 @@ function DesktopLeftPanel() {
     <div
       className="hidden lg:flex w-[55%] flex-col justify-between relative overflow-hidden"
       style={{
-        background: '#0a1a0f',
+        background: '#0F0820',
         padding: '48px 48px 40px',
       }}
     >
@@ -136,7 +136,7 @@ function DesktopLeftPanel() {
             style={{ fontSize: 44, fontWeight: 900, color: 'white', letterSpacing: '-1.5px', lineHeight: 1.1 }}
           >
             Suas finanças<br />sob controle.<br />
-            <span style={{ color: '#4ade80' }}>Finalmente.</span>
+            <span style={{ color: '#A78BFA' }}>Finalmente.</span>
           </motion.h1>
           <p style={{ marginTop: 14, fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
             Controle pessoal, negócio e investimentos<br />tudo em um só lugar.
@@ -149,7 +149,7 @@ function DesktopLeftPanel() {
             padding: '18px 20px', backdropFilter: 'blur(10px)',
           }}>
             {[
-              { icon: <Wallet style={{ width: 16, height: 16 }} />, color: '#4ade80', label: 'Saldo este mês', value: 'R$ 3.200' },
+              { icon: <Wallet style={{ width: 16, height: 16 }} />, color: '#A78BFA', label: 'Saldo este mês', value: 'R$ 3.200' },
               { icon: <TrendingUp style={{ width: 16, height: 16 }} />, color: '#3b82f6', label: 'Score financeiro', value: '847/1000' },
               { icon: <Target style={{ width: 16, height: 16 }} />, color: '#f59e0b', label: 'Meta de viagem', value: '67% ✓' },
             ].map((row, i, arr) => (
@@ -169,8 +169,8 @@ function DesktopLeftPanel() {
               </div>
             ))}
             <div className="flex items-center gap-1.5" style={{ marginTop: 10 }}>
-              <Sparkles style={{ width: 12, height: 12, color: '#4ade80' }} />
-              <span style={{ fontSize: 11, color: '#4ade80', fontStyle: 'italic' }}>
+              <Sparkles style={{ width: 12, height: 12, color: '#A78BFA' }} />
+              <span style={{ fontSize: 11, color: '#A78BFA', fontStyle: 'italic' }}>
                 IA analisando seus dados...
                 <motion.span
                   animate={{ opacity: [1, 0] }}
@@ -204,7 +204,7 @@ function DesktopLeftPanel() {
             {TESTIMONIALS.map((_, i) => (
               <div key={i} style={{
                 width: 6, height: 6, borderRadius: '50%',
-                background: i === testimonialIdx ? '#4ade80' : 'rgba(255,255,255,0.2)',
+                background: i === testimonialIdx ? '#A78BFA' : 'rgba(255,255,255,0.2)',
                 transition: 'background 300ms',
               }} />
             ))}
@@ -463,7 +463,7 @@ export default function LoginPage() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row" style={{ background: '#0a1a0f' }}>
+    <div className="min-h-screen flex flex-col lg:flex-row" style={{ background: '#0F0820' }}>
       {/* Desktop left panel */}
       <DesktopLeftPanel />
 
