@@ -153,6 +153,34 @@ Deno.serve(async (req) => {
     if (upErr) console.error('plan update error', upErr);
     else console.log('✅ plan updated successfully', { userId, newPlan });
 
+    // Buscar nome do usuário para personalizar mensagens
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', userId)
+      .maybeSingle();
+    const firstName = (profile?.full_name || '').split(' ')[0] || undefined;
+    const planLabel = newPlan === 'pro' ? 'Pro' : 'Business';
+    const benefitsList = newPlan === 'business'
+      ? ['Kora IA ilimitada', 'WhatsApp com IA financeira', 'Controle de dívidas + simulador', 'Módulo Negócio + DRE', 'Lançamentos e metas ilimitadas']
+      : ['Kora IA com memória ilimitada', 'WhatsApp com IA financeira', 'Controle de dívidas e simulador', 'Lançamentos e metas ilimitadas'];
+
+    // Email de boas-vindas ao plano
+    try {
+      const { error: emailErr } = await supabase.functions.invoke('send-transactional-email', {
+        body: {
+          templateName: 'plan-welcome',
+          recipientEmail: authUser.email,
+          idempotencyKey: `plan-welcome-${userId}-${transactionId || newPlan}`,
+          templateData: { name: firstName, planName: planLabel, benefits: benefitsList },
+        },
+      });
+      if (emailErr) console.error('plan welcome email error', emailErr);
+      else console.log('📧 plan welcome email enqueued', { userId });
+    } catch (e) {
+      console.error('plan welcome email exception', e);
+    }
+
     // WhatsApp notification (optional)
     const { data: waConn } = await supabase
       .from('whatsapp_connections')
@@ -162,13 +190,9 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (waConn?.phone_number) {
-      const planName = newPlan === 'pro' ? 'Pro' : 'Business';
-      const benefits = newPlan === 'business'
-        ? 'Kora IA, WhatsApp IA, Dívidas, Negócio e DRE'
-        : 'Kora IA, WhatsApp IA, Dívidas e Simulador';
       await sendWhatsApp(
         waConn.phone_number,
-        `🎉 *Plano ${planName} ativado!*\n\nSeu pagamento foi confirmado e todos os benefícios já estão liberados:\n\n✅ ${benefits}\n\nAcesse o app: https://korafinance.app\n\n_KoraFinance 🐨_`,
+        `🎉 *${firstName ? firstName + ', bem-vindo(a) ao' : 'Bem-vindo(a) ao'} Kora ${planLabel}!*\n\nSeu pagamento foi confirmado e todos os benefícios já estão liberados:\n\n${benefitsList.map(b => '✅ ' + b).join('\n')}\n\n💜 Estamos felizes em te ter com a gente!\n\nAcesse o app: https://korafinance.app\n\n_Equipe Kora 🐨_`,
       );
     }
 
