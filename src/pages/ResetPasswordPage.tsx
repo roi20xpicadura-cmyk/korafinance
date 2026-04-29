@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import koraIcon from '@/assets/korafinance-icon.png';
 import { toast } from 'sonner';
+import { translateAuthError } from '@/lib/auth-errors';
 
 type Status = 'checking' | 'ready' | 'invalid';
 
@@ -79,7 +80,7 @@ export default function ResetPasswordPage() {
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) { toast.error(translateAuthError(error.message)); return; }
     toast.success('Senha atualizada com sucesso!');
     navigate('/login');
   };
