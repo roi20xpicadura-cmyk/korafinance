@@ -27,7 +27,7 @@ export default function CTASection() {
         </motion.div>
         <motion.h2 initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
           className="text-[28px] md:text-[56px] font-[900] text-white tracking-[-1px] md:tracking-[-2px] leading-[1.1] mb-4 md:mb-5 px-2">
-          Sua vida financeira merece<br /><span className="text-[#4ade80]">uma segunda chance.</span>
+          Sua vida financeira merece<br /><span className="text-[#A78BFA]">uma segunda chance.</span>
         </motion.h2>
         <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}
           className="text-[15px] md:text-[18px] text-white/60 leading-[1.7] mb-8 md:mb-10 px-4">

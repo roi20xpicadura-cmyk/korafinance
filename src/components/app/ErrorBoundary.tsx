@@ -69,7 +69,7 @@ export class AppErrorBoundary extends Component<Props, State> {
               Ocorreu um erro inesperado. Seus dados estão seguros. Tente recarregar a página.
             </p>
             <button onClick={() => window.location.reload()}
-              style={{ background: '#22c55e', color: 'white', border: 'none', borderRadius: 12, padding: '12px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+              style={{ background: '#7C3AED', color: 'white', border: 'none', borderRadius: 12, padding: '12px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
               Recarregar página
             </button>
             <br />
