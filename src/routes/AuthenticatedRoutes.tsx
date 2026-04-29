@@ -80,6 +80,17 @@ const AuthenticatedRoutes = forwardRef<HTMLDivElement>(function AuthenticatedRou
             <Route path="register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
             <Route path="forgot-password" element={<ForgotPasswordPage />} />
             <Route path="reset-password" element={<ResetPasswordPage />} />
+            {/* Aliases defensivos pra variações comuns de auth */}
+            <Route path="signup" element={<Navigate to="/register" replace />} />
+            <Route path="sign-up" element={<Navigate to="/register" replace />} />
+            <Route path="signin" element={<Navigate to="/login" replace />} />
+            <Route path="sign-in" element={<Navigate to="/login" replace />} />
+            <Route path="entrar" element={<Navigate to="/login" replace />} />
+            <Route path="cadastro" element={<Navigate to="/register" replace />} />
+            <Route path="registrar" element={<Navigate to="/register" replace />} />
+            <Route path="esqueci-senha" element={<Navigate to="/forgot-password" replace />} />
+            <Route path="recuperar-senha" element={<Navigate to="/forgot-password" replace />} />
+            <Route path="redefinir-senha" element={<Navigate to="/reset-password" replace />} />
 
             <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route index element={<OverviewPage />} />
