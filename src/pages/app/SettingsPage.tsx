@@ -145,7 +145,7 @@ export default function SettingsPage() {
     setSaving(true);
     const { error } = await supabase.auth.updateUser({ password: newPw });
     setSaving(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) { toast.error(translateAuthError(error.message)); return; }
     toast.success('Senha alterada!');
     setNewPw(''); setConfirmPw('');
   };
