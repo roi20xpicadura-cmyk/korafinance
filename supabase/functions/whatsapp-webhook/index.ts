@@ -1401,6 +1401,10 @@ serve(async (req) => {
     // ── ATTACHMENT PROCESSING (PDF de extrato/fatura/comprovante OU imagem) ──
     // Importa DIRETO no banco, sem confirmação. Detecta origem (personal/business) via IA.
     if (document || image) {
+      const traceId = crypto.randomUUID();
+      const tReceived = Date.now();
+      const isPdfHint = document ? true : false;
+
       let fileUrl: string | undefined;
       if (document) {
         fileUrl = typeof document === "string"
@@ -1412,13 +1416,23 @@ serve(async (req) => {
           : (image.imageUrl || image.url);
       }
 
+      await logAttachmentTelemetry({
+        traceId,
+        userId,
+        phone,
+        stage: "received",
+        status: fileUrl ? "success" : "error",
+        attachmentKind: isPdfHint ? "pdf" : "image",
+        errorMessage: fileUrl ? null : "fileUrl ausente no payload",
+        metadata: { has_document: !!document, has_image: !!image },
+      });
+
       if (!fileUrl) {
         await sendWhatsApp(phone, `Não consegui baixar o arquivo, ${ctx.name} 😕 Tenta enviar de novo!`);
         return new Response("OK", { status: 200 });
       }
 
       // Feedback imediato — usuário sabe que recebemos enquanto a IA processa
-      const isPdfHint = document ? true : false;
       const ackMsg = isPdfHint
         ? `📄 Recebi seu documento, ${ctx.name}! Analisando as transações... ⏳`
         : `📷 Recebi sua imagem, ${ctx.name}! Lendo o comprovante... ⏳`;
@@ -1430,7 +1444,12 @@ serve(async (req) => {
         created_at: new Date().toISOString(),
       });
 
-      const { transactions, reply, importDirect } = await processAttachment(fileUrl, ctx.name, ctx.profile);
+      const { transactions, reply, importDirect } = await processAttachment(
+        fileUrl,
+        ctx.name,
+        ctx.profile,
+        { traceId, userId, phone },
+      );
 
       // Sempre envia o resumo primeiro
       await sendWhatsApp(phone, reply);
@@ -1443,6 +1462,7 @@ serve(async (req) => {
 
       // Importa direto se a IA achou transações válidas
       if (importDirect && transactions.length > 0) {
+        const tSaveStart = Date.now();
         const rows = transactions.map((t: any) => ({
           user_id: userId,
           type: t.type,
@@ -1457,15 +1477,29 @@ serve(async (req) => {
 
         // Insert em chunks de 50
         let saved = 0;
+        let lastErr: string | null = null;
         for (let i = 0; i < rows.length; i += 50) {
           const chunk = rows.slice(i, i + 50);
           const { error } = await supabase.from("transactions").insert(chunk);
           if (error) {
             console.error("[ATTACHMENT INSERT] error:", error.message);
+            lastErr = error.message;
           } else {
             saved += chunk.length;
           }
         }
+
+        await logAttachmentTelemetry({
+          traceId,
+          userId,
+          phone,
+          stage: "saved",
+          status: saved === transactions.length ? "success" : (saved === 0 ? "error" : "warning"),
+          durationMs: Date.now() - tSaveStart,
+          transactionsFound: transactions.length,
+          transactionsSaved: saved,
+          errorMessage: lastErr,
+        });
 
         const incomeTotal = transactions.filter((t: any) => t.type === "income").reduce((s: number, t: any) => s + t.amount, 0);
         const expenseTotal = transactions.filter((t: any) => t.type === "expense").reduce((s: number, t: any) => s + t.amount, 0);
@@ -1499,6 +1533,18 @@ Acesse seu dashboard pra revisar e ajustar categorias se quiser, ${ctx.name}! �
           await checkAndAlertBudget(userId, phone, cat, ctx.name, freshCtx, amt);
         }
       }
+
+      await logAttachmentTelemetry({
+        traceId,
+        userId,
+        phone,
+        stage: "completed",
+        status: "success",
+        durationMs: Date.now() - tReceived,
+        transactionsFound: transactions.length,
+        transactionsSaved: importDirect ? transactions.length : 0,
+        metadata: { import_direct: importDirect },
+      });
 
       return new Response("OK", { status: 200 });
     }
