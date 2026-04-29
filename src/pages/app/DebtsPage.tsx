@@ -424,40 +424,217 @@ export default function DebtsPage() {
         </motion.button>
       </div>
 
-      {/* ── 1. Hero Status Card ── */}
-      <div style={{
-        margin: '12px 16px 0', background: 'linear-gradient(135deg, #160B28, #0F0520)', border: '1.5px solid rgba(124, 58, 237,0.25)',
-        borderRadius: 20, padding: 20, position: 'relative', overflow: 'hidden',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-      }}>
-        <div style={{ position: 'absolute', top: -30, right: -30, width: 100, height: 100, borderRadius: '50%', background: hc.accent, opacity: 0.08, filter: 'blur(30px)', pointerEvents: 'none' }} />
-        <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Total em dívidas</div>
-        <div style={{ fontSize: 38, fontWeight: 900, fontFamily: 'var(--font-mono)', letterSpacing: '-0.04em', color: 'white', lineHeight: 1, marginBottom: 16 }}>
-          {fmt(totalRemaining)}
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', background: 'rgba(255,255,255,0.05)', borderRadius: 12, padding: 12 }}>
-          {[
-            { label: 'Dívidas', value: String(activeDebts.length), color: 'white' },
-            { label: 'Juros/mês', value: monthlyInterest > 0 ? `R$ ${fmtCompact(monthlyInterest)}` : '—', color: monthlyInterest > 0 ? '#f87171' : 'rgba(255,255,255,0.3)' },
-            { label: 'Custo/ano', value: monthlyInterest > 0 ? `R$ ${fmtCompact(monthlyInterest * 12)}` : '—', color: monthlyInterest > 0 ? '#f87171' : 'rgba(255,255,255,0.3)' },
-          ].map((s, i) => (
-            <div key={i} style={{ padding: '0 10px', borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.08)' : 'none' }}>
-              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>{s.label}</div>
-              <div style={{ fontSize: 15, fontWeight: 800, fontFamily: 'var(--font-mono)', color: s.color, letterSpacing: '-0.02em' }}>{s.value}</div>
+      {/* ── 1. Hero Premium Roxo ── */}
+      {(() => {
+        const totalInitial = activeDebts.reduce((s, d) => s + Number(d.total_amount || 0), 0);
+        const paidPct = totalInitial > 0
+          ? Math.max(0, Math.min(100, ((totalInitial - totalRemaining) / totalInitial) * 100))
+          : 0;
+        const months = payoffInfo?.months ?? null;
+        const freedomLabel = months
+          ? (months < 12 ? `${months} ${months === 1 ? 'mês' : 'meses'}` : `${(months / 12).toFixed(1).replace('.0', '')} anos`)
+          : null;
+        const freedomDateLabel = payoffInfo?.freedomDate
+          ? payoffInfo.freedomDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+          : null;
+        const interestSavings = monthlyInterest * 12;
+
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              margin: '12px 16px 0',
+              background: 'linear-gradient(135deg, var(--color-green-700) 0%, var(--color-green-900) 100%)',
+              borderRadius: 22,
+              padding: 22,
+              position: 'relative',
+              overflow: 'hidden',
+              boxShadow: 'var(--shadow-xl)',
+              color: '#fff',
+            }}
+          >
+            {/* halos decorativos */}
+            <div aria-hidden style={{
+              position: 'absolute', top: -60, right: -60, width: 200, height: 200,
+              borderRadius: '50%', background: 'var(--color-green-400)',
+              opacity: 0.22, filter: 'blur(60px)', pointerEvents: 'none',
+            }} />
+            <div aria-hidden style={{
+              position: 'absolute', bottom: -80, left: -40, width: 220, height: 220,
+              borderRadius: '50%', background: 'var(--color-green-500)',
+              opacity: 0.12, filter: 'blur(70px)', pointerEvents: 'none',
+            }} />
+
+            {/* TOPO: Total devendo + countdown */}
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 18 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.65)',
+                  textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6,
+                }}>
+                  Você está devendo
+                </div>
+                <div style={{
+                  fontSize: 36, fontWeight: 900, fontFamily: 'var(--font-mono)',
+                  letterSpacing: '-0.04em', lineHeight: 1, fontVariantNumeric: 'tabular-nums',
+                }}>
+                  {fmt(totalRemaining)}
+                </div>
+              </div>
+              {freedomLabel && (
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.15 }}
+                  style={{
+                    flexShrink: 0,
+                    background: 'rgba(255,255,255,0.18)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255,255,255,0.25)',
+                    borderRadius: 14,
+                    padding: '8px 12px',
+                    textAlign: 'center',
+                    minWidth: 88,
+                  }}
+                >
+                  <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    Livre em
+                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', marginTop: 1 }}>
+                    {freedomLabel}
+                  </div>
+                </motion.div>
+              )}
             </div>
-          ))}
-        </div>
-        {missingDataDebts.length > 0 && (
-          <div onClick={() => openEditDebt(missingDataDebts[0])} style={{
-            marginTop: 12, background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.2)',
-            borderRadius: 10, padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 8,
-            fontSize: 12, color: '#fbbf24', cursor: 'pointer',
-          }}>
-            <AlertTriangle size={13} />
-            Preencha taxa de juros para cálculos precisos
-          </div>
-        )}
-      </div>
+
+            {/* BARRA DE PROGRESSO */}
+            {totalInitial > 0 && (
+              <div style={{ position: 'relative', marginBottom: 16 }}>
+                <div style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  marginBottom: 6,
+                }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>
+                    Progresso de quitação
+                  </span>
+                  <span style={{
+                    fontSize: 13, fontWeight: 900, color: '#fff',
+                    fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums',
+                  }}>
+                    {paidPct.toFixed(0)}%
+                  </span>
+                </div>
+                <div style={{
+                  width: '100%', height: 8, background: 'rgba(0,0,0,0.25)',
+                  borderRadius: 99, overflow: 'hidden',
+                }}>
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${paidPct}%` }}
+                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                    style={{
+                      height: '100%',
+                      background: 'linear-gradient(90deg, var(--color-success-400), var(--color-success-300))',
+                      borderRadius: 99,
+                      boxShadow: '0 0 12px var(--color-success-400)',
+                    }}
+                  />
+                </div>
+                {totalPaid > 0 && (
+                  <div style={{
+                    fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 6,
+                    display: 'flex', alignItems: 'center', gap: 4,
+                  }}>
+                    <Check size={11} color="var(--color-success-300)" />
+                    Você já pagou <strong style={{ color: '#fff', fontWeight: 800 }}>{fmt(totalPaid)}</strong>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* MINI STATS */}
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
+              background: 'rgba(0,0,0,0.22)', borderRadius: 14, padding: '12px 4px',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}>
+              {[
+                {
+                  label: 'Dívidas',
+                  value: String(activeDebts.length),
+                  hint: activeDebts.length === 1 ? 'ativa' : 'ativas',
+                  color: '#fff',
+                },
+                {
+                  label: 'Sangra/mês',
+                  value: monthlyInterest > 0 ? `R$ ${fmtCompact(monthlyInterest)}` : '—',
+                  hint: monthlyInterest > 0 ? 'em juros' : 'sem juros',
+                  color: monthlyInterest > 0 ? 'var(--color-danger-300)' : 'rgba(255,255,255,0.4)',
+                },
+                {
+                  label: 'Custo/ano',
+                  value: interestSavings > 0 ? `R$ ${fmtCompact(interestSavings)}` : '—',
+                  hint: interestSavings > 0 ? 'desperdiçados' : '—',
+                  color: interestSavings > 0 ? 'var(--color-danger-300)' : 'rgba(255,255,255,0.4)',
+                },
+              ].map((s, i) => (
+                <div key={i} style={{
+                  padding: '0 10px', textAlign: 'center', minWidth: 0,
+                  borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                }}>
+                  <div style={{
+                    fontSize: 9, color: 'rgba(255,255,255,0.55)', fontWeight: 700,
+                    textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3,
+                  }}>
+                    {s.label}
+                  </div>
+                  <div style={{
+                    fontSize: 15, fontWeight: 900, fontFamily: 'var(--font-mono)',
+                    color: s.color, letterSpacing: '-0.02em', lineHeight: 1.1,
+                    fontVariantNumeric: 'tabular-nums',
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>
+                    {s.value}
+                  </div>
+                  <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', marginTop: 2, fontWeight: 600 }}>
+                    {s.hint}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* DATA DA LIBERDADE */}
+            {freedomDateLabel && (
+              <div style={{
+                marginTop: 12, fontSize: 11, color: 'rgba(255,255,255,0.7)',
+                textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              }}>
+                <Sparkles size={11} color="var(--color-success-300)" />
+                Sua liberdade chega em <strong style={{ color: '#fff', fontWeight: 800, textTransform: 'capitalize' }}>{freedomDateLabel}</strong>
+              </div>
+            )}
+
+            {/* AVISO DE DADOS FALTANDO */}
+            {missingDataDebts.length > 0 && (
+              <div
+                onClick={() => openEditDebt(missingDataDebts[0])}
+                style={{
+                  marginTop: 12, background: 'rgba(0,0,0,0.25)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 11, padding: '10px 12px',
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  fontSize: 12, color: '#fff', cursor: 'pointer', fontWeight: 600,
+                }}
+              >
+                <AlertTriangle size={13} color="var(--color-warning-300)" />
+                <span style={{ flex: 1 }}>Preencha taxa de juros pra previsão precisa</span>
+                <ChevronRight size={13} color="rgba(255,255,255,0.6)" />
+              </div>
+            )}
+          </motion.div>
+        );
+      })()}
 
       {/* ── 1.5. Análise da Kora (IA) ── */}
       <DebtCoachCard
