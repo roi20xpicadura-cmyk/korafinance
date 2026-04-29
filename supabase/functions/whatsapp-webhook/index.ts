@@ -629,6 +629,41 @@ async function processAttachment(
       };
     }
 
+    // ─── SELEÇÃO AUTOMÁTICA DE MODELO baseada no formato/tamanho ──
+    // Estimativa do tamanho real (base64 ≈ 4/3 do binário)
+    const sizeBytes = Math.floor((base64.length * 3) / 4);
+    const sizeKB = Math.round(sizeBytes / 1024);
+
+    // Regras:
+    //  - PDF grande (>500KB) → extrato denso, muitas páginas → Pro (precisão máxima)
+    //  - PDF pequeno → fatura/comprovante simples → Flash (rápido + barato)
+    //  - Imagem grande (>1.5MB) → foto de extrato em alta → Pro
+    //  - Imagem pequena → comprovante/cupom curto → Flash-Lite (super rápido)
+    //  - Imagem média → Flash padrão
+    let chosenModel: string;
+    let modelReason: string;
+    if (isPdf) {
+      if (sizeBytes > 500 * 1024) {
+        chosenModel = "google/gemini-2.5-pro";
+        modelReason = `PDF longo (${sizeKB}KB) → Pro p/ máxima precisão`;
+      } else {
+        chosenModel = "google/gemini-2.5-flash";
+        modelReason = `PDF curto (${sizeKB}KB) → Flash`;
+      }
+    } else {
+      if (sizeBytes > 1.5 * 1024 * 1024) {
+        chosenModel = "google/gemini-2.5-pro";
+        modelReason = `Imagem grande (${sizeKB}KB) → Pro`;
+      } else if (sizeBytes < 200 * 1024) {
+        chosenModel = "google/gemini-2.5-flash-lite";
+        modelReason = `Comprovante curto (${sizeKB}KB) → Flash-Lite`;
+      } else {
+        chosenModel = "google/gemini-2.5-flash";
+        modelReason = `Imagem média (${sizeKB}KB) → Flash`;
+      }
+    }
+    console.log(`[ATTACHMENT] modelo escolhido: ${chosenModel} — ${modelReason}`);
+
     const systemPrompt = `Você é a Kora IA, especialista em extrair transações financeiras de extratos bancários, faturas de cartão e comprovantes brasileiros.
 
 Analise o documento e extraia TODAS as transações encontradas.
@@ -737,14 +772,11 @@ Se não encontrar nenhuma transação:
       });
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const callExtraction = (model: string) => fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userContent },
@@ -752,9 +784,18 @@ Se não encontrar nenhuma transação:
       }),
     });
 
+    let response = await callExtraction(chosenModel);
+
+    // Fallback automático: se o modelo Pro falhar (rate limit/5xx), tenta Flash
+    if (!response.ok && chosenModel === "google/gemini-2.5-pro" && (response.status === 429 || response.status >= 500)) {
+      console.log("[ATTACHMENT] Pro falhou, fallback → Flash");
+      response = await callExtraction("google/gemini-2.5-flash");
+      chosenModel = "google/gemini-2.5-flash";
+    }
+
     if (!response.ok) {
       const errBody = await response.text();
-      console.error("[ATTACHMENT] Gemini error:", response.status, errBody.slice(0, 500));
+      console.error(`[ATTACHMENT] Gemini error (${chosenModel}):`, response.status, errBody.slice(0, 500));
       if (response.status === 429) {
         return { transactions: [], reply: `IA sobrecarregada agora, ${userName} 😅 Manda de novo em 1 minutinho!`, importDirect: false };
       }
