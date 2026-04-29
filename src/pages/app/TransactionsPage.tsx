@@ -253,12 +253,16 @@ export default function TransactionsPage({ profile }: TransactionsPageProps = {}
               Saldo do período
             </div>
             <div style={{
-              fontSize: 30, fontWeight: 800, fontFamily: 'var(--font-mono)',
-              letterSpacing: '-0.025em', lineHeight: 1.05,
+              fontSize: 32, fontWeight: 800, fontFamily: 'var(--font-sans)',
+              fontVariantNumeric: 'tabular-nums',
+              letterSpacing: '-0.035em', lineHeight: 1.05,
               color: '#fff',
               textShadow: '0 2px 12px rgba(0,0,0,0.25)',
             }}>
-              {balance < 0 ? '−' : ''}R$ {formatBRL(Math.abs(balance))}
+              <span style={{ fontSize: '0.7em', fontWeight: 700, opacity: 0.85, marginRight: 4, letterSpacing: 0 }}>
+                {balance < 0 ? '−' : ''}R$
+              </span>
+              {formatBRL(Math.abs(balance))}
             </div>
           </div>
 
@@ -278,8 +282,9 @@ export default function TransactionsPage({ profile }: TransactionsPageProps = {}
                   <span style={{ width: 6, height: 6, borderRadius: 99, background: kpi.dot, boxShadow: `0 0 8px ${kpi.dot}` }} />
                   <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)' }}>{kpi.label}</span>
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 800, fontFamily: 'var(--font-mono)', letterSpacing: '-0.02em', color: '#fff' }}>
-                  R$ {formatBRL(kpi.value)}
+                <div style={{ fontSize: 15, fontWeight: 800, fontFamily: 'var(--font-sans)', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.02em', color: '#fff' }}>
+                  <span style={{ fontSize: '0.78em', fontWeight: 700, opacity: 0.8, marginRight: 3 }}>R$</span>
+                  {formatBRL(kpi.value)}
                 </div>
               </div>
             ))}
