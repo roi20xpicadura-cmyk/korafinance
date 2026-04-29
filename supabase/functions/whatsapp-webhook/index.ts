@@ -1250,6 +1250,7 @@ serve(async (req) => {
           date: t.date,
           origin: t.origin || ctx.profile || "personal",
           source: "whatsapp",
+          notes: t.subcategory ? `Subcategoria: ${t.subcategory}` : null,
         }));
 
         // Insert em chunks de 50
