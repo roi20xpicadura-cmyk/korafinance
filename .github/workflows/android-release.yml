@@ -48,6 +48,58 @@ jobs:
       - name: Capacitor sync
         run: npx cap sync android
 
+      - name: Patch AndroidManifest.xml (deep link OAuth)
+        run: |
+          # Injeta intent-filter pra capturar o callback OAuth via deep link
+          # com.korafinance.app://auth-callback (precisa bater com DEEP_LINK_SCHEME
+          # em src/lib/nativeOAuth.ts).
+          # Roda DEPOIS do `npx cap add android` / `npx cap sync` que regeneram
+          # o Manifest a cada build, então o patch precisa ser idempotente.
+          MANIFEST=android/app/src/main/AndroidManifest.xml
+          if [ ! -f "$MANIFEST" ]; then
+            echo "::error::AndroidManifest.xml não encontrado em $MANIFEST"
+            exit 1
+          fi
+
+          if grep -q 'android:scheme="com.korafinance.app"' "$MANIFEST"; then
+            echo "Intent-filter de deep link já presente — skip."
+          else
+            echo "Injetando intent-filter de deep link OAuth no Manifest..."
+            # Usa Python pra editar o XML de forma confiável (sed em XML é frágil).
+            python3 <<'PY'
+          import re, sys
+          path = "android/app/src/main/AndroidManifest.xml"
+          with open(path, "r", encoding="utf-8") as f:
+              src = f.read()
+
+          intent_filter = '''
+              <intent-filter android:autoVerify="false">
+                  <action android:name="android.intent.action.VIEW" />
+                  <category android:name="android.intent.category.DEFAULT" />
+                  <category android:name="android.intent.category.BROWSABLE" />
+                  <data android:scheme="com.korafinance.app" android:host="auth-callback" />
+              </intent-filter>
+          '''
+
+          # Insere ANTES do </activity> da MainActivity
+          pattern = re.compile(r'(<activity[^>]*android:name=".MainActivity"[^>]*>)(.*?)(</activity>)', re.DOTALL)
+          m = pattern.search(src)
+          if not m:
+              print("::error::Não encontrei <activity ... .MainActivity ...> no Manifest", file=sys.stderr)
+              sys.exit(1)
+
+          new_activity = m.group(1) + m.group(2) + intent_filter + m.group(3)
+          out = src[:m.start()] + new_activity + src[m.end():]
+
+          with open(path, "w", encoding="utf-8") as f:
+              f.write(out)
+          print("Intent-filter OAuth injetado com sucesso.")
+          PY
+          fi
+
+          echo "--- AndroidManifest.xml (intent-filters da MainActivity) ---"
+          grep -A 1 "intent-filter\|<data\|<action android:name=\"android.intent" "$MANIFEST" | head -60
+
       - name: Bump versionCode and versionName
         run: |
           # versionCode = GITHUB_RUN_NUMBER + OFFSET
