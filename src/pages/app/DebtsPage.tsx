@@ -459,6 +459,13 @@ export default function DebtsPage() {
         )}
       </div>
 
+      {/* ── 1.5. Análise da Kora (IA) ── */}
+      <DebtCoachCard
+        refreshKey={`${activeDebts.length}-${totalRemaining}-${payments.length}`}
+        currentStrategy={strategy}
+        onApplyStrategy={(s) => handleStrategyChange(s)}
+      />
+
       {/* ── 2. Next Action (Coach) ── */}
       {nextAction && (
         <div style={{ margin: '16px 16px 0' }}>
