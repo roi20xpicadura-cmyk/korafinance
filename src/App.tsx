@@ -31,6 +31,7 @@ const SobrePage = lazy(() => import("./pages/SobrePage"));
 const PrivacidadePage = lazy(() => import("./pages/PrivacidadePage"));
 const ExcluirContaPage = lazy(() => import("./pages/ExcluirContaPage"));
 const AuthenticatedRoutes = lazy(() => import("./routes/AuthenticatedRoutes"));
+const UnsubscribePage = lazy(() => import("./pages/UnsubscribePage"));
 
 // QueryClient otimizado: staleTime maior reduz refetches em troca de tela
 // e em remounts (drawer abre/fecha, navegação volta).
@@ -169,6 +170,7 @@ const App = () => {
                <Route path="/sobre" element={<SobrePage />} />
                <Route path="/privacidade" element={<PrivacidadePage />} />
                <Route path="/excluir-conta" element={<ExcluirContaPage />} />
+               <Route path="/unsubscribe" element={<UnsubscribePage />} />
                 <Route path="/*" element={<AuthenticatedRoutes />} />
              </Routes>
            </Suspense>
