@@ -351,14 +351,6 @@ export default function DebtsPage() {
 
   /* ─── STATE B: Active debts — Coach Experience ─── */
   const priorityDebt = orderedDebts[0] || null;
-  const hasHighInterest = activeDebts.some(d => Number(d.interest_rate) > 10);
-  const severity: 'critical' | 'high' | 'medium' = totalRemaining > 50000 ? 'critical' : hasHighInterest ? 'high' : 'medium';
-  const heroColors = {
-    critical: { bg: '#1a0505', border: 'rgba(239,68,68,0.25)', accent: '#f87171' },
-    high:     { bg: '#1a0a05', border: 'rgba(245,158,11,0.25)', accent: '#fbbf24' },
-    medium:   { bg: '#0a1205', border: 'rgba(124, 58, 237,0.25)',  accent: '#4ade80' },
-  };
-  const hc = heroColors[severity];
 
   // Next action logic
   const getNextAction = () => {
