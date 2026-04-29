@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { requestPushPermission, checkNotificationSupport, sendLocalNotification } from '@/lib/pushNotifications';
 import WhatsAppSettings from '@/components/app/WhatsAppSettings';
+import { translateAuthError } from '@/lib/auth-errors';
 
 export default function SettingsPage() {
   const { user } = useAuth();
