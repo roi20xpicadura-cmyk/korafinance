@@ -15,23 +15,47 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     let resolved = false;
+    let timer: ReturnType<typeof setTimeout>;
     const markReady = () => { resolved = true; setStatus('ready'); };
+    const markInvalid = () => { resolved = true; setStatus('invalid'); };
 
+    const url = new URL(window.location.href);
     const hash = window.location.hash;
-    if (hash.includes('type=recovery')) markReady();
+    const code = url.searchParams.get('code');
+    const errorDesc = url.searchParams.get('error_description') || url.searchParams.get('error');
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') markReady();
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') markReady();
     });
 
-    // Fallback: if no recovery signal arrives quickly, treat link as invalid
-    const timer = setTimeout(() => {
-      if (!resolved) setStatus('invalid');
-    }, 1500);
+    (async () => {
+      if (errorDesc) { markInvalid(); return; }
+
+      // New PKCE-style links: ?code=...
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (error) { markInvalid(); return; }
+        markReady();
+        return;
+      }
+
+      // Legacy hash-based links: #access_token=...&type=recovery
+      if (hash.includes('type=recovery') || hash.includes('access_token')) {
+        // onAuthStateChange will fire — give it a moment
+        timer = setTimeout(() => { if (!resolved) markInvalid(); }, 4000);
+        return;
+      }
+
+      // Maybe there's already an active recovery session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) { markReady(); return; }
+
+      timer = setTimeout(() => { if (!resolved) markInvalid(); }, 4000);
+    })();
 
     return () => {
       subscription.unsubscribe();
-      clearTimeout(timer);
+      if (timer) clearTimeout(timer);
     };
   }, []);
 
