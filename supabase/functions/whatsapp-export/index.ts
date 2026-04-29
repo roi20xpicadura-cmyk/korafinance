@@ -45,52 +45,114 @@ function buildSummaryText(name: string, periodLabel: string, txs: any[]): string
   const income = txs.filter(t => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
   const expenses = txs.filter(t => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
   const balance = income - expenses;
+  const savingsRate = income > 0 ? ((balance / income) * 100) : 0;
 
   const catMap: Record<string, number> = {};
   txs.filter(t => t.type === "expense").forEach(t => {
-    catMap[t.category] = (catMap[t.category] || 0) + Number(t.amount);
+    catMap[t.category || "Outros"] = (catMap[t.category || "Outros"] || 0) + Number(t.amount);
   });
   const topCats = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const totalCatExp = topCats.reduce((s, [, v]) => s + v, 0) || 1;
 
+  // Mini barra de progresso ASCII por categoria
   const catLines = topCats.length
-    ? topCats.map(([c, v]) => `  • ${c}: ${fmt(v)}`).join("\n")
-    : "  Nenhum gasto registrado";
+    ? topCats.map(([c, v], i) => {
+        const pct = (v / totalCatExp) * 100;
+        const filled = Math.round(pct / 10);
+        const bar = "█".repeat(filled) + "░".repeat(10 - filled);
+        const medal = ["🥇", "🥈", "🥉", "  ", "  "][i] || "  ";
+        return `${medal} *${c}*\n     ${bar} ${pct.toFixed(0)}%  ·  ${fmt(v)}`;
+      }).join("\n\n")
+    : "_Nenhum gasto registrado_";
 
-  return `📊 *Resumo Financeiro — ${periodLabel}*
+  const balanceEmoji = balance >= 0 ? "🟢" : "🔴";
+  const trendEmoji = savingsRate >= 20 ? "🚀" : savingsRate >= 10 ? "📈" : savingsRate >= 0 ? "⚖️" : "⚠️";
+  const trendMsg = savingsRate >= 20 ? "Excelente economia!"
+    : savingsRate >= 10 ? "Bom controle!"
+    : savingsRate >= 0 ? "Equilibrado"
+    : "Atenção: gastos > receitas";
 
-👤 ${name}
-📝 ${txs.length} lançamento${txs.length !== 1 ? "s" : ""}
+  return `╔══════════════════════╗
+   📊 *RESUMO FINANCEIRO*
+╚══════════════════════╝
 
-💰 Receitas: *${fmt(income)}*
-💸 Despesas: *${fmt(expenses)}*
-${balance >= 0 ? "✅" : "⚠️"} Saldo: *${fmt(balance)}*
+👤 *${name}*
+📅 ${periodLabel}
+📝 ${txs.length} ${txs.length === 1 ? "lançamento" : "lançamentos"}
 
-🏆 *Top categorias:*
+━━━━━━━━━━━━━━━━━━━━
+
+💰 *Receitas*
+    ${fmt(income)}
+
+💸 *Despesas*
+    ${fmt(expenses)}
+
+${balanceEmoji} *Saldo Líquido*
+    *${fmt(balance)}*
+    ${trendEmoji} ${trendMsg} _(${savingsRate.toFixed(1)}%)_
+
+━━━━━━━━━━━━━━━━━━━━
+
+🏆 *TOP CATEGORIAS DE GASTO*
+
 ${catLines}
 
-_Kora IA 🐨_`;
+━━━━━━━━━━━━━━━━━━━━
+
+💡 _Quer o relatório completo?_
+_Manda: "me envia o PDF do mês"_
+
+🐨 *Kora IA* · KoraFinance`;
 }
 
-function buildCSV(txs: any[]): string {
+function buildCSV(txs: any[], periodLabel: string, name: string): string {
+  const escape = (v: string) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const income = txs.filter(t => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
+  const expenses = txs.filter(t => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
+  const balance = income - expenses;
+  const ts = new Date().toLocaleString("pt-BR");
+
+  const meta = [
+    `# KoraFinance — Relatório Financeiro`,
+    `# Cliente: ${name}`,
+    `# Período: ${periodLabel}`,
+    `# Gerado em: ${ts}`,
+    `# Total de lançamentos: ${txs.length}`,
+    `# Receitas: ${fmt(income)}`,
+    `# Despesas: ${fmt(expenses)}`,
+    `# Saldo: ${fmt(balance)}`,
+    `#`,
+    `# korafinance.app`,
+    ``,
+  ].join("\n");
+
   const header = "Data,Tipo,Valor,Categoria,Descrição,Origem\n";
   const rows = txs.map(t => {
-    const escape = (v: string) => `"${String(v ?? "").replace(/"/g, '""')}"`;
     return [
       brDate(t.date),
       t.type === "income" ? "Receita" : "Despesa",
       Number(t.amount).toFixed(2).replace(".", ","),
       escape(t.category),
       escape(t.description),
-      escape(t.origin),
+      escape(t.origin === "business" ? "Negócio" : "Pessoal"),
     ].join(",");
   }).join("\n");
-  return "\uFEFF" + header + rows; // BOM for Excel UTF-8
+
+  // Linha de totais ao final
+  const footer = `\n\n,,${expenses.toFixed(2).replace(".", ",")},TOTAL DESPESAS,,\n,,${income.toFixed(2).replace(".", ",")},TOTAL RECEITAS,,\n,,${balance.toFixed(2).replace(".", ",")},SALDO,,`;
+
+  return "\uFEFF" + meta + header + rows + footer; // BOM for Excel UTF-8
 }
 
-// Brand palette (KoraFinance green)
-const BRAND: [number, number, number] = [22, 163, 74];
-const BRAND_DARK: [number, number, number] = [21, 128, 61];
-const BRAND_LIGHT: [number, number, number] = [220, 252, 231];
+// Brand palette — KoraFinance roxo
+const BRAND: [number, number, number] = [124, 58, 237];        // #7C3AED
+const BRAND_DARK: [number, number, number] = [91, 33, 182];    // #5B21B6
+const BRAND_LIGHT: [number, number, number] = [237, 233, 254]; // #EDE9FE
+const SUCCESS: [number, number, number] = [22, 163, 74];
+const DANGER: [number, number, number] = [220, 38, 38];
+const INK: [number, number, number] = [31, 41, 55];
+const MUTED: [number, number, number] = [107, 114, 128];
 
 function drawKoraLogo(doc: any, x: number, y: number) {
   // Rounded square badge with stylized "K"
@@ -108,10 +170,17 @@ function buildPDF(name: string, periodLabel: string, txs: any[]): Uint8Array {
   const income = txs.filter(t => t.type === "income").reduce((s, t) => s + Number(t.amount), 0);
   const expenses = txs.filter(t => t.type === "expense").reduce((s, t) => s + Number(t.amount), 0);
   const balance = income - expenses;
+  const savingsRate = income > 0 ? (balance / income) * 100 : 0;
 
-  // ── Header band ──
-  doc.setFillColor(...BRAND);
-  doc.rect(0, 0, 210, 32, "F");
+  // ── Header com gradiente simulado ──
+  for (let i = 0; i < 38; i++) {
+    const t = i / 38;
+    const r = Math.round(BRAND_DARK[0] + (BRAND[0] - BRAND_DARK[0]) * t);
+    const g = Math.round(BRAND_DARK[1] + (BRAND[1] - BRAND_DARK[1]) * t);
+    const b = Math.round(BRAND_DARK[2] + (BRAND[2] - BRAND_DARK[2]) * t);
+    doc.setFillColor(r, g, b);
+    doc.rect(0, i, 210, 1.05, "F");
+  }
   drawKoraLogo(doc, 14, 10);
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
@@ -119,34 +188,62 @@ function buildPDF(name: string, periodLabel: string, txs: any[]): Uint8Array {
   doc.text("KoraFinance", 30, 17);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
-  doc.text(`Relatório Financeiro — ${periodLabel}`, 30, 24);
+  doc.text(`Relatório Financeiro · ${periodLabel}`, 30, 24);
   doc.setFontSize(8);
-  doc.text(`Cliente: ${name}  •  Gerado em ${new Date().toLocaleString("pt-BR")}`, 30, 29);
-
-  // ── Summary box ──
-  doc.setDrawColor(220);
-  doc.setFillColor(248, 250, 248);
-  doc.roundedRect(14, 38, 182, 22, 2, 2, "FD");
-  doc.setFontSize(9);
-  doc.setTextColor(110);
-  doc.text("RECEITAS", 20, 45);
-  doc.text("DESPESAS", 80, 45);
-  doc.text("SALDO", 140, 45);
+  doc.setTextColor(220, 215, 255);
+  doc.text(`${name}  ·  Gerado em ${new Date().toLocaleString("pt-BR")}`, 30, 29);
+  // Selo
+  doc.setFillColor(255, 255, 255);
+  doc.roundedRect(176, 14, 22, 6, 3, 3, "F");
+  doc.setTextColor(...BRAND_DARK);
+  doc.setFontSize(7);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
-  doc.setTextColor(...BRAND);
-  doc.text(fmt(income), 20, 54);
-  doc.setTextColor(220, 38, 38);
-  doc.text(fmt(expenses), 80, 54);
-  doc.setTextColor(...(balance >= 0 ? BRAND : [220, 38, 38] as [number, number, number]));
-  doc.text(fmt(balance), 140, 54);
+  doc.text("CONFIDENCIAL", 187, 18, { align: "center" });
+
+  // ── KPI Cards ──
+  const kpiY = 44;
+  const kpiW = 58;
+  const kpiH = 26;
+  const kpis: Array<{ label: string; value: string; color: [number, number, number] }> = [
+    { label: "RECEITAS", value: fmt(income), color: SUCCESS },
+    { label: "DESPESAS", value: fmt(expenses), color: DANGER },
+    { label: "SALDO LÍQUIDO", value: fmt(balance), color: balance >= 0 ? BRAND : DANGER },
+  ];
+  kpis.forEach((k, i) => {
+    const x = 14 + i * (kpiW + 4);
+    // Sombra
+    doc.setFillColor(240, 240, 245);
+    doc.roundedRect(x + 0.4, kpiY + 0.4, kpiW, kpiH, 3, 3, "F");
+    // Card
+    doc.setFillColor(255, 255, 255);
+    doc.setDrawColor(230, 230, 240);
+    doc.roundedRect(x, kpiY, kpiW, kpiH, 3, 3, "FD");
+    // Faixa esquerda colorida
+    doc.setFillColor(...k.color);
+    doc.roundedRect(x, kpiY, 1.5, kpiH, 0.5, 0.5, "F");
+    // Label
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7);
+    doc.setTextColor(...MUTED);
+    doc.text(k.label, x + 5, kpiY + 8);
+    // Valor
+    doc.setFontSize(13);
+    doc.setTextColor(...k.color);
+    doc.text(k.value, x + 5, kpiY + 18);
+  });
+
+  // Pequeno texto de "saúde financeira"
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
-  doc.setTextColor(120);
-  doc.text(`${txs.length} lançamento${txs.length !== 1 ? "s" : ""}`, 196, 58, { align: "right" });
+  doc.setTextColor(...MUTED);
+  const healthLabel = savingsRate >= 20 ? "Excelente economia"
+    : savingsRate >= 10 ? "Bom controle"
+    : savingsRate >= 0 ? "Equilibrado"
+    : "Atenção";
+  doc.text(`Taxa de poupança: ${savingsRate.toFixed(1)}% · ${healthLabel}  ·  ${txs.length} lançamento${txs.length !== 1 ? "s" : ""}`, 14, kpiY + kpiH + 6);
 
   // ── Top 5 categories bar chart (expenses) ──
-  let y = 68;
+  let y = kpiY + kpiH + 14;
   const catMap: Record<string, number> = {};
   txs.filter(t => t.type === "expense").forEach(t => {
     const c = t.category || "Outros";
@@ -156,95 +253,134 @@ function buildPDF(name: string, periodLabel: string, txs: any[]): Uint8Array {
 
   if (top5.length > 0) {
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(11);
-    doc.setTextColor(60);
-    doc.text("Top 5 Categorias de Despesa", 14, y);
+    doc.setFontSize(7);
+    doc.setTextColor(...INK);
+    doc.text("TOP 5 CATEGORIAS DE DESPESA", 14, y);
     y += 5;
 
     const chartX = 14;
     const chartY = y;
     const chartW = 182;
-    const rowH = 9;
+    const rowH = 11;
     const labelW = 50;
     const valueW = 35;
     const barAreaW = chartW - labelW - valueW - 6;
     const maxVal = top5[0][1] || 1;
 
-    doc.setFillColor(252, 252, 252);
-    doc.setDrawColor(230);
-    doc.roundedRect(chartX, chartY, chartW, rowH * top5.length + 6, 2, 2, "FD");
+    // Card de fundo
+    doc.setFillColor(250, 248, 255);
+    doc.setDrawColor(230, 220, 250);
+    doc.roundedRect(chartX, chartY, chartW, rowH * top5.length + 8, 3, 3, "FD");
 
     top5.forEach(([cat, val], i) => {
-      const ry = chartY + 4 + i * rowH;
+      const ry = chartY + 5 + i * rowH;
+      // Medal/rank
+      const medal = ["🥇", "🥈", "🥉", "4º", "5º"][i] || "";
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(...MUTED);
+      doc.text(medal, chartX + 3, ry + 5);
       // Label
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.setTextColor(60);
-      const label = cat.length > 22 ? cat.slice(0, 20) + "…" : cat;
-      doc.text(label, chartX + 3, ry + 4);
-      // Bar background
-      doc.setFillColor(...BRAND_LIGHT);
-      doc.roundedRect(chartX + labelW, ry, barAreaW, 5, 1, 1, "F");
-      // Bar fill
-      const w = Math.max(1, (val / maxVal) * barAreaW);
-      doc.setFillColor(...(i === 0 ? BRAND_DARK : BRAND));
-      doc.roundedRect(chartX + labelW, ry, w, 5, 1, 1, "F");
-      // Value
-      doc.setTextColor(60);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(9);
-      doc.text(fmt(val), chartX + chartW - 3, ry + 4, { align: "right" });
+      doc.setTextColor(...INK);
+      const label = cat.length > 18 ? cat.slice(0, 16) + "…" : cat;
+      doc.text(label, chartX + 11, ry + 5);
+      // Bar background
+      doc.setFillColor(...BRAND_LIGHT);
+      doc.roundedRect(chartX + labelW, ry + 1, barAreaW, 6, 1.5, 1.5, "F");
+      // Bar fill (gradient: top → escuro)
+      const w = Math.max(2, (val / maxVal) * barAreaW);
+      const fill = i === 0 ? BRAND_DARK : i === 1 ? BRAND : [167, 139, 250] as [number, number, number];
+      doc.setFillColor(...fill);
+      doc.roundedRect(chartX + labelW, ry + 1, w, 6, 1.5, 1.5, "F");
+      // Value + percentage
+      const pct = ((val / expenses) * 100).toFixed(0);
+      doc.setTextColor(...INK);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.text(fmt(val), chartX + chartW - 3, ry + 5, { align: "right" });
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(...MUTED);
+      doc.text(`${pct}%`, chartX + chartW - 3, ry + 9, { align: "right" });
     });
 
-    y = chartY + rowH * top5.length + 12;
+    y = chartY + rowH * top5.length + 14;
   }
 
   // ── Transactions table header ──
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.setTextColor(60);
-  doc.text("Lançamentos", 14, y);
+  doc.setFontSize(7);
+  doc.setTextColor(...INK);
+  doc.text("LANÇAMENTOS DETALHADOS", 14, y);
   y += 4;
 
   doc.setFillColor(...BRAND);
   doc.setTextColor(255);
   doc.setFontSize(9);
-  doc.rect(14, y, 182, 7, "F");
-  y += 5;
+  doc.roundedRect(14, y, 182, 8, 1.5, 1.5, "F");
+  y += 5.5;
   doc.text("Data", 16, y);
   doc.text("Tipo", 36, y);
   doc.text("Categoria", 56, y);
   doc.text("Descrição", 96, y);
   doc.text("Valor", 194, y, { align: "right" });
-  y += 6;
+  y += 7;
   doc.setFont("helvetica", "normal");
 
-  doc.setTextColor(40);
   doc.setFontSize(8);
+  let zebra = false;
   for (const t of txs) {
-    if (y > 280) {
+    if (y > 275) {
       doc.addPage();
-      y = 20;
+      // Mini header na nova página
+      doc.setFillColor(...BRAND);
+      doc.rect(0, 0, 210, 8, "F");
+      doc.setTextColor(255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.text(`KoraFinance · ${periodLabel} · continuação`, 14, 5.5);
+      y = 18;
+      zebra = false;
     }
     const isIncome = t.type === "income";
-    doc.setTextColor(isIncome ? 22 : 220, isIncome ? 163 : 38, isIncome ? 74 : 38);
+    // Zebra
+    if (zebra) {
+      doc.setFillColor(250, 248, 255);
+      doc.rect(14, y - 4, 182, 5.5, "F");
+    }
+    zebra = !zebra;
+    doc.setTextColor(...INK);
+    doc.setFont("helvetica", "normal");
     doc.text(brDate(t.date), 16, y);
+    doc.setTextColor(...(isIncome ? SUCCESS : DANGER));
+    doc.setFont("helvetica", "bold");
     doc.text(isIncome ? "Receita" : "Despesa", 36, y);
-    doc.setTextColor(40);
-    doc.text(String(t.category || "").slice(0, 20), 56, y);
+    doc.setTextColor(...INK);
+    doc.setFont("helvetica", "normal");
+    doc.text(String(t.category || "—").slice(0, 18), 56, y);
     doc.text(String(t.description || "").slice(0, 40), 96, y);
-    doc.setTextColor(isIncome ? 22 : 220, isIncome ? 163 : 38, isIncome ? 74 : 38);
-    doc.text((isIncome ? "+" : "-") + fmt(Number(t.amount)), 194, y, { align: "right" });
-    y += 5;
+    doc.setTextColor(...(isIncome ? SUCCESS : DANGER));
+    doc.setFont("helvetica", "bold");
+    doc.text((isIncome ? "+ " : "− ") + fmt(Number(t.amount)), 194, y, { align: "right" });
+    y += 5.5;
   }
 
   // Footer
   const pageCount = (doc as any).internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
-    doc.setFontSize(8);
-    doc.setTextColor(150);
-    doc.text(`KoraFinance • Página ${i}/${pageCount}`, 105, 290, { align: "center" });
+    // Faixa decorativa roxa
+    doc.setFillColor(...BRAND);
+    doc.rect(0, 291, 210, 6, "F");
+    doc.setFontSize(7);
+    doc.setTextColor(...MUTED);
+    doc.text(`KoraFinance · ${periodLabel}`, 14, 288);
+    doc.text(`Página ${i} de ${pageCount}`, 196, 288, { align: "right" });
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(6);
+    doc.text("korafinance.app · Sua vida financeira em um só lugar", 105, 295, { align: "center" });
   }
 
   return new Uint8Array(doc.output("arraybuffer"));
@@ -317,11 +453,11 @@ serve(async (req) => {
     const ts = Date.now();
 
     if (format === "csv") {
-      const csv = buildCSV(txs);
+      const csv = buildCSV(txs, label, name);
       const bytes = new TextEncoder().encode(csv);
       const path = `${userId}/${ts}-relatorio-${slug}.csv`;
       const signedUrl = await uploadAndSign(path, bytes, "text/csv; charset=utf-8");
-      await sendZapiText(phone, `📊 *Planilha pronta, ${name}!*\n\n📅 Período: ${label}\n📝 ${txs.length} lançamentos\n\nEnviando arquivo CSV...`);
+      await sendZapiText(phone, `📊 *Planilha pronta!*\n\n👤 ${name}\n📅 ${label}\n📝 ${txs.length} ${txs.length === 1 ? "lançamento" : "lançamentos"}\n\n💾 _Abre direto no Excel ou Google Sheets_\n\n⏳ Enviando arquivo...`);
       await sendZapiDocument(phone, signedUrl, `relatorio-${slug}.csv`, "csv");
       return new Response(JSON.stringify({ ok: true, format, count: txs.length, url: signedUrl }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -332,7 +468,7 @@ serve(async (req) => {
       const bytes = buildPDF(name, label, txs);
       const path = `${userId}/${ts}-relatorio-${slug}.pdf`;
       const signedUrl = await uploadAndSign(path, bytes, "application/pdf");
-      await sendZapiText(phone, `📄 *Relatório PDF pronto, ${name}!*\n\n📅 Período: ${label}\n📝 ${txs.length} lançamentos\n\nEnviando arquivo...`);
+      await sendZapiText(phone, `📄 *Relatório PDF pronto!*\n\n👤 ${name}\n📅 ${label}\n📝 ${txs.length} ${txs.length === 1 ? "lançamento" : "lançamentos"}\n\n✨ _Com gráficos, KPIs e top categorias_\n\n⏳ Enviando arquivo...`);
       await sendZapiDocument(phone, signedUrl, `relatorio-${slug}.pdf`, "pdf");
       return new Response(JSON.stringify({ ok: true, format, count: txs.length, url: signedUrl }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
