@@ -50,12 +50,16 @@ const AdminNotificationsPage = lazy(() => import("@/pages/admin/AdminNotificatio
 const AdminSettingsPage = lazy(() => import("@/pages/admin/AdminSettingsPage"));
 
 function PageSkeleton() {
-  return <LogoLoader />;
+  return <LogoLoader fullScreen />;
+}
+
+function RouteSkeleton() {
+  return <InnerPageSkeleton delay={120} />;
 }
 
 function TransactionsRouter() {
   const { config, loading } = useProfile();
-  if (loading) return <PageSkeleton />;
+  if (loading) return <RouteSkeleton />;
   const profileType = config?.profile_type || 'personal';
   if (profileType === 'business') return <Navigate to="/app/transactions/business" replace />;
   return <Navigate to="/app/transactions/personal" replace />;

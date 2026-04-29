@@ -16,6 +16,9 @@ const SplashScreen = forwardRef<HTMLDivElement>(function SplashScreen(_, ref) {
       role="status"
       aria-live="polite"
       style={{
+        width: '100%',
+        minHeight: '100dvh',
+        padding: 'calc(env(safe-area-inset-top, 0px) + 24px) 24px calc(env(safe-area-inset-bottom, 0px) + 24px)',
         background:
           'radial-gradient(ellipse at 50% 24%, hsl(var(--primary) / 0.13), transparent 42%), linear-gradient(180deg, var(--color-bg-elevated, hsl(var(--background))) 0%, var(--color-bg-base, hsl(var(--background))) 56%, var(--color-bg-sunken, hsl(var(--secondary))) 100%)',
         transform: 'translateZ(0)',
@@ -56,30 +59,30 @@ const SplashScreen = forwardRef<HTMLDivElement>(function SplashScreen(_, ref) {
             transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
           />
 
-        <motion.div
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.32, ease: 'easeOut' }}
-          className="relative flex items-center justify-center overflow-hidden"
-          style={{
-            width: 84,
-            height: 84,
-            borderRadius: 24,
-            background: 'linear-gradient(135deg, var(--color-green-500), var(--color-green-700))',
-            boxShadow: '0 20px 54px hsl(var(--primary) / 0.28), 0 0 0 1px hsl(var(--primary-foreground) / 0.16), inset 0 1px 0 hsl(var(--primary-foreground) / 0.22)',
-          }}
-        >
-          <img
-            src={koraIcon}
-            alt=""
-            draggable={false}
-            decoding="sync"
-            loading="eager"
-            width={84}
-            height={84}
-            style={{ width: 84, height: 84, objectFit: 'cover' }}
-          />
-        </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.32, ease: 'easeOut' }}
+            className="relative flex items-center justify-center overflow-hidden"
+            style={{
+              width: 84,
+              height: 84,
+              borderRadius: 24,
+              background: 'linear-gradient(135deg, var(--color-green-500), var(--color-green-700))',
+              boxShadow: '0 20px 54px hsl(var(--primary) / 0.28), 0 0 0 1px hsl(var(--primary-foreground) / 0.16), inset 0 1px 0 hsl(var(--primary-foreground) / 0.22)',
+            }}
+          >
+            <img
+              src={koraIcon}
+              alt=""
+              draggable={false}
+              decoding="sync"
+              loading="eager"
+              width={84}
+              height={84}
+              style={{ width: 84, height: 84, objectFit: 'cover' }}
+            />
+          </motion.div>
         </div>
 
         <div className="flex items-center" style={{ gap: 4 }}>

@@ -14,7 +14,7 @@ const LogoLoader = forwardRef<HTMLDivElement, LogoLoaderProps>(function LogoLoad
   const reduceMotion = useReducedMotion();
   const containerClass = fullScreen
     ? 'fixed inset-0 z-[9998] flex flex-col items-center justify-center'
-    : 'absolute inset-0 w-full h-full min-h-screen flex flex-col items-center justify-center';
+    : 'absolute inset-0 z-10 w-full h-full flex flex-col items-center justify-center';
   const deviceMemory = typeof navigator !== 'undefined'
     ? Number((navigator as Navigator & { deviceMemory?: number }).deviceMemory || 8)
     : 8;
@@ -23,10 +23,13 @@ const LogoLoader = forwardRef<HTMLDivElement, LogoLoaderProps>(function LogoLoad
   return (
     <div
       ref={ref}
-      className={`${containerClass} relative overflow-hidden isolate`}
+      className={`${containerClass} overflow-hidden isolate`}
       role="status"
       aria-live="polite"
       style={{
+        width: '100%',
+        minHeight: fullScreen ? '100dvh' : '100%',
+        padding: 'calc(env(safe-area-inset-top, 0px) + 24px) 24px calc(env(safe-area-inset-bottom, 0px) + 24px)',
         background:
           'radial-gradient(ellipse at 50% 24%, hsl(var(--primary) / 0.12), transparent 42%), linear-gradient(180deg, var(--color-bg-elevated) 0%, var(--color-bg-base) 54%, var(--color-bg-sunken) 100%)',
         gap: 22,
@@ -48,15 +51,15 @@ const LogoLoader = forwardRef<HTMLDivElement, LogoLoaderProps>(function LogoLoad
       )}
 
       <div className="relative flex flex-col items-center" style={{ gap: 22 }}>
-        <div className="relative flex items-center justify-center" style={{ width: 124, height: 124 }}>
+        <div className="relative flex items-center justify-center" style={{ width: 112, height: 112 }}>
           <motion.span
             aria-hidden
             className="absolute"
             style={{
-              inset: 12,
-              borderRadius: '32px',
+              inset: 10,
+              borderRadius: '30px',
               border: '1px solid hsl(var(--primary) / 0.20)',
-              boxShadow: '0 0 0 10px hsl(var(--primary) / 0.045), 0 24px 70px hsl(var(--primary) / 0.20)',
+              boxShadow: '0 0 0 8px hsl(var(--primary) / 0.045), 0 20px 56px hsl(var(--primary) / 0.20)',
               willChange: performanceMode ? undefined : 'transform, opacity',
             }}
             animate={performanceMode ? undefined : { scale: [0.98, 1.06, 0.98], opacity: [0.85, 1, 0.85] }}
@@ -79,7 +82,7 @@ const LogoLoader = forwardRef<HTMLDivElement, LogoLoaderProps>(function LogoLoad
             style={{
               width: 88,
               height: 88,
-              borderRadius: 24,
+              borderRadius: 26,
               background:
                 'linear-gradient(135deg, var(--color-green-500) 0%, var(--color-green-600) 55%, var(--color-green-700) 100%)',
               boxShadow:
@@ -119,7 +122,7 @@ const LogoLoader = forwardRef<HTMLDivElement, LogoLoaderProps>(function LogoLoad
         >
           <span
             style={{
-              fontSize: 26,
+              fontSize: 25,
               fontWeight: 900,
               letterSpacing: 0,
               color: 'var(--color-text-strong)',
@@ -129,7 +132,7 @@ const LogoLoader = forwardRef<HTMLDivElement, LogoLoaderProps>(function LogoLoad
           </span>
           <span
             style={{
-              fontSize: 26,
+              fontSize: 25,
               fontWeight: 900,
               letterSpacing: 0,
               background: 'linear-gradient(90deg, var(--color-green-500), var(--color-green-300))',
@@ -162,7 +165,7 @@ const LogoLoader = forwardRef<HTMLDivElement, LogoLoaderProps>(function LogoLoad
         <div
           className="relative overflow-hidden"
           style={{
-            width: 168,
+            width: 156,
             height: 3,
             borderRadius: 999,
             background: 'var(--color-border-weak)',
