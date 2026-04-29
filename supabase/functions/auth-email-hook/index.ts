@@ -36,9 +36,9 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 
 // Configuration
 const SITE_NAME = "Kora Finance"
-const SENDER_DOMAIN = "notify.korafinance.app"
+const SENDER_DOMAIN = "korafinance.app"
 const ROOT_DOMAIN = "korafinance.app"
-const FROM_DOMAIN = "notify.korafinance.app"
+const FROM_DOMAIN = "korafinance.app"
 
 // Sample data for preview mode ONLY (not used in actual email sending).
 // URLs are baked in at scaffold time from the project's real data.
