@@ -463,12 +463,12 @@ export default function LoginPage() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row" style={{ background: '#0F0820' }}>
+    <div className="auth-screen min-h-screen flex flex-col lg:flex-row" style={{ background: '#0F0820' }}>
       {/* Desktop left panel */}
       <DesktopLeftPanel />
 
       {/* Mobile hero */}
-      <div className="lg:hidden">
+      <div className="lg:hidden auth-hero">
         <DarkHeroSection variant="login" />
       </div>
 
@@ -477,7 +477,7 @@ export default function LoginPage() {
         initial={{ y: 60, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', damping: 28, stiffness: 280, delay: 0.2 }}
-        className="relative z-10 lg:flex-1 lg:flex lg:items-center lg:justify-center"
+        className="auth-form-card relative z-10 lg:flex-1 lg:flex lg:items-center lg:justify-center"
         style={{
           background: 'white',
           borderRadius: '28px 28px 0 0',

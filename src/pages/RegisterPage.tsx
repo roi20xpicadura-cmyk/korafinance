@@ -376,7 +376,7 @@ export default function RegisterPage() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row" style={{ background: '#0F0820' }}>
+    <div className="auth-screen min-h-screen flex flex-col lg:flex-row" style={{ background: '#0F0820' }}>
       {/* Desktop left panel */}
       <div className="hidden lg:flex w-[55%] flex-col justify-between relative overflow-hidden" style={{ background: '#0F0820', padding: '48px 48px 40px' }}>
         <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 70% at 40% 50%, rgba(124, 58, 237,0.30) 0%, rgba(124, 58, 237,0.08) 50%, transparent 80%)' }} />
@@ -405,7 +405,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Mobile hero */}
-      <div className="lg:hidden relative overflow-hidden" style={{ minHeight: '38vh', background: '#0F0820' }}>
+      <div className="lg:hidden auth-hero relative overflow-hidden" style={{ minHeight: '38vh', background: '#0F0820' }}>
         <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 70% at 40% 50%, rgba(124, 58, 237,0.30) 0%, rgba(124, 58, 237,0.08) 50%, transparent 80%)' }} />
         <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
         <div className="absolute" style={{ width: 180, height: 180, borderRadius: '50%', background: 'rgba(124, 58, 237,0.18)', filter: 'blur(50px)', top: -40, right: -40 }} />
@@ -440,7 +440,7 @@ export default function RegisterPage() {
         initial={{ y: 60, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', damping: 28, stiffness: 280, delay: 0.2 }}
-        className="relative z-10 lg:flex-1 lg:flex lg:items-center lg:justify-center"
+        className="auth-form-card relative z-10 lg:flex-1 lg:flex lg:items-center lg:justify-center"
         style={{
           background: 'white', borderRadius: '28px 28px 0 0',
           marginTop: -24, padding: '28px 24px 40px',
