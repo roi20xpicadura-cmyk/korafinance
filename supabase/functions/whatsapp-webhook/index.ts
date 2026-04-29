@@ -772,14 +772,11 @@ Se não encontrar nenhuma transação:
       });
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const callExtraction = (model: string) => fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: chosenModel,
+        model,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userContent },
@@ -787,44 +784,25 @@ Se não encontrar nenhuma transação:
       }),
     });
 
+    let response = await callExtraction(chosenModel);
+
+    // Fallback automático: se o modelo Pro falhar (rate limit/5xx), tenta Flash
+    if (!response.ok && chosenModel === "google/gemini-2.5-pro" && (response.status === 429 || response.status >= 500)) {
+      console.log("[ATTACHMENT] Pro falhou, fallback → Flash");
+      response = await callExtraction("google/gemini-2.5-flash");
+      chosenModel = "google/gemini-2.5-flash";
+    }
+
     if (!response.ok) {
       const errBody = await response.text();
       console.error(`[ATTACHMENT] Gemini error (${chosenModel}):`, response.status, errBody.slice(0, 500));
-      // Fallback: se Pro falhar (rate limit/erro), tenta Flash automaticamente
-      if ((response.status === 429 || response.status >= 500) && chosenModel === "google/gemini-2.5-pro") {
-        console.log("[ATTACHMENT] tentando fallback para Flash...");
-        const fb = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
-            messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userContent }],
-          }),
-        });
-        if (fb.ok) {
-          const fbData = await fb.json();
-          const fbRaw = fbData.choices?.[0]?.message?.content || "{}";
-          const fbMatch = fbRaw.match(/\{[\s\S]*\}/);
-          const fbParsed = JSON.parse(fbMatch ? fbMatch[0] : "{}");
-          if (fbParsed.found && Array.isArray(fbParsed.transactions) && fbParsed.transactions.length > 0) {
-            console.log("[ATTACHMENT] fallback Flash OK");
-            // reaproveita o pipeline normal abaixo, simulando 'data'
-            (response as any).__fallbackData = fbParsed;
-          }
-        }
-      }
       if (response.status === 429) {
         return { transactions: [], reply: `IA sobrecarregada agora, ${userName} 😅 Manda de novo em 1 minutinho!`, importDirect: false };
       }
       if (response.status === 402) {
         return { transactions: [], reply: `Limite de IA atingido. Avisa o admin pra recarregar créditos, ${userName}!`, importDirect: false };
       }
-      const fbData = (response as any).__fallbackData;
-      if (!fbData) {
-        return { transactions: [], reply: `Não consegui ler esse arquivo, ${userName}. Tenta de novo ou descreve em texto 📄`, importDirect: false };
-      }
-      // Se temos dados do fallback, segue o fluxo usando-os
-      var parsedFallback: any = fbData;
+      return { transactions: [], reply: `Não consegui ler esse arquivo, ${userName}. Tenta de novo ou descreve em texto 📄`, importDirect: false };
     }
 
     const data = await response.json();
