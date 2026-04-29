@@ -122,7 +122,7 @@ const LogoLoader = forwardRef<HTMLDivElement, LogoLoaderProps>(function LogoLoad
         >
           <span
             style={{
-              fontSize: 26,
+              fontSize: 25,
               fontWeight: 900,
               letterSpacing: 0,
               color: 'var(--color-text-strong)',
@@ -132,7 +132,7 @@ const LogoLoader = forwardRef<HTMLDivElement, LogoLoaderProps>(function LogoLoad
           </span>
           <span
             style={{
-              fontSize: 26,
+              fontSize: 25,
               fontWeight: 900,
               letterSpacing: 0,
               background: 'linear-gradient(90deg, var(--color-green-500), var(--color-green-300))',
@@ -165,7 +165,7 @@ const LogoLoader = forwardRef<HTMLDivElement, LogoLoaderProps>(function LogoLoad
         <div
           className="relative overflow-hidden"
           style={{
-            width: 168,
+            width: 156,
             height: 3,
             borderRadius: 999,
             background: 'var(--color-border-weak)',
